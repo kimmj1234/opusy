@@ -130,6 +130,26 @@
         <button class="login-btn" type="submit" data-i18n="setPw"></button>
       </form>
 
+      <!-- 등록되지 않은 기기에서 로그인했을 때 -->
+      <div class="notice" data-view="newdev" hidden>
+        <p class="notice-body" data-i18n="newdevBody"></p>
+        <p class="msg side-msg" role="alert" id="newdevMsg"></p>
+        <button class="login-btn" type="button" id="nd-send" data-i18n="newdevSend"></button>
+        <button class="text-btn" type="button" id="nd-retry" data-i18n="newdevRetry"></button>
+      </div>
+
+      <!-- 이메일 확인 뒤: 지금 쓰는 기기를 새로 등록 -->
+      <div class="notice" data-view="adddev" hidden>
+        <div class="device">
+          <svg class="device-ico" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
+          <p class="device-title" id="addTitle"></p>
+          <p class="device-desc" id="addDesc"></p>
+          <p class="device-note" data-i18n="devNote"></p>
+        </div>
+        <p class="msg side-msg" role="alert" id="adddevMsg"></p>
+        <button class="login-btn" type="button" id="ad-register" data-i18n="addBtn"></button>
+      </div>
+
       <div class="notice" data-view="notice" hidden>
         <p class="notice-body" id="noticeBody"></p>
         <a class="login-btn as-link" href="#login" data-go="login" data-i18n="toLogin"></a>

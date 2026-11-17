@@ -256,3 +256,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid #3B3FF0; outline-offs
 #form-find .msg[hidden] { display: none !important; }
 .found { min-height: 42px; font-size: 15px; font-weight: 600; line-height: 1.4; color: #14151F; }
 .found b { font-size: 18px; font-weight: 800; letter-spacing: 0.04em; }
+
+/* ===== 등록되지 않은 기기 / 새 기기 등록 ===== */
+.notice .side-msg, .notice .side-msg:empty { display: block; min-height: 42px; margin: -12px 0; text-align: center; }
+.text-btn { margin-top: -8px; height: 40px; border: 0; background: none; color: #55565f; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: color 0.3s ease; }
+.text-btn:hover { color: #14151F; }
+.notice .device { padding-top: 0; }

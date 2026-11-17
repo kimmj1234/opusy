@@ -25,6 +25,9 @@
         login: ['다시 오신 걸 환영해요!', '정보를 입력해 주세요'],
         signup: ['회원가입', '계정을 만들고 시작해 보세요'],
         notice: ['인증 메일을 보냈어요', ''],
+        newdev: ['등록되지 않은 기기예요', '이메일 확인 후 이 기기를 등록할 수 있어요'],
+        adddev: ['이 기기를 등록해 주세요', '이메일 확인이 끝났어요'],
+        deviceMail: ['확인 메일을 보냈어요', ''],
         find: ['아이디 또는 비밀번호 찾기', '가입할 때 쓴 정보를 입력해 주세요'],
         reset: ['새 비밀번호 설정', '앞으로 쓸 비밀번호를 입력해 주세요'],
         resetSent: ['재설정 메일을 보냈어요', ''],
@@ -52,6 +55,9 @@
       notice: '메일함에서 인증 링크를 눌러 가입을 마무리해 주세요. 메일이 안 보이면 스팸함도 확인해 보세요.',
       noticeResetSent: '가입된 이메일이라면 비밀번호를 다시 정할 수 있는 링크를 보냈어요. 메일이 안 보이면 스팸함도 확인해 보세요.',
       noticePwChanged: '새 비밀번호로 로그인해 주세요.',
+      noticeDeviceMail: '메일의 링크를 지금 쓰는 이 기기에서 열어 주세요. 열면 기기 등록으로 이어져요. 메일이 안 보이면 스팸함도 확인해 보세요.',
+      newdevBody: '이 계정은 등록한 기기에서만 로그인할 수 있어요. 기기를 바꿨거나 잃어버렸다면, 가입한 이메일로 확인한 뒤 지금 쓰는 기기를 새로 등록해 주세요.',
+      newdevSend: '확인 메일 받기', newdevRetry: '등록한 기기로 다시 시도', addBtn: '이 기기 등록하기', deviceWait: '기기에서 확인해 주세요…',
       tabId: '아이디 찾기', tabPw: '비밀번호 찾기', findId: '아이디 찾기', sendReset: '재설정 메일 받기', setPw: '비밀번호 변경', newPw: '새 비밀번호', backLogin: '로그인으로 돌아가기',
       foundId: '가입하신 아이디는 {0} 이에요.',
       err: {
@@ -64,6 +70,8 @@
         birth: '생년월일을 YYYY-MM-DD 형식으로 정확히 입력해 주세요.',
         phone: '전화번호를 정확히 입력해 주세요.',
         idEmpty: '아이디를 입력해 주세요.',
+        expiredLink: '확인 링크가 만료됐거나 이미 사용됐어요. 다시 로그인해서 확인 메일을 받아 주세요.',
+        devLimit: '등록할 수 있는 기기 수를 넘었어요.',
         notFound: '입력한 이름과 이메일로 가입된 계정을 찾지 못했어요.',
         samePw: '이전 비밀번호와 다른 비밀번호를 써 주세요.',
         expired: '링크가 만료됐거나 이미 사용됐어요. 재설정 메일을 다시 받아 주세요.',
@@ -97,6 +105,9 @@
         login: ['Welcome back!', 'Please enter your details'],
         signup: ['Sign up', 'Create an account to get started'],
         notice: ['Verification email sent', ''],
+        newdev: ['This device is not registered', 'Confirm by email to register it'],
+        adddev: ['Register this device', 'Your email is confirmed'],
+        deviceMail: ['Confirmation email sent', ''],
         find: ['Find ID or password', 'Enter the details you signed up with'],
         reset: ['Set a new password', 'Enter the password you will use'],
         resetSent: ['Reset email sent', ''],
@@ -124,6 +135,9 @@
       notice: 'Click the verification link in your inbox to finish signing up. If you do not see it, check your spam folder.',
       noticeResetSent: 'If that email is registered, we sent a link to set a new password. Check your spam folder too.',
       noticePwChanged: 'Please log in with your new password.',
+      noticeDeviceMail: 'Open the link in the email on this device. It continues to device registration. Check your spam folder too.',
+      newdevBody: 'This account can only log in from a registered device. If you changed or lost your device, confirm by email and register the device you are using now.',
+      newdevSend: 'Send confirmation email', newdevRetry: 'Try again with a registered device', addBtn: 'Register this device', deviceWait: 'Confirm on your device…',
       tabId: 'Find ID', tabPw: 'Reset password', findId: 'Find ID', sendReset: 'Send reset email', setPw: 'Change password', newPw: 'New password', backLogin: 'Back to log in',
       foundId: 'Your ID is {0}.',
       err: {
@@ -136,6 +150,8 @@
         birth: 'Enter a valid date of birth as YYYY-MM-DD.',
         phone: 'Enter a valid phone number.',
         idEmpty: 'Please enter an ID.',
+        expiredLink: 'The confirmation link has expired or was already used. Log in again to get a new email.',
+        devLimit: 'You have reached the device limit.',
         notFound: 'No account matches that name and email.',
         samePw: 'Use a password different from your previous one.',
         expired: 'This link has expired or was already used. Request a new reset email.',
@@ -243,7 +259,10 @@
     $('#cardTitle').textContent = title;
     $('#cardSub').textContent = sub;
     $('#cardSub').hidden = !sub;
-    $('#noticeBody').textContent = T(noticeKind === 'resetSent' ? 'noticeResetSent' : noticeKind === 'pwChanged' ? 'noticePwChanged' : 'notice');
+    $('#noticeBody').textContent = T(noticeKind === 'resetSent' ? 'noticeResetSent' : noticeKind === 'pwChanged' ? 'noticePwChanged' : noticeKind === 'deviceMail' ? 'noticeDeviceMail' : 'notice');
+    $('#addTitle').textContent = T('dev.title.' + DEVICE.kind);
+    $('#addDesc').textContent = T('dev.desc.' + DEVICE.platform);
+    $$('.side-msg').forEach((m) => { m.textContent = m.dataset.err ? T('err.' + m.dataset.err) : ''; });
     $('#fd-submit').textContent = T(findMode === 'id' ? 'findId' : 'sendReset');
     if (foundId) $('#fd-result').innerHTML = T('foundId').replace('{0}', '<b>' + foundId.replace(/[<&>]/g, '') + '</b>');
     $$('form').forEach((f) => { const k = errOf.get(f); if (k) $('.msg', f).textContent = errText(k, errArgs.get(f)); });
@@ -290,11 +309,12 @@
   function showView(name, opts) {
     view = name;
     $$('[data-view]').forEach((el) => { el.hidden = el.dataset.view !== name; });
-    const foot = name === 'reset' ? 'find' : name;
+    const foot = ['reset', 'newdev', 'adddev'].includes(name) ? 'find' : name;
+    $$('.side-msg').forEach((m) => { delete m.dataset.err; });
     $$('[data-foot]').forEach((el) => { el.hidden = name === 'notice' || el.dataset.foot !== foot; });
     if (name === 'find') setFindMode(findMode, true);
     $$('form').forEach((f) => { setMsg(f, null); $$('[aria-invalid]', f).forEach((i) => i.removeAttribute('aria-invalid')); });
-    if (!opts.keepHash) history.replaceState(null, '', name === 'login' || name === 'notice' || name === 'reset' ? location.pathname : '#' + name);
+    if (!opts.keepHash) history.replaceState(null, '', ['login', 'notice', 'reset', 'newdev', 'adddev'].includes(name) ? location.pathname : '#' + name);
     if (name === 'signup') { showStep(1, true); $('#su-id-lang').hidden = true; }
     apply();
     const first = $('[data-view="' + name + '"] input:not([type="checkbox"])');
@@ -361,6 +381,126 @@
     }
   });
 
+  // ===== 기기 확인 / 새 기기 등록에 쓰는 도구 =====
+  const B64 = {
+    enc: (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+    dec: (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (ch) => ch.charCodeAt(0)),
+  };
+  const fn = (name, payload, bearer) => fetch(`${CFG.url}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: CFG.key, ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}) },
+    body: JSON.stringify(payload),
+  });
+  let pending = null;                    // 비밀번호까지 확인된 로그인 정보 (기기 확인이나 확인 메일 요청에 다시 씀)
+
+  // 등록한 기기로 확인하고 로그인. 성공하면 토큰, 아니면 { error }
+  async function deviceLogin(id, pw, d) {
+    if (!window.PublicKeyCredential || !navigator.credentials || !window.isSecureContext) return { error: 'nodevice' };
+    let as;
+    try {
+      as = await navigator.credentials.get({
+        publicKey: {
+          challenge: B64.dec(d.challenge),
+          rpId: location.hostname,
+          allowCredentials: d.credentials.map((c) => ({ type: 'public-key', id: B64.dec(c) })),
+          userVerification: 'required',
+          timeout: 120000,
+        },
+      });
+    } catch (err) {
+      return { error: 'nodevice' };        // 이 기기에 등록 정보가 없거나, 확인을 취소함
+    }
+    const r = as.response;
+    const res = await fn('login', {
+      action: 'device', identifier: id, password: pw, token: d.token,
+      assertion: { id: as.id, clientDataJSON: B64.enc(r.clientDataJSON), authenticatorData: B64.enc(r.authenticatorData), signature: B64.enc(r.signature) },
+    });
+    const out = await res.json().catch(() => ({}));
+    if (res.ok && out.access_token) return out;
+    if (out.error === 'device_unknown') return { error: 'nodevice' };
+    if (out.error === 'device_expired') return { error: 'devExpired' };
+    if (out.error === 'device_unverified') return { error: 'devNoLock' };
+    if (out.error === 'invalid_credentials') return { error: 'login' };
+    return { error: 'devFail' };
+  }
+
+  const sideMsg = (el, key) => { if (key) el.dataset.err = key; else delete el.dataset.err; el.textContent = key ? T('err.' + key) : ''; if (key) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); } };
+
+  // 등록되지 않은 기기: 가입 이메일로 확인 메일 요청
+  $('#nd-send').addEventListener('click', async () => {
+    const btn = $('#nd-send'), msg = $('#newdevMsg');
+    if (!pending) { setView('login'); return; }
+    sideMsg(msg, null);
+    btn.disabled = true; btn.textContent = T('loading');
+    try {
+      const res = await fn('login', { action: 'new_device', identifier: pending.id, password: pending.pw, origin: location.origin });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) return sideMsg(msg, out.error === 'rate' ? 'rate' : out.error === 'invalid_credentials' ? 'login' : 'generic');
+      pending = null;
+      $('#form-login').reset();
+      $('#auto-login').checked = autoOn();
+      noticeKind = 'deviceMail';
+      setView('notice', { noFocus: true });
+    } catch (err) {
+      sideMsg(msg, 'network');
+    } finally {
+      btn.disabled = false; btn.textContent = T('newdevSend');
+    }
+  });
+  $('#nd-retry').addEventListener('click', () => setView('login'));
+
+  // 이메일 확인 뒤: 지금 쓰는 기기를 등록
+  $('#ad-register').addEventListener('click', async () => {
+    const btn = $('#ad-register'), msg = $('#adddevMsg');
+    sideMsg(msg, null);
+    if (!window.PublicKeyCredential || !navigator.credentials || !window.isSecureContext) return sideMsg(msg, 'devUnsupported');
+    btn.disabled = true; btn.textContent = T('loading');
+    try {
+      const { data: s } = await sb.auth.getSession();
+      if (!s || !s.session) return sideMsg(msg, 'expiredLink');
+      const user = s.session.user;
+      const { data: prof } = await sb.from('profiles').select('username, name').eq('id', user.id).maybeSingle();
+      const chRes = await fn('signup', { action: 'challenge' });
+      if (!chRes.ok) return sideMsg(msg, 'network');
+      const ch = await chRes.json();
+      let builtIn = false;
+      try { builtIn = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); } catch (err) {}
+      let cred;
+      try {
+        cred = await navigator.credentials.create({
+          publicKey: {
+            challenge: B64.dec(ch.challenge),
+            rp: { name: 'OPUSY', id: location.hostname },
+            user: { id: B64.dec(ch.userHandle), name: (prof && prof.username) || user.email, displayName: (prof && prof.name) || (prof && prof.username) || user.email },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+            authenticatorSelection: { ...(builtIn ? { authenticatorAttachment: 'platform' } : {}), userVerification: 'required', residentKey: 'preferred' },
+            attestation: 'none',
+            timeout: 120000,
+          },
+        });
+      } catch (err) {
+        if (err && err.name === 'NotAllowedError') return sideMsg(msg, builtIn ? 'devCancel' : 'devNoLock');
+        if (err && (err.name === 'NotSupportedError' || err.name === 'SecurityError')) return sideMsg(msg, 'devUnsupported');
+        return sideMsg(msg, 'devFail');
+      }
+      const r = cred && cred.response;
+      if (!r || !r.getPublicKey || !r.getAuthenticatorData || !r.getPublicKey()) return sideMsg(msg, 'devUnsupported');
+      const res = await fn('device', {
+        action: 'add', device_kind: DEVICE.kind, platform: DEVICE.platform, token: ch.token,
+        device: { id: cred.id, clientDataJSON: B64.enc(r.clientDataJSON), authenticatorData: B64.enc(r.getAuthenticatorData()), publicKey: B64.enc(r.getPublicKey()), alg: r.getPublicKeyAlgorithm() },
+      }, s.session.access_token);
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return sideMsg(msg, out.error === 'unauthorized' ? 'expiredLink' : out.error === 'device_expired' ? 'devExpired' : out.error === 'device_unverified' ? 'devNoLock' : out.error === 'device_limit' ? 'devLimit' : 'devFail');
+      }
+      location.href = 'index.html';            // 등록 완료: 이미 로그인된 상태
+    } catch (err) {
+      sideMsg(msg, 'network');
+    } finally {
+      btn.disabled = false; btn.textContent = T('addBtn');
+    }
+  });
+
   // ===== 로그인: 서버 함수가 아이디→이메일을 찾아 로그인시킴 =====
   $('#form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -379,7 +519,18 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) return fail(f, data.error === 'email_not_confirmed' ? 'unconfirmed' : 'login');
       try { localStorage.setItem(AUTO_KEY, $('#auto-login').checked ? '1' : '0'); } catch (err) {}   // 자동 로그인 선택 저장
-      const { error } = await sb.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
+      let tokens = data;
+      if (data.step === 'device') {
+        // 비밀번호는 맞음 → 등록한 기기인지 확인 (지문·얼굴·PIN·기기 비밀번호)
+        pending = { id, pw };
+        $('.login-btn', f).textContent = T('deviceWait');
+        const out = await deviceLogin(id, pw, data);
+        if (out.error === 'nodevice') { setView('newdev', { noFocus: true }); return; }
+        if (out.error) return fail(f, out.error);
+        tokens = out;
+        pending = null;
+      }
+      const { error } = await sb.auth.setSession({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
       if (error) return fail(f, 'generic');
       location.href = 'index.html';
     } catch (err) {
@@ -736,12 +887,19 @@
   const hash0 = location.hash;
   const isRecovery = /type=recovery/.test(hash0);
   const linkError = /error_code|error_description/.test(hash0);
+  const addMode = new URLSearchParams(location.search).get('add') === '1';   // 새 기기 등록 확인 메일의 링크
   sb.auth.onAuthStateChange((event) => {
     if (event === 'PASSWORD_RECOVERY') setView('reset', { instant: true });
-    else if (event === 'SIGNED_IN' && !isRecovery && /access_token|type=signup/.test(hash0)) location.href = 'index.html';
+    else if (event === 'SIGNED_IN' && !isRecovery && !addMode && /access_token|type=signup/.test(hash0)) location.href = 'index.html';
   });
 
-  if (linkError) {
+  if (addMode && linkError) {
+    history.replaceState(null, '', location.pathname);
+    setView('login', { keepHash: true, instant: true, noFocus: true });
+    setMsg($('#form-login'), 'expiredLink');
+  } else if (addMode) {
+    setView('adddev', { keepHash: true, instant: true, noFocus: true });
+  } else if (linkError) {
     findMode = 'pw';
     setView('find', { instant: true, noFocus: true });
     setMsg($('#form-find'), 'expired');
