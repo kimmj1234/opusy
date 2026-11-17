@@ -105,13 +105,39 @@
         </div>
       </form>
 
+      <!-- 아이디 / 비밀번호 찾기 -->
+      <form id="form-find" data-view="find" novalidate hidden>
+        <div class="seg" role="tablist">
+          <button type="button" class="seg-btn is-on" role="tab" data-mode="id" data-i18n="tabId"></button>
+          <button type="button" class="seg-btn" role="tab" data-mode="pw" data-i18n="tabPw"></button>
+        </div>
+        <div class="line-field"><input id="fd-email" name="email" type="email" autocomplete="email" data-ph="email" required></div>
+        <div class="line-field" id="fd-name-row"><input id="fd-name" name="name" type="text" autocomplete="name" maxlength="30" data-ph="name" required></div>
+        <p class="msg" role="alert"></p>
+        <p class="found" id="fd-result" hidden></p>
+        <button class="login-btn" type="submit" id="fd-submit"></button>
+      </form>
+
+      <!-- 새 비밀번호 설정 (재설정 메일의 링크로 들어왔을 때) -->
+      <form id="form-reset" data-view="reset" novalidate hidden>
+        <div class="line-field">
+          <input id="rs-pw" name="password" type="password" autocomplete="new-password" data-ph="newPw" required>
+          <button type="button" class="eye" data-eye="rs-pw"></button>
+        </div>
+        <p class="hint" data-i18n="pwHint"></p>
+        <div class="line-field"><input id="rs-pw2" name="password2" type="password" autocomplete="new-password" data-ph="suPw2" required></div>
+        <p class="msg" role="alert"></p>
+        <button class="login-btn" type="submit" data-i18n="setPw"></button>
+      </form>
+
       <div class="notice" data-view="notice" hidden>
         <p class="notice-body" id="noticeBody"></p>
         <a class="login-btn as-link" href="#login" data-go="login" data-i18n="toLogin"></a>
       </div>
 
+      <p class="card-foot" data-foot="find" hidden><a href="#login" data-go="login" data-i18n="backLogin"></a></p>
       <div class="card-foot" data-foot="login">
-        <p class="forgot"><a href="#find-pw" data-go="find-pw" data-i18n="forgot"></a></p>
+        <p class="forgot"><a href="#find" data-go="find" data-i18n="forgot"></a></p>
         <p><span data-i18n="noAcc"></span> <a href="#signup" data-go="signup" data-i18n="signup"></a></p>
       </div>
       <p class="card-foot" data-foot="signup" hidden><span data-i18n="haveAcc"></span> <a href="#login" data-go="login" data-i18n="login"></a></p>

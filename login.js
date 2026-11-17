@@ -25,6 +25,10 @@
         login: ['다시 오신 걸 환영해요!', '정보를 입력해 주세요'],
         signup: ['회원가입', '계정을 만들고 시작해 보세요'],
         notice: ['인증 메일을 보냈어요', ''],
+        find: ['아이디 또는 비밀번호 찾기', '가입할 때 쓴 정보를 입력해 주세요'],
+        reset: ['새 비밀번호 설정', '앞으로 쓸 비밀번호를 입력해 주세요'],
+        resetSent: ['재설정 메일을 보냈어요', ''],
+        pwChanged: ['비밀번호를 바꿨어요', ''],
       },
       idOrEmail: '아이디 또는 이메일', password: '비밀번호', forgot: '아이디 또는 비밀번호 찾기', noAcc: '계정이 없으신가요?', haveAcc: '이미 계정이 있으신가요?',
       name: '이름', suId: '아이디', email: '이메일', suPw: '비밀번호', suPw2: '비밀번호 확인',
@@ -46,6 +50,10 @@
       stepSub: ['사용할 아이디를 정해 주세요', '이메일을 입력해 주세요', '비밀번호를 만들어 주세요', '내 정보를 알려 주세요', '마지막으로 이 기기를 등록해요'],
       h: { id: '영문 소문자, 숫자, 밑줄(_) 4~20자', idOk: '사용할 수 있는 아이디예요.', idTaken: '이미 사용 중인 아이디예요.' },
       notice: '메일함에서 인증 링크를 눌러 가입을 마무리해 주세요. 메일이 안 보이면 스팸함도 확인해 보세요.',
+      noticeResetSent: '가입된 이메일이라면 비밀번호를 다시 정할 수 있는 링크를 보냈어요. 메일이 안 보이면 스팸함도 확인해 보세요.',
+      noticePwChanged: '새 비밀번호로 로그인해 주세요.',
+      tabId: '아이디 찾기', tabPw: '비밀번호 찾기', findId: '아이디 찾기', sendReset: '재설정 메일 받기', setPw: '비밀번호 변경', newPw: '새 비밀번호', backLogin: '로그인으로 돌아가기',
+      foundId: '가입하신 아이디는 {0} 이에요.',
       err: {
         required: '아이디와 비밀번호를 입력해 주세요.',
         login: '아이디(또는 이메일)나 비밀번호가 올바르지 않아요.',
@@ -56,6 +64,9 @@
         birth: '생년월일을 YYYY-MM-DD 형식으로 정확히 입력해 주세요.',
         phone: '전화번호를 정확히 입력해 주세요.',
         idEmpty: '아이디를 입력해 주세요.',
+        notFound: '입력한 이름과 이메일로 가입된 계정을 찾지 못했어요.',
+        samePw: '이전 비밀번호와 다른 비밀번호를 써 주세요.',
+        expired: '링크가 만료됐거나 이미 사용됐어요. 재설정 메일을 다시 받아 주세요.',
         devUnsupported: '이 브라우저에서는 장치 등록을 쓸 수 없어요. 최신 Chrome, Safari, Edge로 다시 시도해 주세요.',
         devCancel: '장치 등록이 취소됐어요. 버튼을 다시 눌러 등록해 주세요.',
         devFail: '장치를 등록하지 못했어요. 다시 시도해 주세요.',
@@ -86,6 +97,10 @@
         login: ['Welcome back!', 'Please enter your details'],
         signup: ['Sign up', 'Create an account to get started'],
         notice: ['Verification email sent', ''],
+        find: ['Find ID or password', 'Enter the details you signed up with'],
+        reset: ['Set a new password', 'Enter the password you will use'],
+        resetSent: ['Reset email sent', ''],
+        pwChanged: ['Password changed', ''],
       },
       idOrEmail: 'ID or email', password: 'Password', forgot: 'Forgot ID or password?', noAcc: "Don't have an account?", haveAcc: 'Already have an account?',
       name: 'Name', suId: 'ID', email: 'Email', suPw: 'Password', suPw2: 'Confirm password',
@@ -107,6 +122,10 @@
       stepSub: ['Choose your ID', 'Enter your email', 'Create a password', 'Tell us about you', 'Last, register this device'],
       h: { id: 'a-z, 0-9, underscore (_), 4-20 characters', idOk: 'This ID is available.', idTaken: 'This ID is already taken.' },
       notice: 'Click the verification link in your inbox to finish signing up. If you do not see it, check your spam folder.',
+      noticeResetSent: 'If that email is registered, we sent a link to set a new password. Check your spam folder too.',
+      noticePwChanged: 'Please log in with your new password.',
+      tabId: 'Find ID', tabPw: 'Reset password', findId: 'Find ID', sendReset: 'Send reset email', setPw: 'Change password', newPw: 'New password', backLogin: 'Back to log in',
+      foundId: 'Your ID is {0}.',
       err: {
         required: 'Please enter your ID and password.',
         login: 'Your ID (or email) or password is incorrect.',
@@ -117,6 +136,9 @@
         birth: 'Enter a valid date of birth as YYYY-MM-DD.',
         phone: 'Enter a valid phone number.',
         idEmpty: 'Please enter an ID.',
+        notFound: 'No account matches that name and email.',
+        samePw: 'Use a password different from your previous one.',
+        expired: 'This link has expired or was already used. Request a new reset email.',
         devUnsupported: 'Device registration is not available in this browser. Try the latest Chrome, Safari or Edge.',
         devCancel: 'Device registration was cancelled. Press the button to try again.',
         devFail: 'Could not register this device. Please try again.',
@@ -216,12 +238,14 @@
     $$('[data-ph]').forEach((el) => { el.placeholder = T(el.dataset.ph); el.setAttribute('aria-label', T(el.dataset.ph)); });
     $$('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
     $$('[data-eye]').forEach((b) => { b.textContent = T($('#' + b.dataset.eye).type === 'text' ? 'hide' : 'show'); });
-    let [title, sub] = T('head.' + view);
+    let [title, sub] = T('head.' + (view === 'notice' ? noticeKind : view));
     if (view === 'signup') sub = T('stepSub')[step - 1];
     $('#cardTitle').textContent = title;
     $('#cardSub').textContent = sub;
     $('#cardSub').hidden = !sub;
-    $('#noticeBody').textContent = T('notice');
+    $('#noticeBody').textContent = T(noticeKind === 'resetSent' ? 'noticeResetSent' : noticeKind === 'pwChanged' ? 'noticePwChanged' : 'notice');
+    $('#fd-submit').textContent = T(findMode === 'id' ? 'findId' : 'sendReset');
+    if (foundId) $('#fd-result').innerHTML = T('foundId').replace('{0}', '<b>' + foundId.replace(/[<&>]/g, '') + '</b>');
     $$('form').forEach((f) => { const k = errOf.get(f); if (k) $('.msg', f).textContent = errText(k, errArgs.get(f)); });
     refreshIdHint();
     $('#su-next').textContent = T(step === LAST ? 'devBtn' : 'next');
@@ -231,6 +255,9 @@
 
   // ===== 화면 전환 (부드러운 슬라이드 + 페이드) =====
   let step = 1;
+  let noticeKind = 'notice';             // 안내 화면 종류: notice(가입 인증) | resetSent | pwChanged
+  let findMode = 'id';                   // 찾기 화면: id | pw
+  let foundId = '';
   const LAST = 5;                         // 마지막 단계: 장치 등록
   // 지금 쓰는 기기: PC 인지 휴대폰인지에 따라 등록 안내가 달라짐
   const DEVICE = (() => {
@@ -263,18 +290,33 @@
   function showView(name, opts) {
     view = name;
     $$('[data-view]').forEach((el) => { el.hidden = el.dataset.view !== name; });
-    $$('[data-foot]').forEach((el) => { el.hidden = name === 'notice' || el.dataset.foot !== name; });
+    const foot = name === 'reset' ? 'find' : name;
+    $$('[data-foot]').forEach((el) => { el.hidden = name === 'notice' || el.dataset.foot !== foot; });
+    if (name === 'find') setFindMode(findMode, true);
     $$('form').forEach((f) => { setMsg(f, null); $$('[aria-invalid]', f).forEach((i) => i.removeAttribute('aria-invalid')); });
-    if (!opts.keepHash) history.replaceState(null, '', name === 'login' || name === 'notice' ? location.pathname : '#' + name);
+    if (!opts.keepHash) history.replaceState(null, '', name === 'login' || name === 'notice' || name === 'reset' ? location.pathname : '#' + name);
     if (name === 'signup') { showStep(1, true); $('#su-id-lang').hidden = true; }
     apply();
     const first = $('[data-view="' + name + '"] input:not([type="checkbox"])');
     if (first && !opts.noFocus) first.focus({ preventScroll: true });
   }
 
+  function setFindMode(mode, quiet) {
+    findMode = mode;
+    foundId = '';
+    $$('.seg-btn').forEach((b) => { const on = b.dataset.mode === mode; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    const row = $('#fd-name-row');
+    row.classList.toggle('is-off', mode === 'pw');
+    $('#fd-name').disabled = mode === 'pw';
+    $('#fd-result').hidden = true;
+    $('#form-find .msg').hidden = false;
+    setMsg($('#form-find'), null);
+    if (!quiet) apply();
+  }
+
   function setView(name, opts = {}) {
     if (opts.instant || name === view) return showView(name, opts);
-    const dir = name === 'signup' ? 1 : -1;      // 로그인 → 회원가입은 왼쪽으로, 반대는 오른쪽으로
+    const dir = name === 'login' ? -1 : 1;       // 로그인에서 다른 화면으로 갈 때는 왼쪽으로, 돌아올 때는 오른쪽으로
     return swap($('#pane'), dir, () => showView(name, opts));
   }
 
@@ -310,10 +352,12 @@
       apply();
       return;
     }
+    const seg = e.target.closest('.seg-btn');
+    if (seg) { setFindMode(seg.dataset.mode); return; }
     const go = e.target.closest('[data-go]');
     if (go) {
       e.preventDefault();
-      if (['login', 'signup'].includes(go.dataset.go)) setView(go.dataset.go);   // 비밀번호 찾기 화면은 아직 없음
+      if (['login', 'signup', 'find'].includes(go.dataset.go)) setView(go.dataset.go);
     }
   });
 
@@ -527,6 +571,7 @@
       }
       f.reset();
       idState = null;
+      noticeKind = 'notice';
       setView('notice', { noFocus: true });
     } catch (err) {
       fail(f, 'network');
@@ -541,7 +586,7 @@
     // 비밀번호 칸(과 그 보기/가리기 버튼)에 있을 때는 선글라스를 씀
     if (svg) {
       // 선글라스: 비밀번호 칸에 입력 중이거나, 지금 화면의 비밀번호가 '보기' 상태일 때 씀 ('가리기'로 돌리면 벗음)
-      const PW = ['login-pw', 'su-pw', 'su-pw2'];
+      const PW = ['login-pw', 'su-pw', 'su-pw2', 'rs-pw', 'rs-pw2'];
       const update = () => {
         const typing = !!document.activeElement && PW.includes(document.activeElement.id);
         const shown = PW.some((id) => { const el = document.getElementById(id); return el && el.type === 'text' && el.offsetParent !== null && !el.closest('[inert]'); });
@@ -607,16 +652,103 @@
     if (same && history.length > 1) { e.preventDefault(); history.back(); }
   });
 
+  // ===== 아이디 찾기 / 비밀번호 재설정 메일 =====
+  $('#form-find').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget;
+    const email = f.email.value.trim();
+    const box = $('#fd-result');
+    box.hidden = true; foundId = '';
+    $('.msg', f).hidden = false;
+    if (!RE_EMAIL.test(email)) return fail(f, 'emailFmt', f.email);
+    const name = f.elements['name'].value.trim();
+    if (findMode === 'id' && !name) return fail(f, 'name', f.elements['name']);
+    setMsg(f, null);
+    const btn = $('#fd-submit');
+    btn.disabled = true; btn.textContent = T('loading');
+    try {
+      if (findMode === 'id') {
+        const { data, error } = await sb.rpc('find_username', { p_name: name, p_email: email });
+        if (error) return fail(f, 'network');
+        if (!data) return fail(f, 'notFound');
+        foundId = data;                       // 서버가 앞 두 글자만 남기고 가려서 돌려줌
+        $('.msg', f).hidden = true;
+        box.hidden = false;
+      } else {
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/login.html` });
+        if (error) return fail(f, error.status === 429 ? 'rate' : 'generic');
+        f.reset();
+        noticeKind = 'resetSent';
+        setView('notice', { noFocus: true });
+      }
+    } catch (err) {
+      fail(f, 'network');
+    } finally {
+      btn.disabled = false;
+      apply();
+    }
+  });
+
+  // ===== 새 비밀번호 설정 =====
+  $('#form-reset').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget;
+    const pw = f.password.value;
+    if (pw.length < 8) return fail(f, 'pwShort', f.password, [pw.length]);
+    if (pw.length > 72) return fail(f, 'pwLong', f.password, [pw.length]);
+    const miss = [];
+    if (!/[A-Z]/.test(pw)) miss.push('upper');
+    if (!/\d/.test(pw)) miss.push('digit');
+    if (!/[^A-Za-z0-9]/.test(pw)) miss.push('special');
+    if (miss.length) return fail(f, 'pwMissing', f.password, miss);
+    if (pw !== f.password2.value) return fail(f, 'pwMatch', f.password2);
+    setMsg(f, null);
+    const btn = $('.login-btn', f);
+    btn.disabled = true; btn.textContent = T('loading');
+    try {
+      const { data: u } = await sb.auth.getUser();
+      if (!u || !u.user) return fail(f, 'expired');
+      const { data: prof } = await sb.from('profiles').select('username').eq('id', u.user.id).maybeSingle();
+      if (prof && similarToId(pw, prof.username)) return fail(f, 'pwSimilar', f.password);
+      const { error } = await sb.auth.updateUser({ password: pw });
+      if (error) {
+        if (/different|same/i.test(error.message)) return fail(f, 'samePw', f.password);
+        if (/weak|password/i.test(error.message)) return fail(f, 'pw', f.password);
+        return fail(f, 'generic');
+      }
+      await sb.auth.signOut();                // 새 비밀번호로 다시 로그인하게 함
+      f.reset();
+      noticeKind = 'pwChanged';
+      setView('notice', { noFocus: true });
+    } catch (err) {
+      fail(f, 'network');
+    } finally {
+      btn.disabled = false; btn.textContent = T('setPw');
+    }
+  });
+
   // 지난번에 고른 자동 로그인 설정을 스위치에 반영하고, 바꾸면 바로 기억
   $('#auto-login').checked = autoOn();
   $('#auto-login').addEventListener('change', (e) => { try { localStorage.setItem(AUTO_KEY, e.target.checked ? '1' : '0'); } catch (err) {} });
 
   // ===== 시작 =====
-  // 인증 메일 링크로 들어오면 로그인 처리가 끝나는 대로 메인으로
+  // 메일의 링크로 들어온 경우: 가입 인증이면 메인으로, 비밀번호 재설정이면 새 비밀번호 화면으로
+  const hash0 = location.hash;
+  const isRecovery = /type=recovery/.test(hash0);
+  const linkError = /error_code|error_description/.test(hash0);
   sb.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN' && /access_token|type=signup/.test(location.hash)) location.href = 'index.html';
+    if (event === 'PASSWORD_RECOVERY') setView('reset', { instant: true });
+    else if (event === 'SIGNED_IN' && !isRecovery && /access_token|type=signup/.test(hash0)) location.href = 'index.html';
   });
-  sb.auth.getSession().then(({ data }) => { if (data.session && !/access_token/.test(location.hash)) location.replace('index.html'); });
 
-  setView(location.hash === '#signup' ? 'signup' : 'login', { keepHash: true, instant: true });
+  if (linkError) {
+    findMode = 'pw';
+    setView('find', { instant: true, noFocus: true });
+    setMsg($('#form-find'), 'expired');
+  } else if (isRecovery) {
+    setView('reset', { keepHash: true, instant: true, noFocus: true });
+  } else {
+    sb.auth.getSession().then(({ data }) => { if (data.session && !/access_token/.test(hash0)) location.replace('index.html'); });
+    setView(hash0 === '#signup' ? 'signup' : hash0 === '#find' ? 'find' : 'login', { keepHash: true, instant: true });
+  }
 })();

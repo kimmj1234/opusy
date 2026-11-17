@@ -105,7 +105,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid #3B3FF0; outline-offs
 }
 .card-title { margin-top: clamp(28px, 5vh, 56px); font-size: clamp(28px, 2.6vw, 38px); font-weight: 800; letter-spacing: -0.02em; text-align: center; }
 .card-sub { margin-top: 10px; font-size: 15px; font-weight: 500; color: #55565f; }
-#form-login, #form-signup { width: 100%; max-width: 400px; margin-top: clamp(28px, 5vh, 52px); display: flex; flex-direction: column; gap: 12px; }
+#form-login, #form-signup, #form-find, #form-reset { width: 100%; max-width: 400px; margin-top: clamp(28px, 5vh, 52px); display: flex; flex-direction: column; gap: 12px; }
 .line-field { position: relative; }
 .line-field input {
   width: 100%; height: 54px; padding: 0 56px 0 0;
@@ -243,3 +243,16 @@ a:focus-visible, button:focus-visible { outline: 3px solid #3B3FF0; outline-offs
 .switch:checked::before { transform: translateX(20px); }
 .switch:focus-visible { outline: 3px solid #3B3FF0; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .switch, .switch::before { transition: none; } }
+
+/* ===== 아이디 / 비밀번호 찾기, 새 비밀번호 ===== */
+#form-find, #form-reset { gap: 6px; flex: none; }
+.seg { display: flex; padding: 4px; border-radius: 999px; background: #efeff2; margin-bottom: 6px; }
+.seg-btn { flex: 1; height: 40px; border: 0; border-radius: 999px; background: transparent; color: #55565f; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+.seg-btn.is-on { background: #fff; color: #14151F; box-shadow: 0 1px 4px rgba(20, 21, 31, 0.14); }
+/* 비밀번호 찾기에서는 이름 칸을 숨기되 자리는 그대로 둬서 버튼 위치가 변하지 않게 함 */
+#fd-name-row { transition: opacity 0.35s ease; }
+#fd-name-row.is-off { opacity: 0; visibility: hidden; pointer-events: none; }
+#form-find .msg, #form-find .msg:empty, #form-reset .msg, #form-reset .msg:empty { display: block; min-height: 42px; }
+#form-find .msg[hidden] { display: none !important; }
+.found { min-height: 42px; font-size: 15px; font-weight: 600; line-height: 1.4; color: #14151F; }
+.found b { font-size: 18px; font-weight: 800; letter-spacing: 0.04em; }
