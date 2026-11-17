@@ -112,7 +112,8 @@
     if (!cfg || !loginLink || !logoutBtn) return;
     const read = () => {
       try {
-        const s = JSON.parse(localStorage.getItem(cfg.storageKey) || 'null');
+        // 자동 로그인을 켰으면 localStorage 에, 껐으면 sessionStorage(창을 닫으면 사라짐)에 들어 있음
+        const s = JSON.parse(localStorage.getItem(cfg.storageKey) || sessionStorage.getItem(cfg.storageKey) || 'null');
         return s && s.access_token ? s : null;
       } catch (e) { return null; }
     };
@@ -122,7 +123,7 @@
       try {
         if (s) await fetch(`${cfg.url}/auth/v1/logout`, { method: 'POST', headers: { apikey: cfg.key, Authorization: `Bearer ${s.access_token}` } });
       } catch (e) {}
-      try { localStorage.removeItem(cfg.storageKey); } catch (e) {}
+      try { localStorage.removeItem(cfg.storageKey); sessionStorage.removeItem(cfg.storageKey); } catch (e) {}
       render();
     });
     render();

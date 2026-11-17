@@ -1,13 +1,26 @@
 // 로그인 / 회원가입 페이지: 한 카드 안에서 화면 전환, 한글/영어 전환
 (() => {
   const CFG = window.OPUSY_SUPABASE;
+  // 자동 로그인: 켜면 브라우저를 닫아도 로그인이 유지되고(localStorage), 끄면 이 창을 닫을 때 로그아웃됨(sessionStorage)
+  const AUTO_KEY = 'opusy.autoLogin';
+  const autoOn = () => { try { return localStorage.getItem(AUTO_KEY) !== '0'; } catch (e) { return true; } };
+  const sessionStore = {
+    getItem: (k) => { try { return localStorage.getItem(k) ?? sessionStorage.getItem(k); } catch (e) { return null; } },
+    setItem: (k, v) => {
+      try {
+        if (autoOn()) { localStorage.setItem(k, v); sessionStorage.removeItem(k); }
+        else { sessionStorage.setItem(k, v); localStorage.removeItem(k); }
+      } catch (e) {}
+    },
+    removeItem: (k) => { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) {} },
+  };
   const sb = window.supabase.createClient(CFG.url, CFG.key, {
-    auth: { persistSession: true, autoRefreshToken: true, storageKey: CFG.storageKey },
+    auth: { persistSession: true, autoRefreshToken: true, storageKey: CFG.storageKey, storage: sessionStore },
   });
 
   const I18N = {
     ko: {
-      login: '로그인', signup: '회원가입', loading: '잠시만요…', goBack: '이전으로 돌아가기', toLogin: '로그인하러 가기',
+      login: '로그인', signup: '회원가입', loading: '잠시만요…', autoLogin: '자동 로그인', goBack: '이전으로 돌아가기', toLogin: '로그인하러 가기',
       head: {
         login: ['다시 오신 걸 환영해요!', '정보를 입력해 주세요'],
         signup: ['회원가입', '계정을 만들고 시작해 보세요'],
@@ -68,7 +81,7 @@
       },
     },
     en: {
-      login: 'Log in', signup: 'Sign up', loading: 'Please wait…', goBack: 'Go back', toLogin: 'Go to log in',
+      login: 'Log in', signup: 'Sign up', loading: 'Please wait…', autoLogin: 'Stay signed in', goBack: 'Go back', toLogin: 'Go to log in',
       head: {
         login: ['Welcome back!', 'Please enter your details'],
         signup: ['Sign up', 'Create an account to get started'],
@@ -321,6 +334,7 @@
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) return fail(f, data.error === 'email_not_confirmed' ? 'unconfirmed' : 'login');
+      try { localStorage.setItem(AUTO_KEY, $('#auto-login').checked ? '1' : '0'); } catch (err) {}   // 자동 로그인 선택 저장
       const { error } = await sb.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
       if (error) return fail(f, 'generic');
       location.href = 'index.html';
@@ -592,6 +606,10 @@
     try { same = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (err) {}
     if (same && history.length > 1) { e.preventDefault(); history.back(); }
   });
+
+  // 지난번에 고른 자동 로그인 설정을 스위치에 반영하고, 바꾸면 바로 기억
+  $('#auto-login').checked = autoOn();
+  $('#auto-login').addEventListener('change', (e) => { try { localStorage.setItem(AUTO_KEY, e.target.checked ? '1' : '0'); } catch (err) {} });
 
   // ===== 시작 =====
   // 인증 메일 링크로 들어오면 로그인 처리가 끝나는 대로 메인으로
