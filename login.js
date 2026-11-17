@@ -77,6 +77,7 @@
         expired: '링크가 만료됐거나 이미 사용됐어요. 재설정 메일을 다시 받아 주세요.',
         devUnsupported: '이 브라우저에서는 장치 등록을 쓸 수 없어요. 최신 Chrome, Safari, Edge로 다시 시도해 주세요.',
         devCancel: '장치 등록이 취소됐어요. 버튼을 다시 눌러 등록해 주세요.',
+        devTls: '이 브라우저가 사이트의 보안 연결을 아직 신뢰하지 않아 기기 확인을 할 수 없어요. 브라우저를 완전히 종료한 뒤 다시 열어 주세요.',
         devFail: '장치를 등록하지 못했어요. 다시 시도해 주세요.',
         devExpired: '시간이 지나 등록이 만료됐어요. 버튼을 다시 눌러 주세요.',
         devNoLock: '이 기기에 잠금 방식이 없어요. 지문·얼굴·PIN·비밀번호를 먼저 설정해 주세요.',
@@ -157,6 +158,7 @@
         expired: 'This link has expired or was already used. Request a new reset email.',
         devUnsupported: 'Device registration is not available in this browser. Try the latest Chrome, Safari or Edge.',
         devCancel: 'Device registration was cancelled. Press the button to try again.',
+        devTls: 'This browser does not trust the secure connection to this site yet, so device check is blocked. Quit the browser completely and open it again.',
         devFail: 'Could not register this device. Please try again.',
         devExpired: 'The registration timed out. Press the button again.',
         devNoLock: 'This device has no screen lock. Set up a fingerprint, face, PIN or password first.',
@@ -391,6 +393,7 @@
     headers: { 'Content-Type': 'application/json', apikey: CFG.key, ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}) },
     body: JSON.stringify(payload),
   });
+  const tlsBlocked = (err) => !!err && /TLS|certificate/i.test(String(err.message || ''));   // 브라우저가 인증서 문제로 기기 확인을 막음
   let pending = null;                    // 비밀번호까지 확인된 로그인 정보 (기기 확인이나 확인 메일 요청에 다시 씀)
 
   // 등록한 기기로 확인하고 로그인. 성공하면 토큰, 아니면 { error }
@@ -408,6 +411,7 @@
         },
       });
     } catch (err) {
+      if (tlsBlocked(err)) return { error: 'devTls' };
       return { error: 'nodevice' };        // 이 기기에 등록 정보가 없거나, 확인을 취소함
     }
     const r = as.response;
@@ -479,6 +483,7 @@
           },
         });
       } catch (err) {
+        if (tlsBlocked(err)) return sideMsg(msg, 'devTls');
         if (err && err.name === 'NotAllowedError') return sideMsg(msg, builtIn ? 'devCancel' : 'devNoLock');
         if (err && (err.name === 'NotSupportedError' || err.name === 'SecurityError')) return sideMsg(msg, 'devUnsupported');
         return sideMsg(msg, 'devFail');
@@ -675,6 +680,7 @@
           },
         });
       } catch (err) {
+        if (tlsBlocked(err)) return fail(f, 'devTls');
         if (err && err.name === 'NotAllowedError') return fail(f, builtIn ? 'devCancel' : 'devNoLock');
         if (err && (err.name === 'NotSupportedError' || err.name === 'SecurityError')) return fail(f, 'devUnsupported');
         return fail(f, 'devFail');
