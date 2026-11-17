@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPUSY</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="login.css">
+  <script>
+    // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
+    const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
+    fit(); addEventListener('resize', fit);
+  </script>
+</head>
+<body>
+  <header id="menubar" data-theme="light">
+    <a class="logo" href="index.html" aria-label="OPUSY 홈"></a>
+
+    <div class="menu-right">
+      <div class="lang" role="group" aria-label="언어 선택">
+        <button type="button" data-lang="ko" class="active">KR</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-lang="en">ENG</button>
+      </div>
+
+      <a class="login" href="login.html" aria-label="login">
+        <!-- 로고와 같은 선(stroke) 스타일로 그린 'login' -->
+        <svg viewBox="-47 -47 494 187" fill="none" stroke="currentColor" stroke-width="14" stroke-linejoin="miter" aria-hidden="true">
+          <g transform="translate(100 0)">
+          <path d="M0 -40V60"/>
+          <circle cx="60" cy="30" r="30"/>
+          <circle cx="150" cy="30" r="30"/>
+          <path d="M180 0V70A30 30 0 0 1 120 70"/>
+          <path d="M210 0V60"/>
+          <path d="M210 -40V-26"/>
+          <path d="M240 60V30A30 30 0 0 1 300 30V60"/>
+          </g>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- 로그인: 왼쪽 캐릭터 / 오른쪽 폼 -->
+  <main class="auth">
+    <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
+    <div class="auth-art"><img src="images/login-art.svg" alt="" width="588" height="231"></div>
+    <div class="card-wrap">
+    <div class="peek" aria-hidden="true"><svg class="peek-svg" viewBox="0 0 420 580" aria-hidden="true" focusable="false" data-sx="240.2" data-sy="264.3" data-aw="36.4" data-lw="8.3" data-nx="264.6" data-ny="221.1"><defs><filter id="inkp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs><g filter="url(#inkp)"><clipPath id="peekCut"><polygon points="0,0 420,0 420,562 0,2"/></clipPath><g clip-path="url(#peekCut)"><g transform="rotate(-16 375 556)"><path d="M318 378.8L310.2 534.8L359.6 534.8L370 454.2L383 534.8L432.4 534.8L424.6 378.8Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="5.2" stroke-linejoin="round"/><path d="M307.6 534.8C289.4 534.8 279 547.8 284.2 555.6L357 555.6L357 534.8Z" fill="#fff" stroke="#0B0B1E" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M380.4 534.8C372.6 542.6 372.6 555.6 383 555.6L435 555.6L435 534.8Z" fill="#fff" stroke="#0B0B1E" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M336.2 207.2C318 222.8 310.2 259.2 310.2 306C310.2 337.2 312.8 363.2 315.4 384L424.6 386.6C432.4 358 435 306 429.8 264.4C427.2 233.2 416.8 215 401.2 204.6Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M315.4 235.8L341.4 220.2" stroke="#fff" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M333.6 274.8L349.2 274.8L349.2 287.8L341.4 296.9L333.6 287.8Z" fill="#fff"/></g></g><g id="peekHead"><path d="M208.6 133.1C208.6 69.1 328.6 69.1 328.6 141.1C328.6 197.1 304.6 241.1 248.6 241.1C216.6 241.1 204.6 189.1 208.6 133.1Z" fill="#fff"/><path d="M300.6 141.1L328.6 141.1C332.6 153.1 328.6 161.1 320.6 165.1C312.6 157.1 304.6 161.1 300.6 169.1Z" fill="#0B0B1E"/><path d="M300.6 165.1C316.6 149.1 332.6 165.1 324.6 185.1C320.6 197.1 308.6 201.1 300.6 197.1" fill="none" stroke="#0B0B1E" stroke-width="10.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M212.6 149.1C204.6 181.1 212.6 217.1 232.6 233.1C248.6 245.1 276.6 237.1 292.6 213.1" fill="none" stroke="#0B0B1E" stroke-width="12.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M212.6 129.1C184.6 105.1 188.6 65.1 228.6 53.1C264.6 41.1 316.6 45.1 340.6 65.1C356.6 81.1 348.6 109.1 332.6 129.1Z" fill="#fff" stroke="#0B0B1E" stroke-width="12.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M212.6 127.1L332.6 127.1L330.6 147.1L214.6 145.1Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M214.6 143.1C192.6 139.1 168.6 147.1 162.6 163.1C184.6 159.1 208.6 155.1 232.6 151.1Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(242.6 91.1) scale(0.514) translate(-30 -30)" fill="none" stroke="#0B0B1E" stroke-width="14"><path d="M37.76 1.02A30 30 0 0 1 58.98 37.76"/><path d="M51.21 51.21A30 30 0 0 1 8.79 51.21"/><path d="M1.02 37.76A30 30 0 0 1 22.24 1.02"/></g><path d="M218.6 173.1L234.6 173.1" fill="none" stroke="#0B0B1E" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/><g class="pupil"><circle cx="227.4" cy="181.1" r="6" fill="#0B0B1E"/></g><path d="M248.6 173.1L264.6 173.1" fill="none" stroke="#0B0B1E" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/><g class="pupil"><circle cx="257" cy="181.1" r="6" fill="#0B0B1E"/></g><path d="M240.6 185.1L236.6 205.1L246.6 205.1" fill="none" stroke="#0B0B1E" stroke-width="7.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M234.6 221.1L248.6 221.1" fill="none" stroke="#0B0B1E" stroke-width="7.6" stroke-linecap="round" stroke-linejoin="round"/><g id="peekShades"><path d="M205.4 167.1L241.4 167.1C243 181.1 236.6 196.3 223.8 196.3C211 196.3 203.8 181.1 205.4 167.1Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M246.2 167.1L279.8 167.1C281.4 181.1 275 196.3 263 196.3C251 196.3 244.6 181.1 246.2 167.1Z" fill="#0B0B1E" stroke="#0B0B1E" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M240.6 170.7L247 170.7" fill="none" stroke="#0B0B1E" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M279 169.9L306.6 166.7" fill="none" stroke="#0B0B1E" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M212.6 175.5L222.2 175.5" stroke="#fff" stroke-width="4.4" stroke-linecap="round" fill="none"/><path d="M252.6 175.5L261.4 175.5" stroke="#fff" stroke-width="4.4" stroke-linecap="round" fill="none"/></g></g><g id="peekArm"><path id="armOut" fill="none" stroke="#0B0B1E" stroke-linecap="round" stroke-linejoin="round"/><path id="armIn" fill="none" stroke="#0B0B1E" stroke-linecap="round" stroke-linejoin="round"/><g id="peekHand"><path d="M-13 -10.4C-10.4 -20.8 7.8 -20.8 13 -13C20.8 -10.4 20.8 0 15.6 5.2C18.2 13 10.4 20.8 0 18.2C-10.4 20.8 -18.2 13 -15.6 5.2C-20.8 0 -20.8 -7.8 -13 -10.4Z" fill="#fff" stroke="#0B0B1E" stroke-width="7.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M-16.9 -1.3L-7.8 -1.3" fill="none" stroke="#0B0B1E" stroke-width="4.7" stroke-linecap="round" stroke-linejoin="round"/></g></g></g></svg></div>
+    <section class="card">
+      <span class="card-logo" role="img" aria-label="OPUSY"></span>
+      <div class="pane" id="pane">
+      <h2 class="card-title" id="cardTitle"></h2>
+      <p class="card-sub" id="cardSub"></p>
+      <form id="form-login" data-view="login" novalidate>
+        <div class="line-field">
+          <input id="login-id" name="identifier" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" data-ph="idOrEmail" required>
+        </div>
+        <div class="line-field">
+          <input id="login-pw" name="password" type="password" autocomplete="current-password" data-ph="password" required>
+          <button type="button" class="eye" data-eye="login-pw"></button>
+        </div>
+        <p class="msg" role="alert"></p>
+        <button class="login-btn" type="submit" data-i18n="login"></button>
+      </form>
+
+      <form id="form-signup" data-view="signup" novalidate hidden>
+        <div class="progress" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="steps">
+          <div class="step" data-step="1">
+            <div class="line-field"><input id="su-id" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" data-ph="suId" required></div>
+            <p class="hint" id="su-id-hint"></p>
+            <p class="hint bad" id="su-id-lang" data-i18n="idLang" role="alert" hidden></p>
+          </div>
+          <div class="step is-off" data-step="2" inert>
+            <div class="line-field"><input id="su-email" name="email" type="email" autocomplete="email" data-ph="email" required></div>
+          </div>
+          <div class="step is-off" data-step="3" inert>
+            <div class="line-field">
+              <input id="su-pw" name="password" type="password" autocomplete="new-password" data-ph="suPw" required>
+              <button type="button" class="eye" data-eye="su-pw"></button>
+            </div>
+            <p class="hint" data-i18n="pwHint"></p>
+            <div class="line-field"><input id="su-pw2" name="password2" type="password" autocomplete="new-password" data-ph="suPw2" required></div>
+          </div>
+          <div class="step is-off" data-step="4" inert>
+            <div class="line-field"><input id="su-name" name="name" type="text" autocomplete="name" maxlength="30" data-ph="name" required></div>
+            <div class="line-field"><input id="su-birth" name="birth" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" data-ph="birth" required></div>
+            <div class="line-field"><input id="su-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" data-ph="phone" required></div>
+            <label class="check"><input id="su-agree" name="agree" type="checkbox" required><span data-i18n="agree"></span></label>
+          </div>
+          <div class="step is-off" data-step="5" inert>
+            <div class="device">
+              <svg class="device-ico" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
+              <p class="device-title" id="devTitle"></p>
+              <p class="device-desc" id="devDesc"></p>
+              <p class="device-note" data-i18n="devNote"></p>
+            </div>
+          </div>
+        </div>
+        <p class="msg" role="alert"></p>
+        <div class="btn-row">
+          <button class="back-btn is-off" type="button" id="su-back" data-i18n="back" tabindex="-1" aria-hidden="true"></button>
+          <button class="login-btn" type="submit" id="su-next"></button>
+        </div>
+      </form>
+
+      <div class="notice" data-view="notice" hidden>
+        <p class="notice-body" id="noticeBody"></p>
+        <a class="login-btn as-link" href="#login" data-go="login" data-i18n="toLogin"></a>
+      </div>
+
+      <div class="card-foot" data-foot="login">
+        <p class="forgot"><a href="#find-pw" data-go="find-pw" data-i18n="forgot"></a></p>
+        <p><span data-i18n="noAcc"></span> <a href="#signup" data-go="signup" data-i18n="signup"></a></p>
+      </div>
+      <p class="card-foot" data-foot="signup" hidden><span data-i18n="haveAcc"></span> <a href="#login" data-go="login" data-i18n="login"></a></p>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="supabase-config.js"></script>
+  <script defer src="login.js"></script>
+</body>
+</html>

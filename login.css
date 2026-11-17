@@ -1,0 +1,235 @@
+/* 로그인 페이지: 지금은 메뉴바만 남겨 둠 (메인 페이지와 같은 크기) */
+:root { --design-w: 1920; --scale: 1; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  background: #f0f0f0;
+  color: #14151F;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 위쪽 메뉴바: 메인 페이지와 같은 크기(1920×1080 기준을 --scale 로 환산) ===== */
+#menubar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: calc(var(--design-w) * 1px * var(--scale));   /* 스테이지와 같은 폭 */
+  transform: translateX(-50%);
+  height: calc(100px * var(--scale));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(60px * var(--scale));
+  color: #14151F;                       /* 밝은 영역: ink */
+  
+  z-index: 100;
+}
+#menubar[data-theme="dark"] { color: #fff; }   /* 어두운 영역: white */
+#menubar a { color: inherit; text-decoration: none; }
+
+/* 로고: SVG 를 마스크로 써서 현재 글자색(currentColor)으로 칠함 → 배경에 따라 색 자동 전환 */
+#menubar .logo {
+  display: block;
+  height: calc(64px * var(--scale));
+  aspect-ratio: 494 / 187;
+  background-color: currentColor;
+  -webkit-mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+          mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+}
+
+#menubar .menu-right { display: flex; align-items: center; gap: calc(40px * var(--scale)); }
+
+/* 언어 전환 KR / ENG */
+#menubar .lang {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--scale));
+  font-size: calc(20px * var(--scale));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+#menubar .lang button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.4s;
+}
+#menubar .lang button:hover,
+#menubar .lang button.active { opacity: 1; }
+#menubar .lang span { opacity: 0.4; }
+
+/* 로그인: 박스는 로고와 같은 64px, 안의 글자만 32px 크기로 축소(32/64). 글자 오른쪽 끝 위치는 유지 */
+#menubar .login { display: block; height: calc(64px * var(--scale)); aspect-ratio: 494 / 187; line-height: 0; transition: opacity 0.4s; }
+#menubar .login svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(0.5);
+  transform-origin: 91.9% 50%;
+}
+#menubar .login:hover { opacity: 0.55; }
+
+
+[hidden] { display: none !important; }
+a:focus-visible, button:focus-visible { outline: 3px solid #3B3FF0; outline-offset: 2px; }
+
+/* ===== 로그인: 왼쪽 캐릭터 / 오른쪽 폼 카드 ===== */
+.auth {
+  position: fixed;                 /* 화면 전체 (메뉴바는 z-index 100 으로 이 위에 보임) */
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px;
+  background: #e4e4e9;
+  overflow: auto;
+}
+.auth-art { display: flex; align-items: center; justify-content: center; padding: 40px; }
+.auth-art img { width: 100%; max-width: 560px; height: auto; }
+.card {
+  display: flex; flex-direction: column; align-items: center;
+  padding: calc(100px * var(--scale) + clamp(8px, 3vh, 40px)) clamp(24px, 4vw, 64px) 32px;
+  border-radius: 20px; background: #fff;
+}
+.card-logo {
+  flex: none; display: block; height: 44px; aspect-ratio: 494 / 187; background: #14151F;
+  -webkit-mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+          mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+}
+.card-title { margin-top: clamp(28px, 5vh, 56px); font-size: clamp(28px, 2.6vw, 38px); font-weight: 800; letter-spacing: -0.02em; text-align: center; }
+.card-sub { margin-top: 10px; font-size: 15px; font-weight: 500; color: #55565f; }
+#form-login, #form-signup { width: 100%; max-width: 400px; margin-top: clamp(28px, 5vh, 52px); display: flex; flex-direction: column; gap: 12px; }
+.line-field { position: relative; }
+.line-field input {
+  width: 100%; height: 54px; padding: 0 56px 0 0;
+  border: 0; border-bottom: 1.5px solid #8b8b93; border-radius: 0; background: transparent;
+  font: inherit; font-size: 17px; font-weight: 500; color: #14151F;
+  transition: border-color 0.3s ease;
+}
+.line-field input::placeholder { color: #3b3c47; opacity: 1; }
+.line-field input:focus { outline: 0; border-bottom: 2px solid #14151F; }
+.eye { position: absolute; right: 0; top: 0; height: 54px; padding: 0 2px 0 12px; border: 0; background: none; color: #55565f; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: color 0.3s ease; }
+.eye:hover { color: #14151F; }
+.card-foot { text-align: center; }
+.card-foot .forgot { margin-bottom: 10px; }
+.card-foot .forgot a { color: #8b8b93; font-weight: 500; text-decoration: none; transition: color 0.3s ease; }
+.card-foot .forgot a:hover { color: #14151F; text-decoration: none; }
+.msg { min-height: 0; font-size: 14px; font-weight: 600; line-height: 1.5; color: #c62d1f; }
+.msg:empty { display: none; }
+/* 로그인 폼: 오류 문구 자리가 부드럽게 열리며 버튼이 자연스럽게 내려감 */
+#form-login .msg, #form-login .msg:empty {
+  display: block; max-height: 0; margin-top: -12px; opacity: 0; overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1), margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+#form-login .msg.show { max-height: 4.5em; margin-top: 0; opacity: 1; }
+/* 오류 문구가 좌우로 떨림 */
+.msg.shake { animation: msg-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes msg-shake {
+  10%, 90% { transform: translateX(-1.5px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+@media (prefers-reduced-motion: reduce) { .msg.shake { animation: none; } #form-login .msg { transition: none; } }
+.login-btn {
+  height: 56px; margin-top: 12px; border: 0; border-radius: 999px;
+  background: #14151F; color: #fff; font: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+  transition: background-color 0.5s ease;
+}
+.login-btn:hover { background: #5a5a62; }
+.login-btn:disabled { opacity: 0.5; cursor: progress; }
+.card-foot { margin-top: auto; padding-top: 32px; font-size: 13px; font-weight: 500; color: #3b3c47; }
+.card-foot a { color: #14151F; font-weight: 700; text-decoration: none; }
+.card-foot a:hover { text-decoration: underline; }
+
+@media (max-width: 960px) {
+  .auth { grid-template-columns: minmax(0, 1fr); }
+  .auth-art { display: none; }
+}
+
+.pane { display: flex; flex-direction: column; align-items: center; flex: 1; width: 100%; min-height: 0; will-change: transform, opacity; }
+#form-signup { gap: 6px; }
+.progress { display: flex; gap: 6px; margin-bottom: 6px; }
+.progress i { flex: 1; height: 4px; border-radius: 2px; background: #e4e4e9; position: relative; overflow: hidden; }
+.progress i::after { content: ""; position: absolute; inset: 0; background: #14151F; transform: scaleX(0); transform-origin: left; transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1); }
+.progress i.on::after { transform: scaleX(1); }
+.steps { display: grid; }
+.step { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 6px; align-content: start; }
+.step.is-off { visibility: hidden; pointer-events: none; }
+#form-signup .msg, #form-signup .msg:empty { display: block; min-height: 42px; }   /* 오류 두 줄 자리를 항상 잡아 둠: 언어·문구 길이와 상관없이 버튼 위치 고정 */
+.btn-row { display: flex; gap: 10px; margin-top: 8px; }
+.btn-row .login-btn { flex: 1; margin-top: 0; }
+.back-btn { flex: none; width: 96px; overflow: hidden; white-space: nowrap; height: 56px; padding: 0; border: 1.5px solid #14151F; border-radius: 999px; background: #fff; color: #14151F; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1), margin 0.6s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s ease, border-width 0.6s ease, background-color 0.4s ease, color 0.4s ease; }
+.back-btn.is-off { width: 0; margin-right: -10px; opacity: 0; border-width: 0; pointer-events: none; }
+.back-btn:hover { background: #14151F; color: #fff; }
+.card-title, .card-sub, #form-login, .notice, .card-foot { flex: none; }
+.hint { margin-top: -2px; font-size: 13px; font-weight: 500; color: #8b8b93; }
+.hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* 항상 한 줄: 언어가 달라도 아래 칸이 밀리지 않음 */
+.hint.ok { color: #1a7f4b; } .hint.bad { color: #c62d1f; }
+.line-field input[aria-invalid="true"] { border-bottom-color: #c62d1f; }
+.check span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.check { display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; font-size: 13px; font-weight: 500; color: #3b3c47; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 1px; accent-color: #14151F; flex: none; }
+.notice { width: 100%; max-width: 400px; margin-top: clamp(28px, 5vh, 52px); display: flex; flex-direction: column; gap: 24px; }
+.notice-body { font-size: 16px; font-weight: 500; line-height: 1.7; text-align: center; color: #3b3c47; }
+.login-btn.as-link { display: grid; place-items: center; text-decoration: none; }
+.card { overflow: auto; }
+
+/* ===== 페이지 이동: 슬라이드 (Chrome/Safari 의 문서 간 View Transition) ===== */
+@view-transition { navigation: auto; }
+#menubar { view-transition-name: menubar; }          /* 메뉴바는 제자리에 두고 페이지만 밀려남 */
+::view-transition-group(root) { animation-duration: 0.9s; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.9s; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); animation-fill-mode: both; mix-blend-mode: normal; }
+/* 로그인으로 들어올 때: 메인은 왼쪽으로 나가고 로그인은 오른쪽에서 들어옴 */
+@keyframes slide-out-left { to { transform: translateX(-100%); } }
+@keyframes slide-in-right { from { transform: translateX(100%); } }
+::view-transition-old(root) { animation-name: slide-out-left; }
+::view-transition-new(root) { animation-name: slide-in-right; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+
+/* ===== 카드 뒤에서 몸을 반쯤 숨기고 커서를 따라다니는 캐릭터 ===== */
+.card-wrap { position: relative; display: flex; min-width: 0; min-height: 0; }
+.card-wrap .card { flex: 1; position: relative; z-index: 1; min-width: 0; }
+.peek {
+  position: absolute; z-index: 0; top: 50%;
+  width: calc(520px * var(--scale));
+  right: calc(100% - 87px * var(--scale));                 /* 뒤통수와 몸 오른쪽이 카드 뒤로 들어감 */
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.peek-svg { display: block; width: 100%; height: auto; overflow: visible; animation: peek-in 1.1s 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+@keyframes peek-in { from { transform: translateX(calc(140px * var(--scale))); } }
+.peek-svg * { transform-box: view-box; }
+.peek-front { z-index: 2; }                                  /* 카드 가장자리를 잡은 손은 카드 위에 */
+#peekShades { opacity: 0; transform: translateY(-26px); transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.peek-svg.shades-on #peekShades { opacity: 1; transform: translateY(0); }   /* 비밀번호 입력 중: 선글라스 */
+@media (max-width: 960px) { .peek { display: none; } }
+@media (prefers-reduced-motion: reduce) { .peek-svg { animation: none; } }
+
+/* ===== 왼쪽 아래: 이전으로 돌아가기 ===== */
+.back-link {
+  position: absolute; z-index: 2;
+  left: calc(60px * var(--scale)); bottom: calc(48px * var(--scale));
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: max(14px, calc(20px * var(--scale))); font-weight: 600;
+  color: #14151F; text-decoration: none;
+  transition: opacity 0.4s ease;
+}
+.back-link svg { transition: transform 0.4s ease; }
+.back-link:hover { opacity: 0.55; }
+.back-link:hover svg { transform: translateX(-5px); }
+@media (max-width: 960px) { .back-link { display: none; } }
+
+/* ===== 회원가입 마지막 단계: 장치 등록 ===== */
+.device { word-break: keep-all; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding-top: 6px; }
+.device-ico { color: #14151F; margin-bottom: 4px; }
+.device-title { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.device-desc { font-size: 14px; font-weight: 500; line-height: 1.5; color: #3b3c47; min-height: 42px; }
+.device-note { margin-top: 4px; font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #8b8b93; min-height: 38px; }

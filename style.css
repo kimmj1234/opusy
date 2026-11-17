@@ -1,0 +1,479 @@
+/* ===== 기본 ===== */
+:root {
+  --design-w: 1920;
+  --design-h: 1080;
+  --scale: 1;                 /* script.js 가 화면 크기에 맞춰 갱신 */
+  --stage-h: 1080;            /* script.js: 화면이 16:9 보다 세로로 길면 그만큼 스테이지 높이를 늘림 */
+  --move-duration: 1.4s;      /* 영역 이동 속도 (script.js 의 MOVE_MS 와 맞출 것) */
+  --move-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --hover-ease: cubic-bezier(0.25, 0.1, 0.25, 1);   /* 마우스 올림/뗌: 부드럽게 시작하고 천천히 멈춤 */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;           /* 스크롤은 script.js 가 제어 */
+  background: #111;
+  color: #fff;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ===== 영역(화면) ===== */
+/* 3개의 영역이 세로로 쌓인 트랙 */
+#pages {
+  width: 100%;
+  height: 100%;
+  transition: transform var(--move-duration) var(--move-ease);
+  will-change: transform;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* 1920x1080 디자인 캔버스: 화면에 맞춰 비율 유지하며 확대/축소.
+   가로는 항상 1920 기준, 세로는 화면이 16:9 보다 길면 그만큼 늘어나 화면을 가득 채움 (가로로 더 넓은 화면은 양옆이 배경색으로 이어짐) */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(var(--design-w) * 1px);
+  height: calc(var(--stage-h) * 1px);
+  transform: translateX(-50%) scale(var(--scale));
+  transform-origin: top center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#area1 { background: #f0f0f0; }
+#area2 { background: #26262c; }
+#area3 { background: #323239; }
+
+/* ===== 등장 효과 (영역이 열리면 .is-active) ===== */
+/* word rise: 단어마다 마스크 안에서 아래→위로 올라옴 */
+.hero-text .w,
+.a2-title .w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;           /* 글자 아래쪽이 잘리지 않게 */
+  margin-bottom: -0.12em;
+}
+.hero-text .wi,
+.a2-title .wi {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 1.2s var(--move-ease);
+  transition-delay: calc(var(--i) * 0.14s);
+}
+.page.is-active .hero-text .wi,
+.page.is-active .a2-title .wi { transform: translateY(0); }
+
+/* 한 줄/문단 단위로 올라오는 문구 */
+.rise { display: block; overflow: hidden; }
+.rise-in {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 1.2s var(--move-ease);
+  transition-delay: calc(var(--i) * 0.14s);
+}
+.page.is-active .rise-in { transform: translateY(0); }
+
+/* 언어 전환 시 메인 문구 올라오는 효과를 다시 재생하기 위한 준비 상태 */
+.page.is-active .hero-text.pre .wi { transform: translateY(110%); transition: none; }
+
+/* 화면 밖에서 초기 상태로 되돌릴 때는 전환 없이 즉시 */
+.page.no-anim .wi,
+.page.no-anim .rise-in { transition: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wi, .rise-in { transition: none; transform: none; }
+}
+
+/* ===== 메뉴바: 투명(보이지 않음), 모든 영역 위에 고정. 1920x1080 기준 치수를 --scale 로 환산 ===== */
+#menubar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: calc(var(--design-w) * 1px * var(--scale));   /* 스테이지와 같은 폭 */
+  transform: translateX(-50%);
+  height: calc(100px * var(--scale));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(60px * var(--scale));
+  color: #14151F;                       /* 밝은 영역: ink */
+  transition: color var(--move-duration) var(--move-ease);
+  z-index: 100;
+}
+#menubar[data-theme="dark"] { color: #fff; }   /* 어두운 영역: white */
+#menubar a { color: inherit; text-decoration: none; }
+
+/* 로고: SVG 를 마스크로 써서 현재 글자색(currentColor)으로 칠함 → 배경에 따라 색 자동 전환 */
+#menubar .logo {
+  display: block;
+  height: calc(64px * var(--scale));
+  aspect-ratio: 494 / 187;
+  background-color: currentColor;
+  -webkit-mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+          mask: url("Logo-IMG/opusy-logo-ink.svg") center / contain no-repeat;
+}
+
+#menubar .menu-right { display: flex; align-items: center; gap: calc(40px * var(--scale)); }
+
+/* 언어 전환 KR / ENG */
+#menubar .lang {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--scale));
+  font-size: calc(20px * var(--scale));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+#menubar .lang button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.4s;
+}
+#menubar .lang button:hover,
+#menubar .lang button.active { opacity: 1; }
+#menubar .lang span { opacity: 0.4; }
+
+/* 로그아웃 (로그인된 상태에서 login 대신 보임) */
+#menubar .logout {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: calc(20px * var(--scale));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.4s;
+}
+#menubar .logout:hover { opacity: 0.55; }
+#menubar [hidden] { display: none !important; }
+
+/* 로그인: 박스는 로고와 같은 64px, 안의 글자만 32px 크기로 축소(32/64). 글자 오른쪽 끝 위치는 유지 */
+#menubar .login { display: block; height: calc(64px * var(--scale)); aspect-ratio: 494 / 187; line-height: 0; transition: opacity 0.4s; }
+#menubar .login svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(0.5);
+  transform-origin: 91.9% 50%;
+}
+#menubar .login:hover { opacity: 0.55; }
+
+/* ===== 영역 1 ===== */
+#area1 .stage {
+  justify-content: flex-start;
+  padding-left: 74px;               /* 로고 글자 시작 위치에 맞춤 */
+}
+
+/* 왼쪽 메인 문구 (완전 흰색, 3줄) */
+.hero-text {
+  color: #fff;
+  font-size: 180px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+}
+.hero-text .line { display: block; }
+
+/* 오른쪽: 대상 문구 + 슬라이드 카드 (위쪽은 왼쪽 첫 줄, 아래쪽은 마지막 줄에 맞춤) */
+.hero-side {
+  position: absolute;
+  left: 1313px;
+  top: 50%;
+  width: 390px;
+  height: calc(180px * 1.18 * 3);    /* 왼쪽 문구 3줄과 같은 높이 */
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 21px 0 32px;
+  color: #111;
+}
+.side-label { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; }
+.side-desc {
+  height: calc(22px * 1.6 * 6);      /* 항상 6줄 높이로 고정 → 언어가 바뀌어도 카드 크기가 변하지 않음 */
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+/* 슬라이드 카드: 라벨과 설명 사이 빈 자리를 채움. 마스크로 자르지 않고 페이드+살짝 이동으로 등장 */
+.side-card { flex: 1; min-height: 0; margin: 18px 0 16px; overflow: visible; }
+.side-card > .rise-in {
+  height: 100%;
+  transform: translateY(24px);
+  opacity: 0;
+  transition: transform 1.2s var(--move-ease), opacity 1s ease;
+  transition-delay: calc(var(--i) * 0.14s);
+}
+.page.is-active .side-card > .rise-in { transform: translateY(0); opacity: 1; }
+
+.slider { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.slides { display: flex; height: 100%; transition: transform 1s var(--move-ease); }
+.slide {
+  flex: 0 0 100%;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: var(--bg);
+  color: #fff;
+}
+.slide strong { display: block; font-size: 48px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.slide small  { display: block; margin-top: 10px; font-size: 18px; font-weight: 500; opacity: 0.85; }
+
+.pager { position: absolute; top: 24px; right: 24px; display: flex; gap: 8px; }
+.pager button {
+  width: 24px;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.5s;
+}
+.pager button.active { background: #fff; }
+
+/* 아래로 스크롤 안내: 가운데 최하단. 마우스 아이콘 안의 휠이 아래로 움직이는 반복 애니메이션 */
+.scroll-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  display: flex;
+  justify-content: center;
+}
+.scroll-hint button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #14151F;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: transform 1.2s var(--move-ease), opacity 1s ease;
+  transition-delay: 1.6s;              /* 문구가 다 올라온 뒤 나타남 */
+}
+.page.is-active .scroll-hint button { opacity: 1; transform: translateY(0); }
+.page.no-anim .scroll-hint button { transition: none !important; }
+.scroll-hint .mouse { display: block; width: 28px; height: 44px; }
+.scroll-hint .wheel { animation: scroll-wheel 1.8s var(--hover-ease) infinite; }
+@keyframes scroll-wheel {
+  0%   { transform: translateY(0);   opacity: 0; }
+  25%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .scroll-hint .wheel { animation: none; } }
+
+/* ===== 영역 2: 상단 가운데 문구 ===== */
+#area2 .stage {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 92px;                /* 화면 위쪽 끝 ~ 제목 글자 윗선 = 내용 아랫선 ~ 카드 윗선 (글자 모양 기준 같은 간격) */
+}
+.a2-head { text-align: center; color: #fff; }
+.a2-title {
+  font-size: 96px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  white-space: nowrap;               /* 큰 제목은 항상 한 줄 */
+}
+.a2-desc {
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #fff;
+}
+.a2-desc .rise-in { white-space: nowrap; }   /* 내용은 항상 두 줄 */
+
+/* 카드 6개: 흰색 배경, 서로 붙어 있고 얇은 검은 테두리.
+   바탕을 검은색으로 깔고 카드 사이를 2px 비우면 테두리선이 겹치지 않고 균일하게 보임 */
+.a2-cards {
+  position: absolute;
+  left: 74px;
+  right: 74px;
+  top: 380px;
+  bottom: 80px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
+  padding: 2px;
+  background: #000;
+  opacity: 0;
+  transform: translateY(32px);
+  transition: transform 1.2s var(--move-ease), opacity 1s ease;
+  transition-delay: calc(var(--i) * 0.14s);
+}
+.a2-card {
+  --head-h: 76px;                    /* 위쪽 흰색 이름 띠 높이 */
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #5a5a62;               /* 마우스를 올렸을 때 드러나는 회색 */
+  color: #111;
+  text-decoration: none;
+  transition: color 0.7s var(--hover-ease);
+}
+.a2-card .art {                      /* 일러스트(인라인 SVG): 이름 띠 아래 영역. 카드 비율이 바뀌어도 잘리지 않게 contain */
+  position: absolute;
+  left: 0;
+  top: var(--head-h);
+  width: 100%;
+  height: calc(100% - var(--head-h));
+  background: #fff;
+}
+.a2-card strong {                    /* 흰색 이름 띠 + 검은 글자 */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: var(--head-h);
+  padding: 0 28px;
+  background: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: background-color 0.7s var(--hover-ease);
+}
+.a2-card .fi {                       /* 이동 화살표: 흰색 띠의 오른쪽 끝 (Uicons 아이콘 글꼴) */
+  position: absolute;
+  z-index: 1;
+  top: calc((var(--head-h) - 44px) / 2);
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  font-size: 44px;
+  line-height: 1;
+  transition: transform 0.7s var(--hover-ease);
+}
+.a2-card .fi::before { display: block; line-height: 1; }
+
+/* 마우스를 올리면: 띠와 카드가 회색으로, 글자와 화살표는 흰색으로 */
+.a2-card:hover { color: #fff; }
+.a2-card:hover strong { background: #5a5a62; }
+.a2-card:hover .fi { transform: translateX(8px); }
+
+/* ===== 카드 일러스트: 마우스를 올리면 움직임 (그림 안의 사람·사물) ===== */
+.a2-card .art * { transform-box: view-box; }
+@keyframes k-wave   { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-11deg); } }
+@keyframes k-wave2  { 0%,100% { transform: rotate(0); } 50% { transform: rotate(9deg); } }
+@keyframes k-pop    { 0%,100% { transform: scale(1); } 40% { transform: scale(1.16); } }
+@keyframes k-draw   { 0% { stroke-dashoffset: 1; } 35%,80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 1; } }
+@keyframes k-bar    { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.45); } }
+@keyframes k-flow   { to { stroke-dashoffset: -14; } }
+@keyframes k-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes k-swing  { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes k-sway   { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+@keyframes k-write  { 0%,100% { transform: translate(0,0) rotate(0); } 25% { transform: translate(4px,-2px) rotate(-6deg); } 75% { transform: translate(-2px,3px) rotate(5deg); } }
+@keyframes k-blink  { 0%,100% { opacity: 1; } 50% { opacity: 0.15; } }
+@keyframes k-steam  { 0% { opacity: 0; transform: translateY(6px); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes k-tilt   { 0%,100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+@keyframes k-bubble { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+@keyframes k-dot    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes k-beat   { 0%,100% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(1); } }
+@keyframes k-pen    { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-8px,8px); } }
+@keyframes k-check  { 0%,100% { transform: scale(1); } 45% { transform: scale(1.12); } }
+
+.a2-card:hover .a1-arm  { animation: k-wave 1.1s ease-in-out infinite; }
+.a2-card:hover .a1-s    { animation: k-pop 1.8s ease-in-out infinite; }
+.a2-card:hover .a1-s1   { animation-delay: .15s; } .a2-card:hover .a1-s2 { animation-delay: .3s; }
+.a2-card:hover .a1-s3   { animation-delay: .45s; } .a2-card:hover .a1-s4 { animation-delay: .6s; } .a2-card:hover .a1-s5 { animation-delay: .75s; }
+
+.a2-card .a2-ck { stroke-dasharray: 1; }
+.a2-card:hover .a2-ck   { animation: k-draw 2.2s ease-in-out infinite; }
+.a2-card:hover .a2-ck2  { animation-delay: .6s; }
+.a2-card:hover .a2-box  { animation: k-check 2.2s ease-in-out infinite; }
+.a2-card:hover .a2-box2 { animation-delay: .6s; }
+.a2-card:hover .a2-cell { animation: k-pop 2.1s ease-in-out infinite; }
+.a2-card:hover .a2-c1 { animation-delay: .1s; } .a2-card:hover .a2-c2 { animation-delay: .2s; } .a2-card:hover .a2-c3 { animation-delay: .3s; }
+.a2-card:hover .a2-c4 { animation-delay: .4s; } .a2-card:hover .a2-c5 { animation-delay: .5s; } .a2-card:hover .a2-c6 { animation-delay: .6s; }
+.a2-card:hover .a2-pen  { animation: k-pen 1.2s ease-in-out infinite; }
+
+.a2-card:hover .a3-armL { animation: k-wave 1.2s ease-in-out infinite; }
+.a2-card:hover .a3-armR { animation: k-wave2 1.2s ease-in-out infinite .3s; }
+.a2-card:hover .a3-bar  { animation: k-bar 1.6s ease-in-out infinite; }
+.a2-card:hover .a3-bar1 { animation-delay: .2s; } .a2-card:hover .a3-bar2 { animation-delay: .4s; } .a2-card:hover .a3-bar3 { animation-delay: .6s; }
+.a2-card:hover .a3-flow { animation: k-flow 1s linear infinite; }
+
+.a2-card:hover .a4-arm  { animation: k-wave 1.2s ease-in-out infinite; }
+.a2-card:hover .a4-bulb { animation: k-bubble 1.4s ease-in-out infinite; }
+.a2-card:hover .ray     { animation: k-blink 0.9s ease-in-out infinite; }
+.a2-card:hover .a4-write{ animation: k-write 0.9s ease-in-out infinite; }
+.a2-card .a4-ln { stroke-dasharray: 1; }
+.a2-card:hover .a4-ln   { animation: k-draw 2.4s ease-in-out infinite; }
+.a2-card:hover .a4-ln2  { animation-delay: .4s; } .a2-card:hover .a4-ln3 { animation-delay: .8s; }
+
+.a2-card:hover .a5-lamp  { animation: k-swing 2s ease-in-out infinite; }
+.a2-card:hover .a5-plant { animation: k-sway 2.2s ease-in-out infinite; }
+.a2-card:hover .a5-person{ animation: k-tilt 2.4s ease-in-out infinite; }
+.a2-card .a5-type { stroke-dasharray: 1; }
+.a2-card:hover .a5-type  { animation: k-draw 2s ease-in-out infinite; }
+.a2-card:hover .a5-t2    { animation-delay: .5s; }
+.a2-card .a5-steam { opacity: 0; }
+.a2-card:hover .a5-steam { animation: k-steam 1.8s ease-in-out infinite; }
+.a2-card:hover .a5-st1   { animation-delay: .6s; }
+
+.a2-card:hover .a6-p  { animation: k-bob 1.2s ease-in-out infinite; }
+.a2-card:hover .a6-p1 { animation-delay: .2s; } .a2-card:hover .a6-p3 { animation-delay: .4s; }
+.a2-card:hover .a6-b  { animation: k-bubble 1.5s ease-in-out infinite; }
+.a2-card:hover .a6-b2 { animation-delay: .5s; }
+.a2-card:hover .a6-dot{ animation: k-dot 0.8s ease-in-out infinite; }
+.a2-card:hover .a6-d1 { animation-delay: .15s; } .a2-card:hover .a6-d2 { animation-delay: .3s; }
+.a2-card:hover .a6-heart { animation: k-beat 1.1s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) { .a2-card .art * { animation: none !important; } }
+.page.is-active .a2-cards { opacity: 1; transform: translateY(0); }
+.page.no-anim .a2-cards { transition: none !important; }
+
+
+/* ===== 페이지 이동: 슬라이드 (Chrome/Safari 의 문서 간 View Transition) ===== */
+@view-transition { navigation: auto; }
+#menubar { view-transition-name: menubar; }          /* 메뉴바는 제자리에 두고 페이지만 밀려남 */
+::view-transition-group(root) { animation-duration: 0.9s; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.9s; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); animation-fill-mode: both; mix-blend-mode: normal; }
+/* 메인으로 들어올 때: 로그인 페이지는 오른쪽으로 나가고 메인은 왼쪽에서 들어옴 */
+@keyframes slide-out-right { to { transform: translateX(100%); } }
+@keyframes slide-in-left { from { transform: translateX(-100%); } }
+::view-transition-old(root) { animation-name: slide-out-right; }
+::view-transition-new(root) { animation-name: slide-in-left; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
