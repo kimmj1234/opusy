@@ -154,7 +154,15 @@ html, body {
 
 /* 로그아웃 (로그인된 상태에서 login 대신 보임) */
 #menubar .logout {
-  padding: 0;
+  /* login 과 똑같은 크기의 상자를 차지하게 해서, 로그인 여부·언어와 상관없이 KR / ENG 위치가 그대로 있게 함.
+     글자의 오른쪽 끝도 login 글자의 오른쪽 끝(상자 폭의 91.9%)에 맞춤 */
+  display: block;
+  box-sizing: border-box;
+  height: calc(64px * var(--scale));
+  aspect-ratio: 494 / 187;
+  padding: 0 calc(13.7px * var(--scale)) 0 0;
+  text-align: right;
+  white-space: nowrap;
   border: 0;
   background: none;
   color: inherit;
