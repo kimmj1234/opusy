@@ -234,9 +234,9 @@ html, body {
   padding-left: 74px;               /* 로고 글자 시작 위치에 맞춤 */
 }
 
-/* 왼쪽 메인 문구 (완전 흰색, 3줄) */
+/* 왼쪽 메인 문구 (영역 2 배경과 같은 색, 3줄) */
 .hero-text {
-  color: #fff;
+  color: #26262c;
   font-size: 180px;
   font-weight: 800;
   line-height: 1.18;
