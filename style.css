@@ -183,37 +183,75 @@ html, body {
 }
 #menubar .user-name:hover,
 #menubar .user-name[aria-expanded="true"] { opacity: 0.55; }
+/* 이름을 누르면 메뉴바 바로 아래에 열리는 가로 상자 목록. 오른쪽 끝을 고정한 채 아래로 내려오면서 왼쪽으로 길어짐 */
 #menubar .user-menu {
+  --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
   position: absolute;
-  top: calc(100% - 6px * var(--scale));
-  right: calc(13.7px * var(--scale));
-  min-width: calc(132px * var(--scale));
-  padding: calc(6px * var(--scale));
-  border-radius: calc(14px * var(--scale));
+  top: 100%;
+  right: calc(-6px * var(--scale));
+  box-sizing: border-box;
+  width: calc(160px * var(--scale));               /* 닫힌 상태의 폭 (열리면 600px 까지 왼쪽으로 늘어남) */
+  height: calc(76px * var(--scale));
+  padding: calc(8px * var(--scale));
+  display: flex;
+  flex-direction: row-reverse;                     /* 첫 항목이 오른쪽 끝, 다음 항목은 그 왼쪽으로 */
+  gap: calc(8px * var(--scale));
+  overflow: hidden;
+  border-radius: calc(18px * var(--scale));
   background: #fff;
-  box-shadow: 0 calc(10px * var(--scale)) calc(30px * var(--scale)) rgba(16, 16, 20, 0.14);
-  animation: user-menu-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 calc(12px * var(--scale)) calc(34px * var(--scale)) rgba(16, 16, 20, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(calc(-14px * var(--scale)));
+  transition:
+    width 0.38s var(--menu-ease),
+    transform 0.3s var(--menu-ease),
+    opacity 0.22s ease,
+    visibility 0s linear 0.38s;
+}
+#menubar .user-menu.open {
+  width: calc(600px * var(--scale));
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition:
+    width 0.75s var(--menu-ease) 0.08s,            /* 내려오기 시작한 직후부터 왼쪽으로 길어짐 */
+    transform 0.55s var(--menu-ease),
+    opacity 0.3s ease,
+    visibility 0s;
 }
 #menubar .user-menu button {
-  display: block;
-  width: 100%;
-  padding: calc(11px * var(--scale)) calc(14px * var(--scale));
+  flex: none;
+  min-width: calc(140px * var(--scale));
+  height: 100%;
+  padding: 0 calc(22px * var(--scale));
   border: 0;
-  border-radius: calc(9px * var(--scale));
-  background: none;
+  border-radius: calc(11px * var(--scale));
+  background: #f1f1f4;
   color: #15151b;
   font: inherit;
-  font-size: calc(16px * var(--scale));
+  font-size: calc(17px * var(--scale));
   font-weight: 600;
-  text-align: left;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.2s;
+  opacity: 0;
+  transform: translateX(calc(14px * var(--scale)));
+  transition: background 0.2s, opacity 0.2s ease, transform 0.2s ease;
 }
-#menubar .user-menu button:hover { background: #f1f1f4; }
-@keyframes user-menu-in {
-  from { opacity: 0; transform: translateY(calc(-6px * var(--scale))); }
-  to   { opacity: 1; transform: none; }
+#menubar .user-menu.open button {
+  opacity: 1;
+  transform: none;
+  /* 오른쪽 항목부터 차례로 나타남 */
+  transition: background 0.2s, opacity 0.45s ease calc(0.16s + var(--n, 0) * 0.07s), transform 0.6s var(--menu-ease) calc(0.16s + var(--n, 0) * 0.07s);
+}
+#menubar .user-menu button:nth-child(2) { --n: 1; }
+#menubar .user-menu button:nth-child(3) { --n: 2; }
+#menubar .user-menu button:nth-child(4) { --n: 3; }
+#menubar .user-menu button:hover { background: #e4e4ea; }
+@media (prefers-reduced-motion: reduce) {
+  #menubar .user-menu, #menubar .user-menu button { transition: none !important; transform: none; }
 }
 #menubar [hidden] { display: none !important; }
 

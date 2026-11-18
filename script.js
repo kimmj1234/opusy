@@ -126,7 +126,8 @@
       const m = u.user_metadata || {};
       return String(m.name || m.username || (u.email || '').split('@')[0] || '').trim();
     };
-    const openMenu = (open) => { menu.hidden = !open; nameBtn.setAttribute('aria-expanded', String(open)); };
+    const isOpen = () => menu.classList.contains('open');
+    const openMenu = (open) => { menu.classList.toggle('open', open); nameBtn.setAttribute('aria-expanded', String(open)); };
     const render = () => {
       const s = read();
       loginLink.hidden = !!s;
@@ -136,8 +137,8 @@
       nameBtn.title = name;             // 줄어든 이름은 마우스를 올리면 전체가 보임
       openMenu(false);
     };
-    nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(menu.hidden); });
-    document.addEventListener('click', (e) => { if (!menu.hidden && !userBox.contains(e.target)) openMenu(false); });
+    nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(!isOpen()); });
+    document.addEventListener('click', (e) => { if (isOpen() && !userBox.contains(e.target)) openMenu(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openMenu(false); });
     logoutBtn.addEventListener('click', async () => {
       const s = read();
