@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -60,6 +60,14 @@
       tipFormat: 'JPG, PNG, WEBP 같은 이미지 파일을 쓸 수 있어요.',
       devices: '등록된 기기', devCount: (n) => `${n}대`, devOn: (d) => `${d}에 등록`,
       devNone: '등록된 기기가 없어요.', devFail: '기기 목록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.',
+      devPrev: '이전 페이지', devAdd: '기기 추가', devNext: '다음 페이지', devPage: (a, b) => `${a} / ${b}`,
+      devMore: '기기 설정', devEdit: '수정', devDel: '삭제', devLog: '접속기록', devSave: '저장', devCancel: '취소', devClose: '닫기',
+      devNamePh: '기기 이름 (30자 이내)', devDelAsk: '이 기기를 삭제할까요?', devDelLast: '마지막 기기예요. 지우면 다음 로그인 때 메일 확인이 필요해요. 삭제할까요?',
+      devLastAt: (d) => `마지막 접속 ${d}`, devNoLog: '아직 이 기기로 로그인한 기록이 없어요.', devPlace: (p) => `위치 ${p}`, devIp: (ip) => `IP ${ip}`, devNoPlace: '위치를 알 수 없어요',
+      devSent: '가입한 이메일로 링크를 보냈어요. 추가할 기기에서 메일의 링크를 열어 등록해 주세요.', devSendFail: '메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요.',
+      devRate: '메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.', devLimit: '기기는 10대까지 등록할 수 있어요. 쓰지 않는 기기를 먼저 삭제해 주세요.',
+      devSaveFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.', devDelFail: '삭제하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      dateTime: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -96,6 +104,14 @@
       tipFormat: 'Image files such as JPG, PNG and WEBP work.',
       devices: 'Registered devices', devCount: (n) => String(n), devOn: (d) => `Registered on ${d}`,
       devNone: 'No registered devices.', devFail: 'Could not load your devices. Please refresh in a moment.',
+      devPrev: 'Previous', devAdd: 'Add device', devNext: 'Next', devPage: (a, b) => `${a} / ${b}`,
+      devMore: 'Device settings', devEdit: 'Rename', devDel: 'Delete', devLog: 'Activity', devSave: 'Save', devCancel: 'Cancel', devClose: 'Close',
+      devNamePh: 'Device name (up to 30)', devDelAsk: 'Delete this device?', devDelLast: 'This is your last device. You will need an email check at next login. Delete it?',
+      devLastAt: (d) => `Last sign-in ${d}`, devNoLog: 'No sign-ins from this device yet.', devPlace: (p) => `Location ${p}`, devIp: (ip) => `IP ${ip}`, devNoPlace: 'Location unknown',
+      devSent: 'We sent a link to your email. Open it on the device you want to add.', devSendFail: 'Could not send the email. Please try again in a moment.',
+      devRate: 'Too many emails. Please try again in a moment.', devLimit: 'You can register up to 10 devices. Delete one you no longer use first.',
+      devSaveFail: 'Could not save. Please try again in a moment.', devDelFail: 'Could not delete. Please try again in a moment.',
+      dateTime: (d) => d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       m: {
@@ -131,32 +147,152 @@
     pc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>',
     mobile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>',
   };
-  function showDevices() {
+  // 한 쪽에 3대씩 보여 주고, 각 기기 오른쪽 끝의 ⋯ 버튼으로 수정·삭제·접속기록을 엶
+  const PER = 3;
+  let devPage = 0;
+  let devOpen = null;          // 설정이 열린 기기 { id, mode: 'menu' | 'edit' | 'del' | 'log' }
+  let devBusy = false;
+  let devNote = '';            // 기기 칸 아래 안내 (I18N 키). devNoteBad=true 면 빨간 글씨
+  let devNoteBad = false;
+  let myEmail = '';
+  const MORE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const pill = (text, fn, cls) => { const b = el('button', 'pf-dev-pill' + (cls ? ' ' + cls : ''), text); b.type = 'button'; b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+  const setDevNote = (key, bad) => { devNote = key || ''; devNoteBad = !!bad; };
+  const devLabel = (d) => d.nickname || I18N[lang].devName[d.platform] || I18N[lang].devName[d.device_kind === 'mobile' ? 'mobile' : 'pc'];
+
+  function showDevices(focusSel) {
     const t = I18N[lang];
     const list = $('#pfDevList');
     const note = $('#pfDevNote');
     list.textContent = '';
-    note.classList.toggle('bad', devices === false);
-    if (devices === null) { $('#pfDevCount').textContent = ''; note.textContent = ''; return; }
-    if (devices === false) { $('#pfDevCount').textContent = ''; note.textContent = t.devFail; return; }
-    $('#pfDevCount').textContent = t.devCount(devices.length);
-    note.textContent = devices.length ? '' : t.devNone;
-    devices.forEach((d) => {
+    const ok = Array.isArray(devices);
+    $('#pfDevPrev').disabled = $('#pfDevNext').disabled = true;
+    $('#pfDevAdd').disabled = !ok || devBusy;
+    if (!ok) {
+      $('#pfDevCount').textContent = '';
+      note.classList.toggle('bad', devices === false);
+      note.textContent = devices === false ? t.devFail : '';
+      return;
+    }
+    const pages = Math.max(1, Math.ceil(devices.length / PER));
+    devPage = Math.min(devPage, pages - 1);
+    $('#pfDevCount').textContent = t.devCount(devices.length) + (pages > 1 ? ` · ${t.devPage(devPage + 1, pages)}` : '');
+    $('#pfDevPrev').disabled = devPage === 0;
+    $('#pfDevNext').disabled = devPage >= pages - 1;
+    note.classList.toggle('bad', devNoteBad);
+    note.textContent = devNote ? t[devNote] : (devices.length ? '' : t.devNone);
+
+    devices.slice(devPage * PER, devPage * PER + PER).forEach((d) => {
       const kind = d.device_kind === 'mobile' ? 'mobile' : 'pc';
-      const li = document.createElement('li');
-      li.className = 'pf-dev-item';
-      li.innerHTML = ICON[kind];                                   // 고정된 아이콘 그림만 HTML 로 넣고, 글자는 아래에서 textContent 로 넣음
-      const box = document.createElement('div');
-      const name = document.createElement('strong');
-      name.textContent = t.devName[d.platform] || t.devName[kind];
-      const when = document.createElement('span');
-      const dt = localDate(d.created_at);
-      when.textContent = dt ? t.devOn(t.date(dt)) : '';
-      box.append(name, when);
+      const open = devOpen && devOpen.id === d.id ? devOpen.mode : '';
+      const li = el('li', 'pf-dev-item' + (open ? ' is-open is-' + open : ''));
+      li.dataset.id = d.id;
+      li.insertAdjacentHTML('afterbegin', ICON[kind]);              // 고정된 아이콘 그림만 HTML 로 넣고, 글자는 textContent 로 넣음
+      const box = el('div', 'pf-dev-text');
+      if (open === 'edit') {
+        const input = el('input', 'pf-dev-input');
+        input.type = 'text'; input.maxLength = 30; input.value = d.nickname || devLabel(d);
+        input.placeholder = t.devNamePh; input.setAttribute('aria-label', t.devNamePh);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); saveName(d, input.value); }
+          if (e.key === 'Escape') { e.stopPropagation(); closeDev(); }
+        });
+        box.append(input);
+      } else {
+        const name = el('strong', '', devLabel(d)); name.title = devLabel(d);
+        const dt = localDate(d.created_at);
+        box.append(name, el('span', '', dt ? t.devOn(t.date(dt)) : ''));
+      }
       li.append(box);
+
+      // ⋯ 를 누르면 왼쪽 빈 공간으로 펼쳐지는 설정 칸
+      const acts = el('div', 'pf-dev-acts');
+      if (open === 'menu') {
+        acts.append(pill(t.devEdit, () => openDev(d.id, 'edit', '.pf-dev-input')), pill(t.devDel, () => openDev(d.id, 'del', '.pf-dev-pill.is-danger')), pill(t.devLog, () => openDev(d.id, 'log', '.pf-dev-pill')));
+      } else if (open === 'edit') {
+        acts.append(pill(t.devSave, () => saveName(d, $('.pf-dev-input').value), 'is-main'), pill(t.devCancel, closeDev));
+      } else if (open === 'del') {
+        acts.append(el('p', 'pf-dev-ask', devices.length === 1 ? t.devDelLast : t.devDelAsk), pill(t.devDel, () => removeDev(d), 'is-danger'), pill(t.devCancel, closeDev));
+      } else if (open === 'log') {
+        const info = el('div', 'pf-dev-log');
+        const at = d.last_used_at ? new Date(d.last_used_at) : null;
+        if (!at || isNaN(at)) info.append(el('p', '', t.devNoLog));
+        else {
+          const place = [d.last_city, d.last_region, d.last_country].filter((v, i, a) => v && a.indexOf(v) === i).join(', ');
+          info.append(el('p', 'pf-dev-log-at', t.devLastAt(t.dateTime(at))), el('p', '', (place ? t.devPlace(place) : t.devNoPlace) + (d.last_ip ? ' · ' + t.devIp(d.last_ip) : '')));
+        }
+        acts.append(info, pill(t.devClose, closeDev));
+      }
+      li.append(acts);
+
+      const more = el('button', 'pf-dev-more');
+      more.type = 'button';
+      more.innerHTML = MORE;
+      more.setAttribute('aria-label', `${t.devMore}: ${devLabel(d)}`);
+      more.setAttribute('aria-expanded', String(!!open));
+      more.disabled = devBusy;
+      more.addEventListener('click', (e) => { e.stopPropagation(); open ? closeDev(true) : openDev(d.id, 'menu', '.pf-dev-pill'); });
+      li.append(more);
       list.append(li);
     });
+    if (focusSel) {
+      const item = list.querySelector(`.pf-dev-item.is-open`);
+      const target = item && item.querySelector(focusSel);
+      if (target) { target.focus(); if (target.select) target.select(); }
+    }
   }
+  function openDev(id, mode, focusSel) { devOpen = { id, mode }; setDevNote(''); showDevices(focusSel); }
+  function closeDev(focusMore) {
+    const id = devOpen && devOpen.id;
+    devOpen = null; showDevices();
+    if (focusMore && id) { const b = $(`.pf-dev-item[data-id="${id}"] .pf-dev-more`); if (b) b.focus(); }
+  }
+  async function reloadDevices() {
+    try {
+      const { data, error } = await sb.rpc('my_devices');
+      devices = !error && Array.isArray(data) ? data : false;
+    } catch (e) { devices = false; }
+  }
+  async function saveName(d, value) {
+    if (devBusy) return;
+    const name = String(value || '').trim().slice(0, 30);
+    devBusy = true;
+    let ok = false;
+    try { const { error } = await sb.rpc('rename_device', { p_id: d.id, p_name: name }); ok = !error; } catch (e) {}
+    devBusy = false;
+    if (ok) { d.nickname = name || null; devOpen = null; setDevNote(''); } else setDevNote('devSaveFail', true);
+    showDevices();
+  }
+  async function removeDev(d) {
+    if (devBusy) return;
+    devBusy = true; showDevices();
+    let ok = false;
+    try { const { error } = await sb.rpc('delete_device', { p_id: d.id }); ok = !error; } catch (e) {}
+    devBusy = false;
+    if (ok) { devOpen = null; setDevNote(''); await reloadDevices(); } else setDevNote('devDelFail', true);
+    showDevices();
+  }
+  $('#pfDevPrev').addEventListener('click', () => { devPage = Math.max(0, devPage - 1); devOpen = null; showDevices(); });
+  $('#pfDevNext').addEventListener('click', () => { devPage += 1; devOpen = null; showDevices(); });
+  // 기기 추가: 가입한 이메일로 등록 링크를 보냄. 추가할 기기에서 링크를 열면 그 기기를 등록하는 화면이 열림
+  $('#pfDevAdd').addEventListener('click', async () => {
+    if (devBusy || !Array.isArray(devices)) return;
+    if (devices.length >= 10) { setDevNote('devLimit', true); showDevices(); return; }
+    if (!myEmail) { setDevNote('devSendFail', true); showDevices(); return; }
+    devBusy = true; devOpen = null; showDevices();
+    let key = 'devSent', bad = false;
+    try {
+      const { error } = await sb.auth.signInWithOtp({ email: myEmail, options: { shouldCreateUser: false, emailRedirectTo: `${location.origin}/login.html?add=1` } });
+      if (error) { key = error.status === 429 ? 'devRate' : 'devSendFail'; bad = true; }
+    } catch (e) { key = 'devSendFail'; bad = true; }
+    devBusy = false;
+    setDevNote(key, bad);
+    showDevices();
+  });
+  // 설정 칸 바깥을 누르거나 Esc 를 누르면 닫힘
+  document.addEventListener('click', (e) => { if (devOpen && !e.target.closest('.pf-dev-item.is-open')) closeDev(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && devOpen) closeDev(true); });
   const localDate = (v) => {            // 'YYYY-MM-DD' 는 시간대 때문에 하루 밀리지 않게 직접 나눠서 만듦
     if (!v) return null;
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));
@@ -335,7 +471,6 @@
   }
 
   // ===== 활동 상세: 위의 게시글·팔로워·팔로우·좋아요 중 하나를 고르면 왼쪽 아래 칸에 그 내용이 나옴 =====
-  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const fmtN = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
   const shortDate = (iso) => { const d = localDate(iso); return d ? I18N[lang].date(d) : ''; };
   const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 2.8 4.5 6.4 4.5c2 0 3.6 1.1 5.6 3.2 2-2.1 3.6-3.2 5.6-3.2 3.6 0 5.5 3.7 4 7.2C19.5 16.4 12 21 12 21Z"/></svg>';
@@ -528,6 +663,7 @@
     if (!session) { location.replace('login.html'); return; }   // 로그인하지 않았으면 로그인 화면으로
 
     const u = session.user;
+    myEmail = u.email || '';
     const meta = u.user_metadata || {};
     const shownId = String(meta.username || (u.email || '').split('@')[0] || '').trim();
     $('#menubar .login').hidden = true;
@@ -553,11 +689,8 @@
     await loadStats();
     selectView('posts');
 
-    // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·운영체제·등록일만 돌려줌
-    try {
-      const { data, error } = await sb.rpc('my_devices');
-      devices = !error && Array.isArray(data) ? data : false;
-    } catch (e) { devices = false; }
+    // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·이름·등록일·마지막 접속만 돌려줌
+    await reloadDevices();
     showDevices();
     $('#pfDev').classList.remove('is-loading');
   })();
