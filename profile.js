@@ -26,6 +26,9 @@
       pageTitle: '내 프로필 · OPUSY', goBack: '이전으로 돌아가기', profile: '내 프로필', settings: '설정', logout: '로그아웃',
       addPhoto: '사진 추가', changePhoto: '사진 바꾸기', removePhoto: '사진 지우기', photoLabel: '프로필 사진',
       email: '이메일', name: '이름', birth: '생년월일', phone: '전화번호', joined: '가입일',
+      devices: '등록된 기기', devCount: (n) => `${n}대`, devOn: (d) => `${d}에 등록`,
+      devNone: '등록된 기기가 없어요.', devFail: '기기 목록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.',
+      devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
         uploading: '사진을 올리는 중이에요…',
@@ -39,6 +42,9 @@
       pageTitle: 'My profile · OPUSY', goBack: 'Go back', profile: 'My profile', settings: 'Settings', logout: 'Logout',
       addPhoto: 'Add photo', changePhoto: 'Change photo', removePhoto: 'Remove photo', photoLabel: 'Profile photo',
       email: 'Email', name: 'Name', birth: 'Date of birth', phone: 'Phone', joined: 'Joined',
+      devices: 'Registered devices', devCount: (n) => String(n), devOn: (d) => `Registered on ${d}`,
+      devNone: 'No registered devices.', devFail: 'Could not load your devices. Please refresh in a moment.',
+      devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       m: {
         uploading: 'Uploading your photo…',
@@ -61,6 +67,39 @@
     $('#pfPhoto').setAttribute('aria-label', t.photoLabel);
     showMsg(msgKey, msgInfo);
     showDates();
+    showDevices();
+  }
+  // 등록된 기기 목록 (언어를 바꾸면 다시 그림). devices: null=아직 안 불러옴, false=실패, 배열=목록
+  let devices = null;
+  const ICON = {
+    pc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>',
+    mobile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>',
+  };
+  function showDevices() {
+    const t = I18N[lang];
+    const list = $('#pfDevList');
+    const note = $('#pfDevNote');
+    list.textContent = '';
+    note.classList.toggle('bad', devices === false);
+    if (devices === null) { $('#pfDevCount').textContent = ''; note.textContent = ''; return; }
+    if (devices === false) { $('#pfDevCount').textContent = ''; note.textContent = t.devFail; return; }
+    $('#pfDevCount').textContent = t.devCount(devices.length);
+    note.textContent = devices.length ? '' : t.devNone;
+    devices.forEach((d) => {
+      const kind = d.device_kind === 'mobile' ? 'mobile' : 'pc';
+      const li = document.createElement('li');
+      li.className = 'pf-dev-item';
+      li.innerHTML = ICON[kind];                                   // 고정된 아이콘 그림만 HTML 로 넣고, 글자는 아래에서 textContent 로 넣음
+      const box = document.createElement('div');
+      const name = document.createElement('strong');
+      name.textContent = t.devName[d.platform] || t.devName[kind];
+      const when = document.createElement('span');
+      const dt = localDate(d.created_at);
+      when.textContent = dt ? t.devOn(t.date(dt)) : '';
+      box.append(name, when);
+      li.append(box);
+      list.append(li);
+    });
   }
   // 계정 정보의 날짜(생년월일·가입일)는 언어에 맞춰 표기
   let info = { birth: null, joined: null };
@@ -242,5 +281,13 @@
     if (p) setPhoto(p.avatar_path || null); else showMsg('load');
     canEdit = !!p;
     $('#pfTop').classList.remove('is-loading');
+
+    // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·운영체제·등록일만 돌려줌
+    try {
+      const { data, error } = await sb.rpc('my_devices');
+      devices = !error && Array.isArray(data) ? data : false;
+    } catch (e) { devices = false; }
+    showDevices();
+    $('#pfDev').classList.remove('is-loading');
   })();
 })();

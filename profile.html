@@ -54,7 +54,9 @@
     <div class="pf-panel">
       <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
 
-      <!-- 프로필 사진: 흰 상자의 가로 가운데. 누르면 사진을 고를 수 있음 -->
+      <!-- 흰 상자를 가운데 기준으로 네 등분: 왼쪽 위 = 사진과 계정 정보, 오른쪽 위 = 등록된 기기, 아래 두 칸은 비워 둠 -->
+      <div class="pf-grid">
+      <section class="pf-q pf-q1">
       <div class="pf-top is-loading" id="pfTop">
       <div class="pf-photo-box" id="pfPhotoBox">
         <button type="button" class="pf-photo" id="pfPhoto">
@@ -81,6 +83,20 @@
           <div><dt data-i18n="joined"></dt><dd id="pfJoined"></dd></div>
         </dl>
       </div>
+      </div>
+      </section>
+
+      <!-- 오른쪽 위: 이 계정에 등록된 기기 (보기만) -->
+      <section class="pf-q pf-q2">
+        <div class="pf-dev is-loading" id="pfDev">
+          <h2 class="pf-q-title"><span data-i18n="devices"></span><span class="pf-count" id="pfDevCount"></span></h2>
+          <ul class="pf-dev-list" id="pfDevList"></ul>
+          <p class="pf-dev-note" id="pfDevNote"></p>
+        </div>
+      </section>
+
+      <section class="pf-q pf-q3" aria-hidden="true"></section>
+      <section class="pf-q pf-q4" aria-hidden="true"></section>
       </div>
     </div>
   </main>

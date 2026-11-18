@@ -123,12 +123,17 @@
 }
 .pf-page .back-link { left: calc(40px * var(--scale)); bottom: calc(36px * var(--scale)); }
 
-/* ===== 프로필 사진: 흰 동그라미 (1920×1080 기준 지름 260, 상자 위에서 80) ===== */
-/* 사진(왼쪽)과 계정 정보(오른쪽)를 한 줄로 묶어 흰 상자의 가로 가운데에 둠 */
+/* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔. 칸 사이에는 옅은 선 ===== */
+.pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
+.pf-q { min-width: 0; min-height: 0; padding: max(20px, calc(48px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
+.pf-q1, .pf-q3 { border-right: 1px solid #ececf0; }
+.pf-q1, .pf-q2 { border-bottom: 1px solid #ececf0; }
+.pf-q1 { display: flex; align-items: center; justify-content: center; }
+
+/* ===== 왼쪽 위: 프로필 사진(흰 동그라미, 1920×1080 기준 지름 220)과 계정 정보를 한 줄로 묶어 칸 가운데에 둠 ===== */
 .pf-top {
-  position: absolute; top: calc(80px * var(--scale)); left: 50%; transform: translateX(-50%);
-  display: flex; align-items: flex-start; gap: max(28px, calc(72px * var(--scale)));
-  max-width: calc(100% - 48px);
+  display: flex; align-items: flex-start; gap: max(22px, calc(56px * var(--scale)));
+  max-width: 100%;
   transition: opacity 0.5s ease;
 }
 .pf-top.is-loading { opacity: 0; pointer-events: none; }
@@ -136,15 +141,38 @@
 
 /* 계정 정보: 큰 아이디 아래에 항목 이름과 값이 한 줄씩 */
 .pf-info { min-width: 0; padding-top: calc(14px * var(--scale)); }
-.pf-id { max-width: max(260px, calc(620px * var(--scale))); font-size: max(26px, calc(52px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-id { max-width: max(200px, calc(480px * var(--scale))); font-size: max(24px, calc(46px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pf-list { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: max(18px, calc(36px * var(--scale))); row-gap: max(8px, calc(14px * var(--scale))); margin-top: max(14px, calc(26px * var(--scale))); font-size: max(13px, calc(20px * var(--scale))); line-height: 1.4; }
 .pf-list > div { display: contents; }
 .pf-list dt { font-weight: 600; color: #8b8b93; white-space: nowrap; }
-.pf-list dd { font-weight: 500; color: #14151F; max-width: max(220px, calc(520px * var(--scale))); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 700px) { .pf-top { flex-direction: column; align-items: center; } .pf-info { text-align: center; } .pf-list { text-align: left; } }
+.pf-list dd { font-weight: 500; color: #14151F; max-width: max(160px, calc(380px * var(--scale))); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== 오른쪽 위: 등록된 기기 ===== */
+.pf-q2 { display: flex; }
+.pf-dev { display: flex; flex-direction: column; width: 100%; min-height: 0; transition: opacity 0.5s ease; }
+.pf-dev.is-loading { opacity: 0; }
+.pf-q-title { flex: none; display: flex; align-items: baseline; gap: max(8px, calc(12px * var(--scale))); font-size: max(18px, calc(30px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.pf-count { font-size: max(13px, calc(20px * var(--scale))); font-weight: 600; color: #8b8b93; letter-spacing: 0; }
+.pf-dev-list { flex: 0 1 auto; min-height: 0; margin-top: max(12px, calc(22px * var(--scale))); padding: 0; list-style: none; display: flex; flex-direction: column; gap: max(6px, calc(10px * var(--scale))); overflow-y: auto; }
+.pf-dev-item { flex: none; display: flex; align-items: center; gap: max(12px, calc(18px * var(--scale))); padding: max(10px, calc(16px * var(--scale))) max(14px, calc(22px * var(--scale))); border-radius: 14px; background: #f1f1f4; }
+.pf-dev-item svg { flex: none; width: max(20px, calc(30px * var(--scale))); height: auto; aspect-ratio: 1; color: #14151F; }
+.pf-dev-item strong { display: block; font-size: max(14px, calc(20px * var(--scale))); font-weight: 700; }
+.pf-dev-item span { display: block; margin-top: 2px; font-size: max(12px, calc(16px * var(--scale))); font-weight: 500; color: #55565f; }
+.pf-dev-note { flex: none; margin-top: max(10px, calc(16px * var(--scale))); font-size: max(12px, calc(16px * var(--scale))); font-weight: 500; line-height: 1.5; color: #8b8b93; }
+.pf-dev-note:empty { display: none; }
+.pf-dev-note.bad { color: #c62d1f; }
+
+/* 좁은 화면: 네 칸을 한 줄로 쌓고 흰 상자 안에서 스크롤 */
+@media (max-width: 700px) {
+  .pf-panel { overflow: auto; }
+  .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
+  .pf-q { border-right: 0; overflow: visible; }
+  .pf-q3, .pf-q4 { display: none; }
+  .pf-top { flex-direction: column; align-items: center; } .pf-info { text-align: center; } .pf-list { text-align: left; }
+}
 .pf-photo {
   position: relative; display: block;
-  width: max(120px, calc(260px * var(--scale))); aspect-ratio: 1;
+  width: max(110px, calc(220px * var(--scale))); aspect-ratio: 1;
   padding: 0; border: 1.5px solid #e4e4e9; border-radius: 50%;
   background: #fff; color: #8b8b93; font: inherit; cursor: pointer; overflow: hidden;
   box-shadow: 0 calc(14px * var(--scale)) calc(44px * var(--scale)) rgba(20, 21, 31, 0.08);
@@ -159,5 +187,5 @@
 .pf-photo.has-img:hover .pf-photo-hover, .pf-photo.has-img:focus-visible .pf-photo-hover { opacity: 1; }
 .pf-photo.is-busy { cursor: progress; }
 .pf-photo.is-busy img, .pf-photo.is-busy .pf-photo-empty { opacity: 0.4; }
-.pf-photo-box .msg { width: max(120px, calc(260px * var(--scale))); text-align: center; word-break: keep-all; }
+.pf-photo-box .msg { width: max(110px, calc(220px * var(--scale))); text-align: center; word-break: keep-all; }
 .pf-photo-box .text-btn { margin-top: 0; height: 28px; }
