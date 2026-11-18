@@ -116,86 +116,9 @@
 }
 .pf-panel {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   border-radius: 20px;
   background: #fff;
   overflow: hidden;
 }
 .pf-page .back-link { left: calc(40px * var(--scale)); bottom: calc(36px * var(--scale)); }
-.pf-view { grid-area: 1 / 1; min-width: 0; min-height: 0; animation: pf-view-in 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-@keyframes pf-view-in { from { opacity: 0; transform: translateY(12px); } }
-@media (prefers-reduced-motion: reduce) { .pf-view { animation: none; } }
-
-/* ===== 첫 화면: 위쪽 가운데에 프로필 사진과 이미지, 그 아래 아이디, 맨 아래 메뉴들 (1920×1080 기준 치수를 --scale 로 환산) ===== */
-.pf-home {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: calc(32px * var(--scale)) calc(32px * var(--scale)) calc(40px * var(--scale));
-  overflow: auto;
-}
-.pf-head { display: flex; flex-direction: column; align-items: center; flex: 0 1 auto; width: 100%; min-height: 0; text-align: center; }
-.pf-head.is-loading > .pf-id, .pf-head.is-loading > .pf-joined, .pf-head.is-loading .pf-avatar { opacity: 0; }
-/* 이미지: 가로 855 × 세로 432. 화면이 낮으면 세로만 줄어듦 */
-.pf-cover {
-  position: relative; flex: 0 1 calc(432px * var(--scale));
-  width: min(calc(855px * var(--scale)), 100%); min-height: 120px;
-  border-radius: 20px; background: #e4e4e9;
-  display: grid; place-items: center;
-}
-.pf-cover img { width: 62%; height: 62%; object-fit: contain; }
-/* 프로필 사진: 이미지 아래쪽 가장자리 가운데에 반쯤 걸침 */
-.pf-avatar {
-  position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 50%);
-  display: grid; place-items: center;
-  width: max(72px, calc(150px * var(--scale))); aspect-ratio: 1; border-radius: 50%;
-  border: max(4px, calc(6px * var(--scale))) solid #fff;
-  background: #14151F; color: #fff;
-  font-size: max(30px, calc(60px * var(--scale))); font-weight: 800; line-height: 1; text-transform: uppercase;
-  transition: opacity 0.5s ease;
-}
-.pf-id { flex: none; max-width: 100%; margin-top: max(46px, calc(92px * var(--scale))); font-size: max(26px, calc(52px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity 0.5s ease; }
-.pf-joined { flex: none; min-height: 1.4em; margin-top: calc(8px * var(--scale)); font-size: max(13px, calc(18px * var(--scale))); font-weight: 500; color: #55565f; transition: opacity 0.5s ease; }
-
-/* 메뉴들: 가로 1316 × 세로 285 안에 같은 크기의 상자 3개 */
-.pf-menus {
-  flex: 0 1 calc(285px * var(--scale));
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(16px * var(--scale));
-  width: min(calc(1316px * var(--scale)), 100%); min-height: 110px;
-  margin-top: calc(36px * var(--scale));
-}
-.pf-menu {
-  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
-  min-width: 0; padding: max(16px, calc(30px * var(--scale)));
-  border: 0; border-radius: 20px; background: #f1f1f4; color: #14151F;
-  font: inherit; text-align: left; cursor: pointer;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-.pf-menu:hover { background: #14151F; color: #fff; }
-.pf-menu svg { flex: none; width: max(22px, calc(34px * var(--scale))); height: auto; aspect-ratio: 1; }
-.pf-menu-text { display: flex; flex-direction: column; gap: calc(6px * var(--scale)); min-width: 0; max-width: 100%; }
-.pf-menu strong { font-size: max(15px, calc(26px * var(--scale))); font-weight: 700; letter-spacing: -0.01em; }
-.pf-menu-text > span { font-size: max(12px, calc(16px * var(--scale))); font-weight: 500; opacity: 0.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ===== 내 정보 수정 ===== */
-.pf-main { display: flex; padding: 32px clamp(24px, 4vw, 64px); overflow: auto; }
-.pf-pane { display: flex; flex-direction: column; align-items: center; width: 100%; margin: auto; }   /* 세로 가운데. 화면이 낮으면 위에서부터 스크롤 */
-.pf-pane .card-title { margin-top: 0; }
-.pf-pane .text-btn { margin-top: 6px; }
-
-#form-profile { width: 100%; max-width: 400px; margin-top: clamp(20px, 4vh, 40px); display: flex; flex-direction: column; gap: 14px; flex: none; }
-.pf-field { display: flex; flex-direction: column; }
-.pf-field label { font-size: 13px; font-weight: 600; color: #8b8b93; }
-.pf-field .line-field input { height: 44px; padding-right: 0; }
-.pf-field .line-field input::placeholder { color: #b5b5bd; }
-.pf-field .line-field input[readonly] { color: #8b8b93; border-bottom-color: #d5d5db; cursor: default; }
-.pf-field .line-field input[readonly]:focus { border-bottom: 1.5px solid #d5d5db; }
-#form-profile .msg, #form-profile .msg:empty { display: block; min-height: 42px; }   /* 문구 두 줄 자리를 항상 잡아 둠 → 버튼 위치 고정 */
-#form-profile .msg.ok { color: #1a7f4b; }
-#form-profile .login-btn { margin-top: 0; }
-#form-profile .login-btn:disabled { opacity: 0.35; cursor: default; }
-#form-profile .login-btn:disabled:hover { background: #14151F; }
-#form-profile.is-loading .line-field input { color: transparent; }
-
-@media (max-width: 700px) { .pf-menus { grid-template-columns: minmax(0, 1fr); flex: none; } .pf-home { justify-content: flex-start; } .pf-cover { flex: none; height: 180px; } }
