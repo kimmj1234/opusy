@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611181930">
-  <link rel="stylesheet" href="profile.css?v=202611181930">
+  <link rel="stylesheet" href="login.css?v=202611181937">
+  <link rel="stylesheet" href="profile.css?v=202611181937">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -59,17 +59,29 @@
       <section class="pf-q pf-q1">
       <!-- 프로필 카드: 위에 커버(회색 배경과 같은 색), 커버 아래쪽에 걸친 프로필 동그라미, 아이디·이메일, 구분선, 계정 정보 -->
       <div class="pf-card is-loading" id="pfTop">
-        <div class="pf-banner" aria-hidden="true"></div>
-        <div class="pf-photo-box" id="pfPhotoBox">
-          <button type="button" class="pf-photo" id="pfPhoto">
-            <img id="pfPhotoImg" alt="" hidden>
-            <span class="pf-photo-empty" id="pfPhotoEmpty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3.2"/></svg>
-              <span data-i18n="addPhoto"></span>
+        <div class="pf-cover">
+          <!-- 배경 사진: 누르면 바꿀 수 있음. 없을 때는 바깥 회색 배경과 같은 색 -->
+          <button type="button" class="pf-banner" id="pfCover">
+            <img id="pfCoverImg" alt="" hidden>
+            <span class="pf-banner-empty" id="pfCoverEmpty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-4.5-4.5L8 20"/></svg>
+              <span data-i18n="addCover"></span>
             </span>
-            <span class="pf-photo-hover" data-i18n="changePhoto" aria-hidden="true"></span>
+            <span class="pf-banner-hover" data-i18n="changeCover" aria-hidden="true"></span>
           </button>
-          <input type="file" id="pfFile" accept="image/*" hidden>
+          <input type="file" id="pfCoverFile" accept="image/*" hidden>
+          <!-- 프로필 동그라미: 배경 사진 아래쪽 가장자리에 반쯤 걸침 -->
+          <div class="pf-photo-box" id="pfPhotoBox">
+            <button type="button" class="pf-photo" id="pfPhoto">
+              <img id="pfPhotoImg" alt="" hidden>
+              <span class="pf-photo-empty" id="pfPhotoEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3.2"/></svg>
+                <span data-i18n="addPhoto"></span>
+              </span>
+              <span class="pf-photo-hover" data-i18n="changePhoto" aria-hidden="true"></span>
+            </button>
+            <input type="file" id="pfFile" accept="image/*" hidden>
+          </div>
         </div>
         <div class="pf-head">
           <div class="pf-who">
@@ -77,15 +89,19 @@
             <p class="pf-email" id="pfEmail"></p>
           </div>
           <div class="pf-actions">
-            <button class="pf-pill" type="button" id="pfRemove" data-i18n="removePhoto" hidden></button>
+            <div class="pf-pills">
+              <button class="pf-pill" type="button" id="pfCoverRemove" data-i18n="removeCover" hidden></button>
+              <button class="pf-pill" type="button" id="pfRemove" data-i18n="removePhoto" hidden></button>
+            </div>
             <p class="msg" id="pfMsg" role="status"></p>
           </div>
         </div>
+        <!-- 게시글·팔로워·팔로우·좋아요: 아직 해당 기능이 없어서 0 으로 표시 -->
         <dl class="pf-stats">
-          <div><dd id="pfName"></dd><dt data-i18n="name"></dt></div>
-          <div><dd id="pfBirth"></dd><dt data-i18n="birth"></dt></div>
-          <div><dd id="pfPhone"></dd><dt data-i18n="phone"></dt></div>
-          <div><dd id="pfJoined"></dd><dt data-i18n="joined"></dt></div>
+          <div><dd id="pfStatPosts">0</dd><dt data-i18n="posts"></dt></div>
+          <div><dd id="pfStatFollowers">0</dd><dt data-i18n="followers"></dt></div>
+          <div><dd id="pfStatFollowing">0</dd><dt data-i18n="following"></dt></div>
+          <div><dd id="pfStatLikes">0</dd><dt data-i18n="likes"></dt></div>
         </dl>
       </div>
       </section>
@@ -107,6 +123,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611181930"></script>
+  <script defer src="profile.js?v=202611181937"></script>
 </body>
 </html>

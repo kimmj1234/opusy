@@ -125,35 +125,46 @@
 
 /* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔 ===== */
 .pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
-.pf-q { min-width: 0; min-height: 0; padding: max(20px, calc(48px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
+.pf-q { min-width: 0; min-height: 0; padding: max(18px, calc(36px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
 /* 작업하는 동안 칸을 알아보기 위한 가운데 십자 선 (작업이 끝나면 이 두 줄을 지움) */
 .pf-q1, .pf-q3 { border-right: 1px solid #ececf0; }
 .pf-q1, .pf-q2 { border-bottom: 1px solid #ececf0; }
-.pf-q1 { display: flex; align-items: center; justify-content: flex-start; }
+.pf-q1 { display: flex; align-items: stretch; justify-content: flex-start; }   /* 카드가 칸의 위아래를 가득 채움 */
 
-/* ===== 왼쪽 위: 프로필 카드 (1920×1080 기준 치수를 --scale 로 환산) ===== */
-.pf-card { position: relative; width: 100%; min-width: 0; transition: opacity 0.5s ease; }
+/* ===== 왼쪽 위: 프로필 카드 (1920×1080 기준 치수를 --scale 로 환산). 칸의 위아래를 가득 채우고 남는 높이는 배경 사진이 차지함 ===== */
+.pf-card { --pro: max(34px, calc(64px * var(--scale))); /* 프로필 동그라미가 배경 사진 아래로 튀어나오는 길이 */ position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; transition: opacity 0.5s ease; }
 .pf-card.is-loading { opacity: 0; pointer-events: none; }
-/* 커버: 바깥 회색 배경(#e4e4e9)과 같은 색 */
-.pf-banner { height: max(64px, calc(120px * var(--scale))); border-radius: max(14px, calc(22px * var(--scale))); background: #e4e4e9; }
-/* 프로필 동그라미: 커버 아래쪽 가장자리에 반쯤 걸치고, 왼쪽 글자와 같은 선에서 살짝 안쪽 */
-.pf-photo-box { position: absolute; left: max(10px, calc(20px * var(--scale))); top: calc(max(64px, calc(120px * var(--scale))) - max(30px, calc(56px * var(--scale)))); }
-.pf-head { display: flex; align-items: flex-start; justify-content: space-between; gap: max(10px, calc(20px * var(--scale))); margin-top: max(36px, calc(76px * var(--scale))); }
+.pf-cover { position: relative; flex: 1 1 auto; min-height: max(56px, calc(100px * var(--scale))); }
+/* 배경 사진: 없을 때는 바깥 회색 배경(#e4e4e9)과 같은 색 */
+.pf-banner { position: absolute; inset: 0; display: block; width: 100%; padding: 0; border: 0; border-radius: max(14px, calc(22px * var(--scale))); background: #e4e4e9; color: #8b8b93; font: inherit; cursor: pointer; overflow: hidden; transition: color 0.4s ease; }
+.pf-banner:hover { color: #14151F; }
+.pf-banner img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pf-banner-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: max(6px, calc(10px * var(--scale))); padding-left: max(60px, calc(150px * var(--scale))); font-size: max(12px, calc(18px * var(--scale))); font-weight: 600; }   /* 왼쪽은 프로필 동그라미 자리라 조금 비움 */
+.pf-banner-empty svg { width: max(16px, calc(26px * var(--scale))); height: auto; aspect-ratio: 1; }
+.pf-banner-hover { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20, 21, 31, 0.45); color: #fff; font-size: max(13px, calc(19px * var(--scale))); font-weight: 600; opacity: 0; transition: opacity 0.4s ease; }
+.pf-banner.has-img:hover .pf-banner-hover, .pf-banner.has-img:focus-visible .pf-banner-hover { opacity: 1; }
+.pf-banner.is-busy { cursor: progress; }
+.pf-banner.is-busy img, .pf-banner.is-busy .pf-banner-empty { opacity: 0.4; }
+/* 프로필 동그라미: 배경 사진 아래쪽 가장자리에 반쯤 걸침 (배경 사진 위에 겹쳐 보이도록 위에 둠) */
+.pf-photo-box { position: absolute; z-index: 1; left: max(10px, calc(24px * var(--scale))); bottom: calc(-1 * var(--pro)); }
+.pf-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: max(10px, calc(20px * var(--scale))); margin-top: calc(var(--pro) + max(8px, calc(14px * var(--scale)))); }
 .pf-who { min-width: 0; }
-.pf-id { font-size: max(20px, calc(36px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pf-email { margin-top: max(2px, calc(4px * var(--scale))); font-size: max(12px, calc(19px * var(--scale))); font-weight: 500; color: #8b8b93; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 오른쪽: 사진 지우기(윤곽선 버튼)와 안내 문구 */
-.pf-actions { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: max(6px, calc(8px * var(--scale))); max-width: 50%; }
-.pf-pill { height: max(30px, calc(48px * var(--scale))); padding: 0 max(14px, calc(26px * var(--scale))); border: 1.5px solid #14151F; border-radius: 999px; background: transparent; color: #14151F; font: inherit; font-size: max(12px, calc(18px * var(--scale))); font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 0.4s ease, color 0.4s ease; }
+.pf-id { font-size: max(22px, calc(42px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-email { margin-top: max(2px, calc(6px * var(--scale))); font-size: max(13px, calc(21px * var(--scale))); font-weight: 500; color: #8b8b93; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 오른쪽: 지우기 버튼(윤곽선)과 안내 문구 */
+.pf-actions { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: max(6px, calc(8px * var(--scale))); max-width: 55%; }
+.pf-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: max(6px, calc(10px * var(--scale))); }
+.pf-pill { height: max(30px, calc(48px * var(--scale))); padding: 0 max(14px, calc(24px * var(--scale))); border: 1.5px solid #14151F; border-radius: 999px; background: transparent; color: #14151F; font: inherit; font-size: max(12px, calc(18px * var(--scale))); font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 0.4s ease, color 0.4s ease; }
+.pf-pill[hidden] { display: none; }
 .pf-pill:hover { background: #14151F; color: #fff; }
 .pf-pill:disabled { opacity: 0.4; cursor: progress; }
 .pf-actions .msg { text-align: right; word-break: keep-all; font-size: max(11px, calc(15px * var(--scale))); }
 .pf-actions .msg:empty { display: none; }
-/* 구분선 아래 계정 정보: 값은 크게, 항목 이름은 그 아래에 작게 */
-.pf-stats { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: space-between; gap: max(10px, calc(18px * var(--scale))); margin-top: max(14px, calc(26px * var(--scale))); padding-top: max(14px, calc(26px * var(--scale))); border-top: 1px solid #e4e4e9; }
-.pf-stats > div { display: flex; flex-direction: column; min-width: 0; }
-.pf-stats dd { order: 1; font-size: max(13px, calc(22px * var(--scale))); font-weight: 600; color: #14151F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pf-stats dt { order: 2; margin-top: max(4px, calc(8px * var(--scale))); font-size: max(11px, calc(16px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }
+/* 구분선 아래: 게시글·팔로워·팔로우·좋아요. 값은 크게, 이름은 그 아래에 작게 */
+.pf-stats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: max(8px, calc(14px * var(--scale))); margin-top: max(12px, calc(24px * var(--scale))); padding-top: max(12px, calc(24px * var(--scale))); border-top: 1px solid #e4e4e9; text-align: center; }
+.pf-stats > div { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.pf-stats dd { order: 1; font-size: max(20px, calc(38px * var(--scale))); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; color: #14151F; }
+.pf-stats dt { order: 2; margin-top: max(4px, calc(8px * var(--scale))); font-size: max(12px, calc(19px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }
 
 /* ===== 오른쪽 위: 등록된 기기 ===== */
 .pf-q2 { display: flex; }
@@ -176,11 +187,11 @@
   .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
   .pf-q { border-right: 0; overflow: visible; }
   .pf-q3, .pf-q4 { display: none; }
-  .pf-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-card { height: auto; } .pf-cover { flex: none; height: 140px; }
 }
 .pf-photo {
   position: relative; display: block;
-  width: max(60px, calc(112px * var(--scale))); aspect-ratio: 1;
+  width: max(72px, calc(136px * var(--scale))); aspect-ratio: 1;
   padding: 0; border: 0; border-radius: 50%;
   background: #fff; color: #8b8b93; font: inherit; cursor: pointer; overflow: hidden;
   box-shadow: 0 0 0 max(3px, calc(6px * var(--scale))) #fff, 0 calc(8px * var(--scale)) calc(24px * var(--scale)) rgba(20, 21, 31, 0.12);   /* 바깥에 흰 테두리를 둘러 커버와 구분 */

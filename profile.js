@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfName', 'pfBirth', 'pfPhone', 'pfJoined', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -37,7 +37,8 @@
     ko: {
       pageTitle: '내 프로필 · OPUSY', goBack: '이전으로 돌아가기', profile: '내 프로필', settings: '설정', logout: '로그아웃',
       addPhoto: '사진 추가', changePhoto: '사진 바꾸기', removePhoto: '사진 지우기', photoLabel: '프로필 사진',
-      email: '이메일', name: '이름', birth: '생년월일', phone: '전화번호', joined: '가입일',
+      addCover: '배경 사진 추가', changeCover: '배경 사진 바꾸기', removeCover: '배경 지우기', coverLabel: '배경 사진',
+      posts: '게시글', followers: '팔로워', following: '팔로우', likes: '좋아요',
       devices: '등록된 기기', devCount: (n) => `${n}대`, devOn: (d) => `${d}에 등록`,
       devNone: '등록된 기기가 없어요.', devFail: '기기 목록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
@@ -53,7 +54,8 @@
     en: {
       pageTitle: 'My profile · OPUSY', goBack: 'Go back', profile: 'My profile', settings: 'Settings', logout: 'Logout',
       addPhoto: 'Add photo', changePhoto: 'Change photo', removePhoto: 'Remove photo', photoLabel: 'Profile photo',
-      email: 'Email', name: 'Name', birth: 'Date of birth', phone: 'Phone', joined: 'Joined',
+      addCover: 'Add cover photo', changeCover: 'Change cover photo', removeCover: 'Remove cover', coverLabel: 'Cover photo',
+      posts: 'Posts', followers: 'Followers', following: 'Following', likes: 'Likes',
       devices: 'Registered devices', devCount: (n) => String(n), devOn: (d) => `Registered on ${d}`,
       devNone: 'No registered devices.', devFail: 'Could not load your devices. Please refresh in a moment.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
@@ -77,8 +79,8 @@
     $$('[data-i18n]').forEach((el) => { const v = t[el.dataset.i18n]; if (typeof v === 'string') el.textContent = v; });
     $$('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
     $('#pfPhoto').setAttribute('aria-label', t.photoLabel);
+    $('#pfCover').setAttribute('aria-label', t.coverLabel);
     showMsg(msgKey, msgInfo);
-    showDates();
     showDevices();
   }
   // 등록된 기기 목록 (언어를 바꾸면 다시 그림). devices: null=아직 안 불러옴, false=실패, 배열=목록
@@ -113,23 +115,11 @@
       list.append(li);
     });
   }
-  // 계정 정보의 날짜(생년월일·가입일)는 언어에 맞춰 표기
-  let info = { birth: null, joined: null };
   const localDate = (v) => {            // 'YYYY-MM-DD' 는 시간대 때문에 하루 밀리지 않게 직접 나눠서 만듦
     if (!v) return null;
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));
     const d = m && String(v).length === 10 ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(v);
     return isNaN(d) ? null : d;
-  };
-  function showDates() {
-    const t = I18N[lang];
-    const put = (id, v) => { const d = localDate(v); $(id).textContent = d ? t.date(d) : '–'; };
-    put('#pfBirth', info.birth);
-    put('#pfJoined', info.joined);
-  }
-  const fmtPhone = (v) => {
-    const d = String(v || '').replace(/\D/g, '');
-    return d.length > 7 ? `${d.slice(0, 3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}` : d;
   };
   // 사진 아래 안내 문구 (언어를 바꾸면 다시 표기). info=true 면 오류가 아닌 진행 안내
   let msgKey = '';
@@ -174,36 +164,20 @@
     if (same && history.length > 1) { e.preventDefault(); history.back(); }
   });
 
-  // ===== 프로필 사진 =====
-  // 사진은 저장소(avatars)의 '내 아이디 폴더/시각.jpg' 에 올리고, 그 경로를 profiles.avatar_path 에 적어 둠
-  const photoBtn = $('#pfPhoto');
-  const photoImg = $('#pfPhotoImg');
-  const fileInput = $('#pfFile');
-  const removeBtn = $('#pfRemove');
+  // ===== 프로필 사진과 배경 사진 =====
+  // 사진은 저장소(avatars)의 '내 아이디 폴더' 에 올리고, 그 경로를 profiles 표의 avatar_path(프로필) / cover_path(배경)에 적어 둠
   const bucket = () => sb.storage.from('avatars');
   let uid = null;
   let canEdit = false;
   let busy = false;
-  let photoPath = null;
-  const photoUrl = (path) => `${CFG.url}/storage/v1/object/public/avatars/${path}`;
-  function setPhoto(path) {
-    photoPath = path;
-    if (path) photoImg.src = photoUrl(path);
-    else photoImg.removeAttribute('src');
-    photoImg.hidden = !path;
-    $('#pfPhotoEmpty').hidden = !!path;
-    photoBtn.classList.toggle('has-img', !!path);
-    removeBtn.hidden = !path;
-  }
-  const setBusy = (on) => { busy = on; photoBtn.classList.toggle('is-busy', on); removeBtn.disabled = on; };
   const isImage = (file) => String(file.type).startsWith('image/');
+  const publicUrl = (path) => `${CFG.url}/storage/v1/object/public/avatars/${path}`;
+  const dropFile = async (path) => { try { await bucket().remove([path]); } catch (e) {} };
 
-  // 고른 사진을 가운데 기준 정사각형으로 잘라 640px JPEG 으로 줄임 (원본을 그대로 올리지 않음)
-  async function toSquareJpeg(file) {
-    let src;
-    try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  async function decode(file) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); }
     catch (e) {
-      src = await new Promise((res, rej) => {
+      return new Promise((res, rej) => {
         const im = new Image();
         const url = URL.createObjectURL(file);
         im.onload = () => { URL.revokeObjectURL(url); res(im); };
@@ -211,6 +185,11 @@
         im.src = url;
       });
     }
+  }
+  const toJpeg = (cv, q) => new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', q));
+  // 프로필 사진: 가운데 기준 정사각형으로 잘라 640px 로 줄임 (원본을 그대로 올리지 않음)
+  async function squareJpeg(file) {
+    const src = await decode(file);
     const w = src.width, h = src.height, side = Math.min(w, h), out = Math.min(640, side);
     const cv = document.createElement('canvas');
     cv.width = out; cv.height = out;
@@ -218,53 +197,87 @@
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out, out);          // 투명한 부분은 흰색으로
     ctx.drawImage(src, (w - side) / 2, (h - side) / 2, side, side, 0, 0, out, out);
     if (src.close) src.close();
-    return new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', 0.86));
+    return toJpeg(cv, 0.86);
   }
-  const savePath = async (path) => {
-    const { data, error } = await sb.from('profiles').update({ avatar_path: path }).eq('id', uid).select('id');
-    return !error && !!data && data.length === 1;
-  };
-  const dropFile = async (path) => { try { await bucket().remove([path]); } catch (e) {} };
+  // 배경 사진: 자르지 않고 긴 쪽이 1600px 이하가 되게 줄임. 저장소 제한(1MB)을 넘으면 화질을 조금씩 낮춤
+  async function wideJpeg(file) {
+    const src = await decode(file);
+    const k = Math.min(1, 1600 / Math.max(src.width, src.height));
+    const cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(src.width * k)); cv.height = Math.max(1, Math.round(src.height * k));
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(src, 0, 0, cv.width, cv.height);
+    if (src.close) src.close();
+    let blob = null;
+    for (const q of [0.86, 0.72, 0.58, 0.45]) { blob = await toJpeg(cv, q); if (blob.size <= 900 * 1024) break; }
+    return blob;
+  }
 
-  photoBtn.addEventListener('click', () => {
-    if (busy) return;
-    if (!canEdit) return showMsg('load');       // 내 정보를 못 불러온 상태: 조용히 무시하지 않고 이유를 알림
-    try { if (fileInput.showPicker) fileInput.showPicker(); else fileInput.click(); }
-    catch (e) { fileInput.click(); }
-  });
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files && fileInput.files[0];
-    fileInput.value = '';
-    if (!file || busy || !canEdit) return;
-    if (!isImage(file)) return showMsg('notImage');
-    if (file.size > 20 * 1024 * 1024) return showMsg('tooBig');
-    setBusy(true); showMsg('uploading', true);
-    const old = photoPath;
-    const path = `${uid}/${Date.now()}.jpg`;
-    let ok = false;
-    try {
-      const blob = await toSquareJpeg(file);
-      const up = await bucket().upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
-      if (!up.error) {
-        ok = await savePath(path);
-        if (!ok) await dropFile(path);          // 경로를 못 적었으면 올린 파일을 치움
-      }
-    } catch (e) {}
-    if (ok) {
-      setPhoto(path); showMsg('');
-      if (old) await dropFile(old);             // 이전 사진 파일 정리
-    } else showMsg('fail');
-    setBusy(false);
-  });
-  removeBtn.addEventListener('click', async () => {
-    if (!photoPath || busy || !canEdit) return;
-    setBusy(true); showMsg('');
-    const old = photoPath;
-    let ok = false;
-    try { ok = await savePath(null); } catch (e) {}
-    if (ok) { await dropFile(old); setPhoto(null); } else showMsg('fail');
-    setBusy(false);
-  });
+  // 사진 한 종류(프로필 / 배경)를 다루는 묶음: 보여 주기, 올리기, 바꾸기, 지우기
+  function photoKind(o) {
+    const k = { path: null };
+    const btn = $(o.btn), img = $(o.img), empty = $(o.empty), file = $(o.file), rm = $(o.remove);
+    k.btn = btn; k.rm = rm;
+    k.show = (path) => {
+      k.path = path;
+      if (path) img.src = publicUrl(path); else img.removeAttribute('src');
+      img.hidden = !path;
+      empty.hidden = !!path;
+      btn.classList.toggle('has-img', !!path);
+      rm.hidden = !path;
+    };
+    const save = async (path) => {
+      const { data, error } = await sb.from('profiles').update({ [o.column]: path }).eq('id', uid).select('id');
+      return !error && !!data && data.length === 1;
+    };
+    btn.addEventListener('click', () => {
+      if (busy) return;
+      if (!canEdit) return showMsg('load');       // 내 정보를 못 불러온 상태: 조용히 무시하지 않고 이유를 알림
+      try { if (file.showPicker) file.showPicker(); else file.click(); } catch (e) { file.click(); }
+    });
+    file.addEventListener('change', async () => {
+      const f = file.files && file.files[0];
+      file.value = '';
+      if (!f || busy || !canEdit) return;
+      if (!isImage(f)) return showMsg('notImage');
+      if (f.size > 20 * 1024 * 1024) return showMsg('tooBig');
+      setBusy(true, btn); showMsg('uploading', true);
+      const old = k.path;
+      const path = `${uid}/${o.prefix}${Date.now()}.jpg`;
+      let ok = false;
+      try {
+        const blob = await o.encode(f);
+        const up = await bucket().upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+        if (!up.error) {
+          ok = await save(path);
+          if (!ok) await dropFile(path);          // 경로를 못 적었으면 올린 파일을 치움
+        }
+      } catch (e) {}
+      if (ok) {
+        k.show(path); showMsg('');
+        if (old) await dropFile(old);             // 이전 사진 파일 정리
+      } else showMsg('fail');
+      setBusy(false, btn);
+    });
+    rm.addEventListener('click', async () => {
+      if (!k.path || busy || !canEdit) return;
+      setBusy(true, btn); showMsg('');
+      const old = k.path;
+      let ok = false;
+      try { ok = await save(null); } catch (e) {}
+      if (ok) { await dropFile(old); k.show(null); } else showMsg('fail');
+      setBusy(false, btn);
+    });
+    return k;
+  }
+  const photo = photoKind({ btn: '#pfPhoto', img: '#pfPhotoImg', empty: '#pfPhotoEmpty', file: '#pfFile', remove: '#pfRemove', column: 'avatar_path', prefix: '', encode: squareJpeg });
+  const cover = photoKind({ btn: '#pfCover', img: '#pfCoverImg', empty: '#pfCoverEmpty', file: '#pfCoverFile', remove: '#pfCoverRemove', column: 'cover_path', prefix: 'c', encode: wideJpeg });
+  function setBusy(on, btn) {
+    busy = on;
+    btn.classList.toggle('is-busy', on);
+    photo.rm.disabled = on; cover.rm.disabled = on;
+  }
 
   // ===== 시작: 로그인 확인 =====
   applyLang();
@@ -281,21 +294,17 @@
     nameBtn.textContent = shownId;
     nameBtn.title = shownId;
 
-    // 저장된 프로필 사진과 계정 정보 불러오기
+    // 저장된 프로필 사진·배경 사진과 계정 정보 불러오기
     uid = u.id;
     let p = null;
     try {
-      const { data, error } = await sb.from('profiles').select('username, name, birth_date, phone, created_at, avatar_path').eq('id', uid).maybeSingle();
+      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path').eq('id', uid).maybeSingle();
       if (!error && data) p = data;
     } catch (e) {}
     const text = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
     text('#pfId', (p && p.username) || shownId);
     text('#pfEmail', u.email);
-    text('#pfName', p && p.name);
-    text('#pfPhone', p && fmtPhone(p.phone));
-    info = { birth: p && p.birth_date, joined: (p && p.created_at) || u.created_at };
-    showDates();
-    if (p) setPhoto(p.avatar_path || null); else showMsg('load');
+    if (p) { photo.show(p.avatar_path || null); cover.show(p.cover_path || null); } else showMsg('load');
     canEdit = !!p;
     $('#pfTop').classList.remove('is-loading');
 
