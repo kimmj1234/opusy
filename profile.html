@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611181937">
-  <link rel="stylesheet" href="profile.css?v=202611181937">
+  <link rel="stylesheet" href="login.css?v=202611181949">
+  <link rel="stylesheet" href="profile.css?v=202611181949">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -70,6 +70,14 @@
             <span class="pf-banner-hover" data-i18n="changeCover" aria-hidden="true"></span>
           </button>
           <input type="file" id="pfCoverFile" accept="image/*" hidden>
+          <!-- 배경 사진 안내: 작은 동그라미 안의 느낌표를 누르면 말풍선이 열림 -->
+          <div class="pf-tip pf-tip-cover">
+            <button type="button" class="pf-tip-btn" id="pfTipCover" aria-expanded="false" aria-controls="pfTipCoverBubble">!</button>
+            <div class="pf-tip-bubble" id="pfTipCoverBubble" role="note" hidden>
+              <strong data-i18n="tipCoverT"></strong>
+              <ul><li data-i18n="tipCoverSize"></li><li data-i18n="tipCoverFit"></li><li data-i18n="tipMax"></li><li data-i18n="tipFormat"></li></ul>
+            </div>
+          </div>
           <!-- 프로필 동그라미: 배경 사진 아래쪽 가장자리에 반쯤 걸침 -->
           <div class="pf-photo-box" id="pfPhotoBox">
             <button type="button" class="pf-photo" id="pfPhoto">
@@ -81,6 +89,14 @@
               <span class="pf-photo-hover" data-i18n="changePhoto" aria-hidden="true"></span>
             </button>
             <input type="file" id="pfFile" accept="image/*" hidden>
+            <!-- 프로필 사진 안내 -->
+            <div class="pf-tip pf-tip-photo">
+              <button type="button" class="pf-tip-btn" id="pfTipPhoto" aria-expanded="false" aria-controls="pfTipPhotoBubble">!</button>
+              <div class="pf-tip-bubble" id="pfTipPhotoBubble" role="note" hidden>
+                <strong data-i18n="tipPhotoT"></strong>
+                <ul><li data-i18n="tipPhotoSize"></li><li data-i18n="tipPhotoFit"></li><li data-i18n="tipMax"></li><li data-i18n="tipFormat"></li></ul>
+              </div>
+            </div>
           </div>
         </div>
         <div class="pf-head">
@@ -123,6 +139,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611181937"></script>
+  <script defer src="profile.js?v=202611181949"></script>
 </body>
 </html>

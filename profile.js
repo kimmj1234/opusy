@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -39,6 +39,13 @@
       addPhoto: '사진 추가', changePhoto: '사진 바꾸기', removePhoto: '사진 지우기', photoLabel: '프로필 사진',
       addCover: '배경 사진 추가', changeCover: '배경 사진 바꾸기', removeCover: '배경 지우기', coverLabel: '배경 사진',
       posts: '게시글', followers: '팔로워', following: '팔로우', likes: '좋아요',
+      tipLabel: '업로드 안내 보기',
+      tipPhotoT: '프로필 사진', tipPhotoSize: '권장 크기: 640 × 640px (정사각형)',
+      tipPhotoFit: '가운데를 기준으로 동그랗게 잘려서 보여요.',
+      tipCoverT: '배경 사진', tipCoverSize: '권장 크기: 1600 × 230px (가로로 아주 긴 7 : 1)',
+      tipCoverFit: '화면 크기에 따라 위아래가 조금 잘릴 수 있어서, 중요한 부분은 가운데에 두세요.',
+      tipMax: '최대 20MB까지 올릴 수 있어요. 올리면 자동으로 줄여서 저장해요.',
+      tipFormat: 'JPG, PNG, WEBP 같은 이미지 파일을 쓸 수 있어요.',
       devices: '등록된 기기', devCount: (n) => `${n}대`, devOn: (d) => `${d}에 등록`,
       devNone: '등록된 기기가 없어요.', devFail: '기기 목록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
@@ -56,6 +63,13 @@
       addPhoto: 'Add photo', changePhoto: 'Change photo', removePhoto: 'Remove photo', photoLabel: 'Profile photo',
       addCover: 'Add cover photo', changeCover: 'Change cover photo', removeCover: 'Remove cover', coverLabel: 'Cover photo',
       posts: 'Posts', followers: 'Followers', following: 'Following', likes: 'Likes',
+      tipLabel: 'Show upload tips',
+      tipPhotoT: 'Profile photo', tipPhotoSize: 'Recommended size: 640 × 640px (square)',
+      tipPhotoFit: 'It is cropped to a circle around the center.',
+      tipCoverT: 'Cover photo', tipCoverSize: 'Recommended size: 1600 × 230px (a very wide 7 : 1)',
+      tipCoverFit: 'The top and bottom may be trimmed depending on the screen, so keep the key part in the middle.',
+      tipMax: 'Up to 20MB. It is resized automatically when saved.',
+      tipFormat: 'Image files such as JPG, PNG and WEBP work.',
       devices: 'Registered devices', devCount: (n) => String(n), devOn: (d) => `Registered on ${d}`,
       devNone: 'No registered devices.', devFail: 'Could not load your devices. Please refresh in a moment.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
@@ -80,6 +94,8 @@
     $$('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
     $('#pfPhoto').setAttribute('aria-label', t.photoLabel);
     $('#pfCover').setAttribute('aria-label', t.coverLabel);
+    $('#pfTipCover').setAttribute('aria-label', t.tipLabel);
+    $('#pfTipPhoto').setAttribute('aria-label', t.tipLabel);
     showMsg(msgKey, msgInfo);
     showDevices();
   }
@@ -163,6 +179,19 @@
     try { same = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (err) {}
     if (same && history.length > 1) { e.preventDefault(); history.back(); }
   });
+
+  // ===== 안내 말풍선: 느낌표를 누르면 열고, 다시 누르거나 바깥을 누르거나 Esc 를 누르면 닫음 (한 번에 하나만) =====
+  const tips = [['#pfTipCover', '#pfTipCoverBubble'], ['#pfTipPhoto', '#pfTipPhotoBubble']].map(([b, bub]) => ({ btn: $(b), bubble: $(bub) }));
+  const closeTips = (except) => tips.forEach((t) => { if (t !== except) { t.bubble.hidden = true; t.btn.setAttribute('aria-expanded', 'false'); } });
+  tips.forEach((t) => t.btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = t.bubble.hidden;
+    closeTips(open ? t : null);
+    t.bubble.hidden = !open;
+    t.btn.setAttribute('aria-expanded', String(open));
+  }));
+  document.addEventListener('click', (e) => { if (!e.target.closest('.pf-tip')) closeTips(null); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTips(null); });
 
   // ===== 프로필 사진과 배경 사진 =====
   // 사진은 저장소(avatars)의 '내 아이디 폴더' 에 올리고, 그 경로를 profiles 표의 avatar_path(프로필) / cover_path(배경)에 적어 둠
@@ -307,6 +336,19 @@
     if (p) { photo.show(p.avatar_path || null); cover.show(p.cover_path || null); } else showMsg('load');
     canEdit = !!p;
     $('#pfTop').classList.remove('is-loading');
+
+    // 게시글·팔로워·팔로우·좋아요: 서버 함수 my_stats 가 내 숫자를 세어서 돌려줌 (실패하면 0 그대로 둠)
+    try {
+      const { data, error } = await sb.rpc('my_stats');
+      const r = !error && Array.isArray(data) ? data[0] : null;
+      if (r) {
+        const n = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
+        $('#pfStatPosts').textContent = n(r.posts);
+        $('#pfStatFollowers').textContent = n(r.followers);
+        $('#pfStatFollowing').textContent = n(r.following);
+        $('#pfStatLikes').textContent = n(r.likes);
+      }
+    } catch (e) {}
 
     // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·운영체제·등록일만 돌려줌
     try {

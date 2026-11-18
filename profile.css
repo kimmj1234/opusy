@@ -139,7 +139,7 @@
 .pf-banner { position: absolute; inset: 0; display: block; width: 100%; padding: 0; border: 0; border-radius: max(14px, calc(22px * var(--scale))); background: #e4e4e9; color: #8b8b93; font: inherit; cursor: pointer; overflow: hidden; transition: color 0.4s ease; }
 .pf-banner:hover { color: #14151F; }
 .pf-banner img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.pf-banner-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: max(6px, calc(10px * var(--scale))); padding-left: max(60px, calc(150px * var(--scale))); font-size: max(12px, calc(18px * var(--scale))); font-weight: 600; }   /* 왼쪽은 프로필 동그라미 자리라 조금 비움 */
+.pf-banner-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: max(6px, calc(10px * var(--scale))); font-size: max(12px, calc(18px * var(--scale))); font-weight: 600; }   /* 배경 사진 칸의 정가운데 */
 .pf-banner-empty svg { width: max(16px, calc(26px * var(--scale))); height: auto; aspect-ratio: 1; }
 .pf-banner-hover { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20, 21, 31, 0.45); color: #fff; font-size: max(13px, calc(19px * var(--scale))); font-weight: 600; opacity: 0; transition: opacity 0.4s ease; }
 .pf-banner.has-img:hover .pf-banner-hover, .pf-banner.has-img:focus-visible .pf-banner-hover { opacity: 1; }
@@ -207,3 +207,23 @@
 .pf-photo.has-img:hover .pf-photo-hover, .pf-photo.has-img:focus-visible .pf-photo-hover { opacity: 1; }
 .pf-photo.is-busy { cursor: progress; }
 .pf-photo.is-busy img, .pf-photo.is-busy .pf-photo-empty { opacity: 0.4; }
+
+/* ===== 안내 말풍선: 작은 동그라미 안의 느낌표를 누르면 열림 ===== */
+.pf-tip { position: absolute; z-index: 3; }
+.pf-tip-cover { top: max(8px, calc(14px * var(--scale))); right: max(8px, calc(14px * var(--scale))); }
+.pf-tip-photo { top: max(2px, calc(8px * var(--scale))); left: calc(100% - max(8px, calc(14px * var(--scale)))); }   /* 프로필 동그라미의 오른쪽 위 가장자리 */
+.pf-tip-btn { display: grid; place-items: center; width: max(18px, calc(28px * var(--scale))); aspect-ratio: 1; padding: 0; border: 1.5px solid #8b8b93; border-radius: 50%; background: #fff; color: #55565f; font: inherit; font-size: max(11px, calc(17px * var(--scale))); font-weight: 700; line-height: 1; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+.pf-tip-btn:hover, .pf-tip-btn[aria-expanded="true"] { background: #14151F; border-color: #14151F; color: #fff; }
+.pf-tip-bubble { position: absolute; top: calc(100% + max(8px, calc(12px * var(--scale)))); width: max(210px, calc(330px * var(--scale))); padding: max(10px, calc(16px * var(--scale))) max(12px, calc(20px * var(--scale))); border-radius: max(10px, calc(16px * var(--scale))); background: #14151F; color: #fff; font-size: max(12px, calc(16px * var(--scale))); font-weight: 500; line-height: 1.5; text-align: left; word-break: keep-all; box-shadow: 0 calc(10px * var(--scale)) calc(30px * var(--scale)) rgba(20, 21, 31, 0.25); animation: pf-tip-in 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.pf-tip-bubble[hidden] { display: none; }
+.pf-tip-bubble::before { content: ""; position: absolute; top: -5px; width: 10px; height: 10px; background: #14151F; transform: rotate(45deg); }   /* 말풍선 꼬리 */
+.pf-tip-cover .pf-tip-bubble { right: calc(-1 * max(4px, calc(6px * var(--scale)))); }
+.pf-tip-cover .pf-tip-bubble::before { right: max(10px, calc(15px * var(--scale))); }
+/* 프로필 동그라미 쪽 말풍선은 느낌표 오른쪽 옆으로 열어서 카드 아래로 넘치지 않게 함 */
+.pf-tip-photo .pf-tip-bubble { top: calc(-1 * max(4px, calc(6px * var(--scale)))); left: calc(100% + max(8px, calc(12px * var(--scale)))); }
+.pf-tip-photo .pf-tip-bubble::before { top: max(8px, calc(12px * var(--scale))); left: -5px; }
+.pf-tip-bubble strong { display: block; margin-bottom: max(4px, calc(6px * var(--scale))); font-size: max(13px, calc(17px * var(--scale))); font-weight: 700; }
+.pf-tip-bubble ul { margin: 0; padding-left: 1.15em; }
+.pf-tip-bubble li + li { margin-top: max(2px, calc(4px * var(--scale))); }
+@keyframes pf-tip-in { from { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .pf-tip-bubble { animation: none; } }
