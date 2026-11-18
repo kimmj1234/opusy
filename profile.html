@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611181926">
-  <link rel="stylesheet" href="profile.css?v=202611181926">
+  <link rel="stylesheet" href="login.css?v=202611181930">
+  <link rel="stylesheet" href="profile.css?v=202611181930">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -54,38 +54,39 @@
     <div class="pf-panel">
       <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
 
-      <!-- 흰 상자를 가운데 기준으로 네 등분: 왼쪽 위 = 사진과 계정 정보, 오른쪽 위 = 등록된 기기, 아래 두 칸은 비워 둠 -->
+      <!-- 흰 상자를 가운데 기준으로 네 등분: 왼쪽 위 = 프로필 카드(사진·계정 정보), 오른쪽 위 = 등록된 기기, 아래 두 칸은 비워 둠 -->
       <div class="pf-grid">
       <section class="pf-q pf-q1">
-      <div class="pf-top is-loading" id="pfTop">
-      <div class="pf-photo-box" id="pfPhotoBox">
-        <button type="button" class="pf-photo" id="pfPhoto">
-          <img id="pfPhotoImg" alt="" hidden>
-          <span class="pf-photo-empty" id="pfPhotoEmpty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3.2"/></svg>
-            <span data-i18n="addPhoto"></span>
-          </span>
-          <span class="pf-photo-hover" data-i18n="changePhoto" aria-hidden="true"></span>
-        </button>
-        <input type="file" id="pfFile" accept="image/*" hidden>
-        <!-- 동그라미 아래에 떠 있는 줄: 자리를 차지하지 않아서 동그라미가 글의 세로 가운데에 그대로 있음 -->
-        <div class="pf-photo-under">
-          <p class="msg" id="pfMsg" role="status"></p>
-          <button class="text-btn" type="button" id="pfRemove" data-i18n="removePhoto" hidden></button>
+      <!-- 프로필 카드: 위에 커버(회색 배경과 같은 색), 커버 아래쪽에 걸친 프로필 동그라미, 아이디·이메일, 구분선, 계정 정보 -->
+      <div class="pf-card is-loading" id="pfTop">
+        <div class="pf-banner" aria-hidden="true"></div>
+        <div class="pf-photo-box" id="pfPhotoBox">
+          <button type="button" class="pf-photo" id="pfPhoto">
+            <img id="pfPhotoImg" alt="" hidden>
+            <span class="pf-photo-empty" id="pfPhotoEmpty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3.2"/></svg>
+              <span data-i18n="addPhoto"></span>
+            </span>
+            <span class="pf-photo-hover" data-i18n="changePhoto" aria-hidden="true"></span>
+          </button>
+          <input type="file" id="pfFile" accept="image/*" hidden>
         </div>
-      </div>
-
-      <!-- 사진 오른쪽: 계정에 등록된 정보 (보기만) -->
-      <div class="pf-info">
-        <h2 class="pf-id" id="pfId"></h2>
-        <dl class="pf-list">
-          <div><dt data-i18n="email"></dt><dd id="pfEmail"></dd></div>
-          <div><dt data-i18n="name"></dt><dd id="pfName"></dd></div>
-          <div><dt data-i18n="birth"></dt><dd id="pfBirth"></dd></div>
-          <div><dt data-i18n="phone"></dt><dd id="pfPhone"></dd></div>
-          <div><dt data-i18n="joined"></dt><dd id="pfJoined"></dd></div>
+        <div class="pf-head">
+          <div class="pf-who">
+            <h2 class="pf-id" id="pfId"></h2>
+            <p class="pf-email" id="pfEmail"></p>
+          </div>
+          <div class="pf-actions">
+            <button class="pf-pill" type="button" id="pfRemove" data-i18n="removePhoto" hidden></button>
+            <p class="msg" id="pfMsg" role="status"></p>
+          </div>
+        </div>
+        <dl class="pf-stats">
+          <div><dd id="pfName"></dd><dt data-i18n="name"></dt></div>
+          <div><dd id="pfBirth"></dd><dt data-i18n="birth"></dt></div>
+          <div><dd id="pfPhone"></dd><dt data-i18n="phone"></dt></div>
+          <div><dd id="pfJoined"></dd><dt data-i18n="joined"></dt></div>
         </dl>
-      </div>
       </div>
       </section>
 
@@ -106,6 +107,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611181926"></script>
+  <script defer src="profile.js?v=202611181930"></script>
 </body>
 </html>
