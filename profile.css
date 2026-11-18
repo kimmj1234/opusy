@@ -380,3 +380,33 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-layout-msg { position: absolute; z-index: 6; left: 50%; bottom: max(14px, calc(28px * var(--scale))); margin: 0; padding: max(8px, calc(12px * var(--scale))) max(14px, calc(22px * var(--scale))); border-radius: 999px; background: #14151F; color: #fff; font-size: max(12px, calc(15px * var(--scale))); font-weight: 600; white-space: nowrap; opacity: 0; transform: translate(-50%, 10px); pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; }
 .pf-layout-msg.show { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .pf-pick, .pf-pick-in, .pf-zone, .pf-layout-msg { transition: none !important; } }
+
+/* ===== 칸 크기에 따라 늘어나는 정보 (data-size: q 한 칸 · wide 가로 절반 · tall 세로 절반 · full 전체) ===== */
+/* 프로필: 넓거나 긴 칸에서는 계정 정보(이름·생년월일·전화번호·가입일)가 함께 보임 */
+.pf-bottom { flex: none; min-width: 0; }
+.pf-info { display: none; margin: 0; gap: max(6px, calc(10px * var(--scale))); }
+.pf-info > div { min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, calc(12px * var(--scale))) max(12px, calc(18px * var(--scale))); border-radius: 14px; background: #f6f6f8; }
+.pf-info dt { font-size: max(11px, calc(14px * var(--scale))); font-weight: 500; color: #8b8b93; }
+.pf-info dd { margin: 2px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: max(13px, calc(18px * var(--scale))); font-weight: 700; color: #14151F; }
+.pf-q[data-size="tall"] .pf-info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: max(8px, calc(14px * var(--scale))); }
+.pf-q[data-size="full"] .pf-info { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: max(8px, calc(14px * var(--scale))); }
+/* 가로 절반: 높이는 한 칸과 같으므로 숫자 네 개 오른쪽에 나란히 둠 */
+.pf-q[data-size="wide"] .pf-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: max(16px, calc(40px * var(--scale))); margin-top: max(12px, calc(22px * var(--scale))); padding-top: max(10px, calc(18px * var(--scale))); border-top: 1px solid #e4e4e9; }
+.pf-q[data-size="wide"] .pf-stats { margin-top: 0; padding-top: 0; border-top: 0; }
+.pf-q[data-size="wide"] .pf-info { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* 등록된 기기: 가로·전체에서는 두 줄로 나란히 */
+.pf-q[data-size="wide"] .pf-dev-list, .pf-q[data-size="full"] .pf-dev-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* 활동: 가로·전체에서는 왼쪽에 지표·그래프, 오른쪽에 목록. 사람·좋아요 목록은 두 줄로 */
+.pf-q[data-size="wide"] .pf-d-body.is-split, .pf-q[data-size="full"] .pf-d-body.is-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: max(20px, calc(56px * var(--scale))); align-content: start; }
+.pf-q[data-size="wide"] .pf-d-body.is-split .pf-d-col + .pf-d-col > .pf-sub:first-child, .pf-q[data-size="full"] .pf-d-body.is-split .pf-d-col + .pf-d-col > .pf-sub:first-child { margin-top: 0; }
+.pf-q[data-size="wide"] .pf-d-body:not(.is-split) .pf-rows, .pf-q[data-size="full"] .pf-d-body:not(.is-split) .pf-rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pf-q[data-size="tall"] .pf-chart, .pf-q[data-size="full"] .pf-chart { height: max(120px, calc(220px * var(--scale))); }
+.pf-d-col { min-width: 0; }
+@media (max-width: 700px) {
+  .pf-q[data-size] .pf-bottom { display: block; margin-top: 0; padding-top: 0; border-top: 0; }
+  .pf-q[data-size] .pf-stats { margin-top: max(12px, calc(22px * var(--scale))); padding-top: max(10px, calc(18px * var(--scale))); border-top: 1px solid #e4e4e9; }
+  .pf-q[data-size] .pf-info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+  .pf-q[data-size] .pf-dev-list { display: flex; }
+  .pf-q[data-size] .pf-d-body.is-split, .pf-q[data-size] .pf-d-body:not(.is-split) .pf-rows { display: block; }
+  .pf-q[data-size] .pf-d-body:not(.is-split) .pf-rows { display: flex; }
+}

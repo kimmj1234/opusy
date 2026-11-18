@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611190400">
-  <link rel="stylesheet" href="profile.css?v=202611190400">
+  <link rel="stylesheet" href="login.css?v=202611190500">
+  <link rel="stylesheet" href="profile.css?v=202611190500">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -119,11 +119,20 @@
           </div>
         </div>
         <!-- 게시글·팔로워·팔로우·좋아요: 하나를 고르면 왼쪽 아래 칸에 그 자세한 내용이 나옴 -->
+        <!-- 아래 줄: 숫자 네 개 + (칸이 넓거나 길 때만 보이는) 계정 정보 -->
+        <div class="pf-bottom">
         <div class="pf-stats" role="tablist" id="pfTabs">
           <button type="button" class="pf-stat is-on" role="tab" id="tabPosts" data-view="posts" aria-selected="true" aria-controls="pfDetail"><b id="pfStatPosts">0</b><span data-i18n="posts"></span></button>
           <button type="button" class="pf-stat" role="tab" id="tabFollowers" data-view="followers" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatFollowers">0</b><span data-i18n="followers"></span></button>
           <button type="button" class="pf-stat" role="tab" id="tabFollowing" data-view="following" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatFollowing">0</b><span data-i18n="following"></span></button>
           <button type="button" class="pf-stat" role="tab" id="tabLikes" data-view="likes" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatLikes">0</b><span data-i18n="likes"></span></button>
+        </div>
+        <dl class="pf-info" id="pfInfo">
+          <div><dt data-i18n="iName"></dt><dd id="pfName">–</dd></div>
+          <div><dt data-i18n="iBirth"></dt><dd id="pfBirth">–</dd></div>
+          <div><dt data-i18n="iPhone"></dt><dd id="pfPhone">–</dd></div>
+          <div><dt data-i18n="iJoined"></dt><dd id="pfJoined">–</dd></div>
+        </dl>
         </div>
       </div>
       </section>
@@ -190,6 +199,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611190400"></script>
+  <script defer src="profile.js?v=202611190500"></script>
 </body>
 </html>

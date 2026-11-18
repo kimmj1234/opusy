@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfTools', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfTools', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -43,8 +43,9 @@
       tabsLabel: '내 활동', loading: '불러오는 중…',
       dPostsT: '게시글 조회 지표', dFollowersT: '나를 팔로우한 사람', dFollowingT: '내가 팔로우한 사람', dLikesT: '좋아요 기록',
       segRecv: '받은 좋아요', segGave: '보낸 좋아요',
-      mViews: '총 조회수', mWeek: '최근 7일 조회수', mAvg: '게시글당 평균',
-      chartT: '최근 7일 조회수', listT: '게시글별 조회수',
+      mViews: '총 조회수', mWeek: (n) => `최근 ${n}일 조회수`, mAvg: '게시글당 평균',
+      chartT: (n) => `최근 ${n}일 조회수`, listT: '게시글별 조회수',
+      iName: '이름', iBirth: '생년월일', iPhone: '전화번호', iJoined: '가입일', devLastShort: (d) => `마지막 접속 ${d}`,
       viewsN: (n) => `조회 ${n}`, likesN: (n) => `좋아요 ${n}`,
       emptyPosts: '아직 올린 게시글이 없어요. 글을 올리면 조회수 지표가 여기에 쌓여요.',
       emptyFollowers: '아직 나를 팔로우한 사람이 없어요.', emptyFollowing: '아직 팔로우한 사람이 없어요.',
@@ -92,8 +93,9 @@
       tabsLabel: 'My activity', loading: 'Loading…',
       dPostsT: 'Post view metrics', dFollowersT: 'People following me', dFollowingT: 'People I follow', dLikesT: 'Like history',
       segRecv: 'Received', segGave: 'Given',
-      mViews: 'Total views', mWeek: 'Views, last 7 days', mAvg: 'Average per post',
-      chartT: 'Views in the last 7 days', listT: 'Views by post',
+      mViews: 'Total views', mWeek: (n) => `Views, last ${n} days`, mAvg: 'Average per post',
+      chartT: (n) => `Views in the last ${n} days`, listT: 'Views by post',
+      iName: 'Name', iBirth: 'Date of birth', iPhone: 'Phone', iJoined: 'Joined', devLastShort: (d) => `Last sign-in ${d}`,
       viewsN: (n) => `${n} views`, likesN: (n) => `${n} likes`,
       emptyPosts: 'No posts yet. View metrics will build up here once you post.',
       emptyFollowers: 'No one is following you yet.', emptyFollowing: 'You are not following anyone yet.',
@@ -149,6 +151,7 @@
     $('#pfTools').setAttribute('aria-label', t.toolsLabel);
     if (pick) fillPick();
     showMsg(msgKey, msgInfo);
+    showInfo();
     showDevices();
     $('#pfTabs').setAttribute('aria-label', t.tabsLabel);
     renderDetail();
@@ -159,8 +162,22 @@
     pc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>',
     mobile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>',
   };
+  // 계정 정보(이름·생년월일·전화번호·가입일): 프로필 칸이 넓거나 길 때만 보임. 날짜는 언어에 맞춰 다시 표기
+  let info = null;
+  function showInfo() {
+    const t = I18N[lang];
+    const day = (v) => { const d = localDate(v); return d ? t.date(d) : ''; };
+    const set = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
+    set('#pfName', info && info.name);
+    set('#pfBirth', info && day(info.birth));
+    set('#pfPhone', info && info.phone);
+    set('#pfJoined', info && day(info.joined));
+  }
+
   // 한 쪽에 3대씩 보여 주고, 각 기기 오른쪽 끝의 ⋯ 버튼으로 수정·삭제·접속기록을 엶
-  const PER = 3;
+  // 한 쪽에 보이는 기기 수는 칸 크기에 따라: 한 칸 3대, 가로(두 줄로) 6대, 세로 7대, 전체(두 줄로) 14대
+  const PER_BY = { q: 3, wide: 6, tall: 7, full: 14 };
+  const sizeOf = (w) => { const sec = $(`.pf-q[data-w="${w}"]`); return (sec && sec.dataset.size) || 'q'; };
   let devPage = 0;
   let devOpen = null;          // 설정이 열린 기기 { id, mode: 'menu' | 'edit' | 'del' | 'log' }
   let devBusy = false;
@@ -206,6 +223,8 @@
       note.textContent = devices === false ? t.devFail : '';
       return;
     }
+    const size = sizeOf('devices');
+    const PER = PER_BY[size];
     const pages = Math.max(1, Math.ceil(devices.length / PER));
     devPage = Math.min(devPage, pages - 1);
     $('#pfDevCount').textContent = t.devCount(devices.length) + (pages > 1 ? ` · ${t.devPage(devPage + 1, pages)}` : '');
@@ -234,7 +253,11 @@
       } else {
         const name = el('strong', '', devLabel(d)); name.title = devLabel(d);
         const dt = localDate(d.created_at);
-        box.append(name, el('span', '', dt ? t.devOn(t.date(dt)) : ''));
+        // 칸이 넓거나 길면 등록일 옆에 마지막 접속 시각도 함께 보여 줌
+        const at = size !== 'q' && d.last_used_at ? new Date(d.last_used_at) : null;
+        const sub = [dt ? t.devOn(t.date(dt)) : '', at && !isNaN(at) ? t.devLastShort(t.dateTime(at)) : ''].filter(Boolean).join(' · ');
+        const subEl = el('span', '', sub); subEl.title = sub;
+        box.append(name, subEl);
       }
       li.append(box);
 
@@ -349,7 +372,13 @@
       const sl = layout[sec.dataset.w];
       if (sl) sec.dataset.slot = sl; else sec.removeAttribute('data-slot');
       sec.classList.toggle('has-back', !!sl && SLOTS[sl].includes(2));
+      // 칸 크기: q(한 칸) · wide(가로 절반) · tall(세로 절반) · full(전체). 크기에 따라 보이는 정보가 늘어남
+      const size = !sl ? '' : SLOTS[sl].length === 4 ? 'full' : SLOTS[sl].length === 1 ? 'q' : (sl === 'top' || sl === 'bottom') ? 'wide' : 'tall';
+      if (size) sec.dataset.size = size; else sec.removeAttribute('data-size');
     });
+    devOpen = null;
+    showDevices();                                   // 한 쪽에 보이는 기기 수가 달라짐
+    if (detail.days !== daysFor()) { if (detail.view === 'posts' && detail.started) loadDetail(); }   // 그래프 기간이 달라짐
     // 십자 선: 한 기능이 양쪽 칸을 함께 차지하면 그 사이 토막은 숨김
     const spans = (a, b) => Object.values(layout).some((sl) => SLOTS[sl].includes(a) && SLOTS[sl].includes(b));
     $('.pf-line-vt').hidden = spans(0, 1);
@@ -667,6 +696,9 @@
   const fmtN = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
   const shortDate = (iso) => { const d = localDate(iso); return d ? I18N[lang].date(d) : ''; };
   const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 2.8 4.5 6.4 4.5c2 0 3.6 1.1 5.6 3.2 2-2.1 3.6-3.2 5.6-3.2 3.6 0 5.5 3.7 4 7.2C19.5 16.4 12 21 12 21Z"/></svg>';
+  // 조회수 그래프 기간도 칸 크기에 따라: 한 칸 7일, 가로·세로 14일, 전체 30일
+  const DAYS_BY = { q: 7, wide: 14, tall: 14, full: 30 };
+  const daysFor = () => DAYS_BY[sizeOf('activity')];
   const detail = { view: 'posts', dir: 'received', data: {}, err: false, actErr: false, seq: 0 };
   const tabBtns = $$('#pfTabs .pf-stat');
   const dBody = $('#pfDetailBody');
@@ -705,29 +737,34 @@
     const week = series.reduce((n, x) => n + Number(x.views || 0), 0);
     const avg = posts.length ? Math.round((total / posts.length) * 10) / 10 : 0;
     const m = el('div', 'pf-metrics');
-    [[total, t.mViews], [week, t.mWeek], [avg, t.mAvg]].forEach(([v, label]) => {
+    const nDays = series.length || daysFor();
+    const left = el('div', 'pf-d-col'), right = el('div', 'pf-d-col');   // 칸이 넓으면 왼쪽(지표·그래프)과 오른쪽(게시글 목록)으로 나뉨
+    dBody.classList.add('is-split');
+    dBody.append(left, right);
+    [[total, t.mViews], [week, t.mWeek(nDays)], [avg, t.mAvg]].forEach(([v, label]) => {
       const c = el('div', 'pf-metric');
       c.append(el('b', null, fmtN(v)), el('span', null, label));
       m.append(c);
     });
-    dBody.append(m);
+    left.append(m);
 
-    dBody.append(el('p', 'pf-sub', t.chartT));
+    left.append(el('p', 'pf-sub', t.chartT(nDays)));
     const max = Math.max(1, ...series.map((x) => Number(x.views || 0)));
     const chart = el('div', 'pf-chart');
-    series.forEach((x) => {
+    const step = Math.ceil(series.length / 8);                    // 날짜 글자는 겹치지 않게 며칠에 한 번만
+    series.forEach((x, i) => {
       const col = el('div');
       col.title = `${x.day}: ${fmtN(x.views)}`;
       const bar = el('i', Number(x.views) ? '' : 'zero');
       bar.style.height = `${Math.max(3, Math.round((Number(x.views || 0) / max) * 100))}%`;
       const d0 = localDate(x.day);
-      col.append(bar, el('small', null, d0 ? `${d0.getMonth() + 1}/${d0.getDate()}` : ''));
+      col.append(bar, el('small', null, d0 && (series.length - 1 - i) % step === 0 ? `${d0.getMonth() + 1}/${d0.getDate()}` : '\u00a0'));
       chart.append(col);
     });
-    dBody.append(chart);
+    left.append(chart);
 
-    dBody.append(el('p', 'pf-sub', t.listT));
-    if (!posts.length) { dBody.append(el('p', 'pf-d-note', t.emptyPosts)); return; }
+    right.append(el('p', 'pf-sub', t.listT));
+    if (!posts.length) { right.append(el('p', 'pf-d-note', t.emptyPosts)); return; }
     const top = Math.max(1, ...posts.map((p) => Number(p.views || 0)));
     const ul = el('ul', 'pf-rows');
     posts.forEach((p) => {
@@ -742,7 +779,7 @@
       li.append(main, views);
       ul.append(li);
     });
-    dBody.append(ul);
+    right.append(ul);
   }
 
   function renderPeople(rows, t, kind) {
@@ -791,6 +828,7 @@
     $('#pfSeg').hidden = v !== 'likes';
     $$('#pfSeg .pf-seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.dir === detail.dir));
     dBody.textContent = '';
+    dBody.classList.toggle('is-split', false);
     const d = detail.data[v];
     if (d === undefined) { dBody.append(el('p', detail.err ? 'pf-d-note bad' : 'pf-d-note', detail.err ? t.dFail : t.loading)); return; }
     if (detail.actErr) dBody.append(el('p', 'pf-d-note bad', t.actFail));
@@ -801,12 +839,14 @@
 
   async function loadDetail() {
     const v = detail.view, my = ++detail.seq;
+    const days = daysFor();
+    detail.started = true;
     detail.err = false;
     renderDetail();
     let d;
     try {
       if (v === 'posts') {
-        const [a, b] = await Promise.all([sb.rpc('my_post_stats'), sb.rpc('my_views_series', { p_days: 7 })]);
+        const [a, b] = await Promise.all([sb.rpc('my_post_stats'), sb.rpc('my_views_series', { p_days: days })]);
         if (a.error || b.error) throw new Error('load');
         d = { posts: a.data || [], series: b.data || [] };
       } else {
@@ -820,6 +860,7 @@
     }
     if (my !== detail.seq) return;           // 그 사이 다른 항목을 골랐으면 이 결과는 버림
     detail.data[v] = d;
+    if (v === 'posts') detail.days = days;
     detail.actErr = false;
     renderDetail();
   }
@@ -868,12 +909,14 @@
     uid = u.id;
     let p = null;
     try {
-      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path, layout').eq('id', uid).maybeSingle();
+      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path, layout, name, birth_date, phone, created_at').eq('id', uid).maybeSingle();
       if (!error && data) p = data;
     } catch (e) {}
     const text = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
     text('#pfId', (p && p.username) || shownId);
     text('#pfEmail', u.email);
+    info = p ? { name: p.name, birth: p.birth_date, phone: p.phone, joined: p.created_at } : null;
+    showInfo();
     if (p) { photo.show(p.avatar_path || null); cover.show(p.cover_path || null); } else showMsg('load');
     canEdit = !!p;
     layout = cleanLayout(p && p.layout);          // 계정에 저장된 배치 (없으면 기본 배치)
