@@ -140,6 +140,8 @@
     nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(!isOpen()); });
     document.addEventListener('click', (e) => { if (isOpen() && !userBox.contains(e.target)) openMenu(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openMenu(false); });
+    // 내 프로필·설정: 아직 연결된 화면이 없어서 누르면 목록만 닫힘
+    ['menuProfile', 'menuSettings'].forEach((id) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => openMenu(false)); });
     logoutBtn.addEventListener('click', async () => {
       const s = read();
       try {
@@ -160,7 +162,7 @@
       s1t: '일하다',   s1d: '나의 분야에서 깊이 있게',
       s2t: '배우다',   s2d: '새로운 것을 함께 익히며',
       s3t: '연결되다', s3d: '사람과 사람이 이어지는',
-      logout: '로그아웃',
+      profile: '내 프로필', settings: '설정', logout: '로그아웃',
       a2: '무엇을 시작해볼까요?',
       c2a: '일하고, 배우고, 연결되는 콘텐츠를 한곳에서 만나보세요.',
       c2b: '지금 필요한 공간으로 바로 이동할 수 있어요.',
@@ -175,7 +177,7 @@
       s1t: 'Work',    s1d: 'Go deep in your own field',
       s2t: 'Learn',   s2d: 'Pick up something new, together',
       s3t: 'Connect', s3d: 'People linking with people',
-      logout: 'Logout',
+      profile: 'My profile', settings: 'Settings', logout: 'Logout',
       a2: 'What will you start?',
       c2a: 'Find everything you need to work, learn and connect,',
       c2b: 'and jump straight into the space that fits you.',

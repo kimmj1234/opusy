@@ -188,13 +188,13 @@ html, body {
   --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
   position: absolute;
   top: 100%;
-  right: calc(-6px * var(--scale));
+  right: 0;                                        /* 오른쪽 끝을 이름 상자의 오른쪽 끝에 맞춤 */
   box-sizing: border-box;
-  width: calc(160px * var(--scale));               /* 닫힌 상태의 폭 (열리면 600px 까지 왼쪽으로 늘어남) */
+  width: calc(205px * var(--scale));               /* 닫힌 상태의 폭: 항목 하나만 보임 (열리면 600px 까지 왼쪽으로 늘어남) */
   height: calc(76px * var(--scale));
   padding: calc(8px * var(--scale));
   display: flex;
-  flex-direction: row-reverse;                     /* 첫 항목이 오른쪽 끝, 다음 항목은 그 왼쪽으로 */
+  justify-content: flex-end;                       /* 항목을 오른쪽 끝에 붙여 둠 → 폭이 늘어나면 왼쪽 항목이 차례로 드러남 */
   gap: calc(8px * var(--scale));
   overflow: hidden;
   border-radius: calc(18px * var(--scale));
@@ -224,9 +224,9 @@ html, body {
 }
 #menubar .user-menu button {
   flex: none;
-  min-width: calc(140px * var(--scale));
+  width: calc((600px - 8px * 4) / 3 * var(--scale));   /* 세 항목이 600px 상자를 꼭 맞게 채움 */
   height: 100%;
-  padding: 0 calc(22px * var(--scale));
+  padding: 0;
   border: 0;
   border-radius: calc(11px * var(--scale));
   background: #f1f1f4;
@@ -246,9 +246,9 @@ html, body {
   /* 오른쪽 항목부터 차례로 나타남 */
   transition: background 0.2s, opacity 0.45s ease calc(0.16s + var(--n, 0) * 0.07s), transform 0.6s var(--menu-ease) calc(0.16s + var(--n, 0) * 0.07s);
 }
-#menubar .user-menu button:nth-child(2) { --n: 1; }
-#menubar .user-menu button:nth-child(3) { --n: 2; }
-#menubar .user-menu button:nth-child(4) { --n: 3; }
+#menubar .user-menu button:nth-last-child(2) { --n: 1; }
+#menubar .user-menu button:nth-last-child(3) { --n: 2; }
+#menubar .user-menu button:nth-last-child(4) { --n: 3; }
 #menubar .user-menu button:hover { background: #e4e4ea; }
 @media (prefers-reduced-motion: reduce) {
   #menubar .user-menu, #menubar .user-menu button { transition: none !important; transform: none; }
