@@ -120,11 +120,11 @@
         return s && s.access_token ? s : null;
       } catch (e) { return null; }
     };
-    // 보여 줄 이름: 가입할 때 적은 이름 → 없으면 아이디 → 없으면 이메일 앞부분
+    // 보여 줄 이름: 아이디 → 없으면 이메일 앞부분 (실명은 메뉴바에 드러내지 않음)
     const nameOf = (s) => {
       const u = (s && s.user) || {};
       const m = u.user_metadata || {};
-      return String(m.name || m.username || (u.email || '').split('@')[0] || '').trim();
+      return String(m.username || (u.email || '').split('@')[0] || '').trim();
     };
     const isOpen = () => menu.classList.contains('open');
     const openMenu = (open) => { menu.classList.toggle('open', open); nameBtn.setAttribute('aria-expanded', String(open)); };
