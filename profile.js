@@ -24,8 +24,9 @@
   const I18N = {
     ko: {
       pageTitle: '내 프로필 · OPUSY',
-      title: '내 프로필', sub: '내 정보를 확인하고 바꿀 수 있어요',
       username: '아이디', email: '이메일', name: '이름', birth: '생년월일', phone: '전화번호',
+      title: '내 정보 수정', sub: '이름, 생년월일, 전화번호를 바꿀 수 있어요',
+      edit: '내 정보 수정', editD: '이름 · 생년월일 · 전화번호', settingsD: '준비 중이에요', logoutD: '이 기기에서 로그아웃해요', toHome: '돌아가기',
       save: '저장하기', saving: '저장하는 중…', goBack: '이전으로 돌아가기',
       profile: '내 프로필', settings: '설정', logout: '로그아웃',
       joined: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일에 가입했어요`,
@@ -40,8 +41,9 @@
     },
     en: {
       pageTitle: 'My profile · OPUSY',
-      title: 'My profile', sub: 'Check and update your details',
       username: 'ID', email: 'Email', name: 'Name', birth: 'Date of birth', phone: 'Phone number',
+      title: 'Edit my details', sub: 'Update your name, date of birth and phone number',
+      edit: 'Edit my details', editD: 'Name · Date of birth · Phone', settingsD: 'Coming soon', logoutD: 'Sign out on this device', toHome: 'Back',
       save: 'Save', saving: 'Saving…', goBack: 'Go back',
       profile: 'My profile', settings: 'Settings', logout: 'Logout',
       joined: (d) => `Joined on ${d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
@@ -102,13 +104,26 @@
   nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(!isOpen()); });
   document.addEventListener('click', (e) => { if (isOpen() && !userBox.contains(e.target)) openMenu(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openMenu(false); });
-  $('#menuProfile').addEventListener('click', () => openMenu(false));     // 이미 이 페이지
+  $('#menuProfile').addEventListener('click', () => { openMenu(false); showEdit(false); });     // 이미 이 페이지: 첫 화면으로
   $('#menuSettings').addEventListener('click', () => openMenu(false));    // 아직 연결된 화면이 없음
-  $('#logout').addEventListener('click', async () => {
+  const logout = async () => {
     try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {}
     sessionStore.removeItem(CFG.storageKey);
     location.href = 'index.html';
-  });
+  };
+  $('#logout').addEventListener('click', logout);
+
+  // ===== 화면 전환: 첫 화면(사진·메뉴) ↔ 내 정보 수정 =====
+  const viewHome = $('#viewHome');
+  const viewEdit = $('#viewEdit');
+  const showEdit = (on) => {
+    viewHome.hidden = on; viewEdit.hidden = !on;
+    if (on) { const el = $('#pf-name'); if (!el.disabled) el.focus({ preventScroll: true }); }
+  };
+  $('#mEdit').addEventListener('click', () => showEdit(true));
+  $('#toHome').addEventListener('click', () => showEdit(false));
+  $('#mSettings').addEventListener('click', () => {});                    // 아직 연결된 화면이 없음
+  $('#mLogout').addEventListener('click', logout);
 
   // 이전으로 돌아가기: 이 사이트에서 넘어왔으면 그 페이지로, 아니면 메인으로
   $('#goBack').addEventListener('click', (e) => {

@@ -49,16 +49,39 @@
     </div>
   </header>
 
-  <!-- 내 프로필: 메뉴바 아래를 가득 채우는 흰 상자 하나. 왼쪽 계정 요약 / 오른쪽 내 정보 -->
+  <!-- 내 프로필: 메뉴바 아래 흰 상자 하나. 위쪽 가운데에 프로필 사진과 이미지, 아래쪽에 메뉴들 -->
   <main class="auth pf-page">
     <div class="pf-panel">
       <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
-      <div class="pf-side is-loading" id="pfSide">
-        <div class="pf-avatar" id="pfAvatar" aria-hidden="true"></div>
-        <p class="pf-id" id="pfId"></p>
-        <p class="pf-joined" id="pfJoined"></p>
+
+      <!-- 첫 화면: 프로필 사진·이미지 + 메뉴 -->
+      <div class="pf-view pf-home" id="viewHome">
+        <div class="pf-head is-loading" id="pfSide">
+          <div class="pf-cover">
+            <img src="images/login-art.svg" alt="" width="588" height="231">
+            <div class="pf-avatar" id="pfAvatar" aria-hidden="true"></div>
+          </div>
+          <p class="pf-id" id="pfId"></p>
+          <p class="pf-joined" id="pfJoined"></p>
+        </div>
+        <nav class="pf-menus" data-i18n-label="menus">
+          <button type="button" class="pf-menu" id="mEdit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <span class="pf-menu-text"><strong data-i18n="edit"></strong><span data-i18n="editD"></span></span>
+          </button>
+          <button type="button" class="pf-menu" id="mSettings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+            <span class="pf-menu-text"><strong data-i18n="settings"></strong><span data-i18n="settingsD"></span></span>
+          </button>
+          <button type="button" class="pf-menu" id="mLogout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+            <span class="pf-menu-text"><strong data-i18n="logout"></strong><span data-i18n="logoutD"></span></span>
+          </button>
+        </nav>
       </div>
-      <div class="pf-main">
+
+      <!-- 내 정보 수정: 메뉴에서 누르면 열림 -->
+      <div class="pf-view pf-main" id="viewEdit" hidden>
         <div class="pf-pane">
         <h2 class="card-title" data-i18n="title"></h2>
         <p class="card-sub" data-i18n="sub"></p>
@@ -86,6 +109,7 @@
         <p class="msg" role="status" id="pfMsg"></p>
         <button class="login-btn" type="submit" id="pfSave" data-i18n="save" disabled></button>
       </form>
+        <button class="text-btn" type="button" id="toHome" data-i18n="toHome"></button>
         </div>
       </div>
     </div>
