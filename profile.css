@@ -1,0 +1,138 @@
+/* 내 프로필 페이지: 기본 틀(메뉴바·카드·입력칸·버튼)은 login.css 를 그대로 쓰고, 여기에는 이 페이지에만 필요한 것만 둠 */
+
+/* ===== 메뉴바의 사용자 이름과 목록 (style.css 와 같은 규칙) ===== */
+/* 로그인된 상태: login 대신 사용자 이름이 보이고, 누르면 로그아웃 메뉴가 열림 */
+#menubar .user {
+  /* login 과 똑같은 크기의 상자를 차지하게 해서, 로그인 여부·언어·이름 길이와 상관없이 KR / ENG 위치가 그대로 있게 함 */
+  position: relative;
+  flex: none;
+  width: calc(64px * 494 / 187 * var(--scale));   /* 이름이 길어도 늘어나지 않게 폭을 고정 */
+  height: calc(64px * var(--scale));
+}
+#menubar .user-name {
+  /* 이름은 이 상자 폭까지만 보이고, 넘치는 부분은 ... 으로 줄임. 글자의 오른쪽 끝은 login 글자의 오른쪽 끝(상자 폭의 91.9%)에 맞춤 */
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0 calc(13.7px * var(--scale)) 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: calc(20px * var(--scale));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.4s;
+}
+#menubar .user-name:hover,
+#menubar .user-name[aria-expanded="true"] { opacity: 0.55; }
+/* 이름을 누르면 메뉴바 바로 아래에 열리는 가로 상자 목록. 오른쪽 끝을 고정한 채 아래로 내려오면서 왼쪽으로 길어짐 */
+#menubar .user-menu {
+  --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: absolute;
+  top: 100%;
+  right: 0;                                        /* 오른쪽 끝을 이름 상자의 오른쪽 끝에 맞춤 */
+  box-sizing: border-box;
+  width: calc(205px * var(--scale));               /* 닫힌 상태의 폭: 항목 하나만 보임 (열리면 600px 까지 왼쪽으로 늘어남) */
+  height: calc(76px * var(--scale));
+  padding: calc(8px * var(--scale));
+  display: flex;
+  justify-content: flex-end;                       /* 항목을 오른쪽 끝에 붙여 둠 → 폭이 늘어나면 왼쪽 항목이 차례로 드러남 */
+  gap: calc(8px * var(--scale));
+  overflow: hidden;
+  border-radius: calc(18px * var(--scale));
+  background: #fff;
+  box-shadow: 0 calc(12px * var(--scale)) calc(34px * var(--scale)) rgba(16, 16, 20, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(calc(-14px * var(--scale)));
+  /* 닫힐 때: 열릴 때의 반대 순서. 먼저 오른쪽으로 짧아지고, 끝날 즈음 위로 올라가며 사라짐 */
+  transition:
+    width 0.46s cubic-bezier(0.5, 0, 0.2, 1),
+    transform 0.36s cubic-bezier(0.4, 0, 0.6, 1) 0.24s,
+    opacity 0.28s ease 0.3s,
+    visibility 0s linear 0.6s;
+}
+#menubar .user-menu.open {
+  width: calc(600px * var(--scale));
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition:
+    width 0.75s var(--menu-ease) 0.08s,            /* 내려오기 시작한 직후부터 왼쪽으로 길어짐 */
+    transform 0.55s var(--menu-ease),
+    opacity 0.3s ease,
+    visibility 0s;
+}
+#menubar .user-menu button {
+  flex: none;
+  width: calc((600px - 8px * 4) / 3 * var(--scale));   /* 세 항목이 600px 상자를 꼭 맞게 채움 */
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: calc(11px * var(--scale));
+  background: #f1f1f4;
+  color: #15151b;
+  font: inherit;
+  font-size: calc(17px * var(--scale));
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(calc(14px * var(--scale)));
+  /* 닫힐 때: 제자리에서 왼쪽 항목부터 차례로 흐려짐 (옆으로 밀리는 움직임은 다 사라진 뒤에 되돌림) */
+  transition: background 0.2s, opacity 0.22s ease calc((2 - var(--n, 0)) * 0.05s), transform 0s linear 0.6s;
+}
+/* 맨 오른쪽 항목은 닫히는 동안 그대로 있다가 상자와 함께 사라짐 (빈 상자만 올라가 보이지 않게) */
+#menubar .user-menu:not(.open) button:last-child { transition: background 0.2s, opacity 0s linear 0.6s, transform 0s linear 0.6s; }
+#menubar .user-menu.open button {
+  opacity: 1;
+  transform: none;
+  /* 오른쪽 항목부터 차례로 나타남 */
+  transition: background 0.2s, opacity 0.45s ease calc(0.16s + var(--n, 0) * 0.07s), transform 0.6s var(--menu-ease) calc(0.16s + var(--n, 0) * 0.07s);
+}
+#menubar .user-menu button:nth-last-child(2) { --n: 1; }
+#menubar .user-menu button:nth-last-child(3) { --n: 2; }
+#menubar .user-menu button:nth-last-child(4) { --n: 3; }
+#menubar .user-menu button:hover { background: #e4e4ea; }
+@media (prefers-reduced-motion: reduce) {
+  #menubar .user-menu, #menubar .user-menu button { transition: none !important; transform: none; }
+}
+
+/* ===== 왼쪽: 내 계정 요약 ===== */
+.pf-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 40px; text-align: center; min-width: 0; }
+.pf-avatar {
+  display: grid; place-items: center;
+  width: clamp(96px, 9vw, 148px); aspect-ratio: 1; border-radius: 50%;
+  background: #14151F; color: #fff;
+  font-size: clamp(40px, 4.2vw, 68px); font-weight: 800; line-height: 1; text-transform: uppercase;
+}
+.pf-id { max-width: 100%; margin-top: 10px; font-size: clamp(30px, 3.2vw, 52px); font-weight: 800; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-joined { min-height: 1.4em; font-size: 15px; font-weight: 500; color: #55565f; }
+.pf-side > * { transition: opacity 0.5s ease; }
+.pf-side.is-loading > * { opacity: 0; }
+
+/* ===== 오른쪽: 내 정보 ===== */
+#form-profile { width: 100%; max-width: 400px; margin-top: clamp(20px, 4vh, 44px); display: flex; flex-direction: column; gap: 14px; flex: none; }
+.pf-field { display: flex; flex-direction: column; }
+.pf-field label { font-size: 13px; font-weight: 600; color: #8b8b93; }
+.pf-field .line-field input { height: 44px; padding-right: 0; }
+.pf-field .line-field input::placeholder { color: #b5b5bd; }
+.pf-field .line-field input[readonly] { color: #8b8b93; border-bottom-color: #d5d5db; cursor: default; }
+.pf-field .line-field input[readonly]:focus { border-bottom: 1.5px solid #d5d5db; }
+#form-profile .msg, #form-profile .msg:empty { display: block; min-height: 42px; }   /* 문구 두 줄 자리를 항상 잡아 둠 → 버튼 위치 고정 */
+#form-profile .msg.ok { color: #1a7f4b; }
+#form-profile .login-btn { margin-top: 0; }
+#form-profile .login-btn:disabled { opacity: 0.35; cursor: default; }
+#form-profile .login-btn:disabled:hover { background: #14151F; }
+#form-profile.is-loading .line-field input { color: transparent; }
+
+@media (max-width: 960px) { .pf-side { display: none; } }

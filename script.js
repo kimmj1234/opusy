@@ -140,8 +140,11 @@
     nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(!isOpen()); });
     document.addEventListener('click', (e) => { if (isOpen() && !userBox.contains(e.target)) openMenu(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openMenu(false); });
-    // 내 프로필·설정: 아직 연결된 화면이 없어서 누르면 목록만 닫힘
-    ['menuProfile', 'menuSettings'].forEach((id) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => openMenu(false)); });
+    // 내 프로필: 프로필 화면으로 이동. 설정: 아직 연결된 화면이 없어서 누르면 목록만 닫힘
+    const profileBtn = document.getElementById('menuProfile');
+    if (profileBtn) profileBtn.addEventListener('click', () => { location.href = 'profile.html'; });
+    const settingsBtn = document.getElementById('menuSettings');
+    if (settingsBtn) settingsBtn.addEventListener('click', () => openMenu(false));
     logoutBtn.addEventListener('click', async () => {
       const s = read();
       try {

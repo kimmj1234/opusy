@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>내 프로필 · OPUSY</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="profile.css">
+  <script>
+    // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
+    const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
+    fit(); addEventListener('resize', fit);
+  </script>
+</head>
+<body>
+  <header id="menubar" data-theme="light">
+    <a class="logo" href="index.html" aria-label="OPUSY 홈"></a>
+
+    <div class="menu-right">
+      <div class="lang" role="group" aria-label="언어 선택">
+        <button type="button" data-lang="ko" class="active">KR</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-lang="en">ENG</button>
+      </div>
+
+      <a class="login" href="login.html" aria-label="login">
+        <!-- 로고와 같은 선(stroke) 스타일로 그린 'login' -->
+        <svg viewBox="-47 -47 494 187" fill="none" stroke="currentColor" stroke-width="14" stroke-linejoin="miter" aria-hidden="true">
+          <g transform="translate(100 0)">
+          <path d="M0 -40V60"/>
+          <circle cx="60" cy="30" r="30"/>
+          <circle cx="150" cy="30" r="30"/>
+          <path d="M180 0V70A30 30 0 0 1 120 70"/>
+          <path d="M210 0V60"/>
+          <path d="M210 -40V-26"/>
+          <path d="M240 60V30A30 30 0 0 1 300 30V60"/>
+          </g>
+        </svg>
+      </a>
+      <div class="user" id="user" hidden>
+        <button type="button" class="user-name" id="userName" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="user-menu" id="userMenu">
+          <button type="button" id="menuProfile" data-i18n="profile">내 프로필</button>
+          <button type="button" id="menuSettings" data-i18n="settings">설정</button>
+          <button type="button" id="logout" data-i18n="logout">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 내 프로필: 왼쪽 계정 요약 / 오른쪽 내 정보 -->
+  <main class="auth">
+    <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
+    <div class="pf-side is-loading" id="pfSide">
+      <div class="pf-avatar" id="pfAvatar" aria-hidden="true"></div>
+      <p class="pf-id" id="pfId"></p>
+      <p class="pf-joined" id="pfJoined"></p>
+    </div>
+    <div class="card-wrap">
+    <section class="card">
+      <span class="card-logo" role="img" aria-label="OPUSY"></span>
+      <div class="pane">
+      <h2 class="card-title" data-i18n="title"></h2>
+      <p class="card-sub" data-i18n="sub"></p>
+      <form id="form-profile" class="is-loading" novalidate>
+        <div class="pf-field">
+          <label for="pf-username" data-i18n="username"></label>
+          <div class="line-field"><input id="pf-username" type="text" readonly tabindex="-1"></div>
+        </div>
+        <div class="pf-field">
+          <label for="pf-email" data-i18n="email"></label>
+          <div class="line-field"><input id="pf-email" type="email" readonly tabindex="-1"></div>
+        </div>
+        <div class="pf-field">
+          <label for="pf-name" data-i18n="name"></label>
+          <div class="line-field"><input id="pf-name" name="name" type="text" autocomplete="name" maxlength="30" required></div>
+        </div>
+        <div class="pf-field">
+          <label for="pf-birth" data-i18n="birth"></label>
+          <div class="line-field"><input id="pf-birth" name="birth" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="YYYY-MM-DD" required></div>
+        </div>
+        <div class="pf-field">
+          <label for="pf-phone" data-i18n="phone"></label>
+          <div class="line-field"><input id="pf-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" required></div>
+        </div>
+        <p class="msg" role="status" id="pfMsg"></p>
+        <button class="login-btn" type="submit" id="pfSave" data-i18n="save" disabled></button>
+      </form>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="supabase-config.js"></script>
+  <script defer src="profile.js"></script>
+</body>
+</html>
