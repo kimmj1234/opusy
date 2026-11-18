@@ -211,13 +211,19 @@
 .pf-dev-note:empty { display: none; }
 .pf-dev-note.bad { color: #c62d1f; }
 /* 목록 아래: 이전 페이지 · 기기 추가 · 다음 페이지 */
-.pf-dev-nav { flex: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: max(6px, calc(10px * var(--scale))); margin-top: max(10px, calc(16px * var(--scale))); }
+.pf-dev-foot { position: relative; flex: none; margin-top: max(10px, calc(16px * var(--scale))); overflow: hidden; }
+.pf-dev-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: max(6px, calc(10px * var(--scale))); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.22s, opacity 0.3s ease 0.22s; }
+/* 안내 글: 버튼과 같은 자리에 겹쳐 있다가, 버튼이 내려가 사라지면 나타남 */
+.pf-dev-toast { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 max(10px, calc(16px * var(--scale))); text-align: center; font-size: max(12px, calc(16px * var(--scale))); font-weight: 600; line-height: 1.4; color: #55565f; opacity: 0; transform: translateY(-30%); pointer-events: none; outline: none; transition: opacity 0.3s ease, transform 0.3s ease; }
+.pf-dev-toast.bad { color: #c62d1f; }
+.pf-dev-foot.is-note .pf-dev-nav { transform: translateY(110%); opacity: 0; pointer-events: none; visibility: hidden; transition: transform 0.4s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.3s ease, visibility 0s linear 0.4s; }
+.pf-dev-foot.is-note .pf-dev-toast { opacity: 1; transform: none; transition: opacity 0.35s ease 0.3s, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.3s; }
 .pf-dev-navbtn { height: max(40px, calc(58px * var(--scale))); padding: 0 8px; border: 1.5px solid #e4e4e9; border-radius: 14px; background: #fff; color: #15151b; font: inherit; font-size: max(13px, calc(17px * var(--scale))); font-weight: 600; white-space: nowrap; cursor: pointer; transition: background 0.2s, border-color 0.2s, opacity 0.2s; }
 .pf-dev-navbtn:hover:not(:disabled) { background: #f1f1f4; }
 .pf-dev-navbtn.is-add { border-color: #14151F; background: #14151F; color: #fff; }
 .pf-dev-navbtn.is-add:hover:not(:disabled) { background: #2c2d3a; }
 .pf-dev-navbtn:disabled { cursor: default; opacity: 0.4; }
-@media (prefers-reduced-motion: reduce) { .pf-dev-acts, .pf-dev-pill { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .pf-dev-acts, .pf-dev-pill { animation: none !important; } .pf-dev-nav, .pf-dev-toast { transition: none !important; } }
 
 /* 좁은 화면: 네 칸을 한 줄로 쌓고 흰 상자 안에서 스크롤 */
 @media (max-width: 700px) {

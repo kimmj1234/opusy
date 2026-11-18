@@ -152,13 +152,32 @@
   let devPage = 0;
   let devOpen = null;          // 설정이 열린 기기 { id, mode: 'menu' | 'edit' | 'del' | 'log' }
   let devBusy = false;
-  let devNote = '';            // 기기 칸 아래 안내 (I18N 키). devNoteBad=true 면 빨간 글씨
+  let devNote = '';            // 버튼 자리에 잠깐 뜨는 안내 (I18N 키). devNoteBad=true 면 빨간 글씨
   let devNoteBad = false;
+  let devNoteTimer = 0;
   let myEmail = '';
   const MORE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const pill = (text, fn, cls) => { const b = el('button', 'pf-dev-pill' + (cls ? ' ' + cls : ''), text); b.type = 'button'; b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
-  const setDevNote = (key, bad) => { devNote = key || ''; devNoteBad = !!bad; };
+  // 안내가 생기면 버튼이 아래로 내려가 사라지고 그 자리에 글이 3초 동안 떠 있다가, 글이 사라진 뒤 버튼이 다시 올라옴
+  const NOTE_MS = 3000;
+  function setDevNote(key, bad) {
+    if (!key) return;                                  // 빈 안내로는 떠 있는 글을 지우지 않음 (3초가 지나면 저절로 사라짐)
+    devNote = key; devNoteBad = !!bad;
+    const foot = $('#pfDevFoot');
+    const toast = $('#pfDevToast');
+    toast.textContent = I18N[lang][key];
+    toast.classList.toggle('bad', devNoteBad);
+    const back = document.activeElement && foot.contains(document.activeElement);
+    if (back) { toast.setAttribute('tabindex', '-1'); toast.focus({ preventScroll: true }); }   // 사라지는 버튼에 머물던 키보드 위치를 글로 옮김
+    foot.classList.add('is-note');
+    clearTimeout(devNoteTimer);
+    devNoteTimer = setTimeout(() => {
+      foot.classList.remove('is-note');
+      devNote = '';
+      if (document.activeElement === toast) $('#pfDevAdd').focus({ preventScroll: true });
+    }, NOTE_MS);
+  }
   const devLabel = (d) => d.nickname || I18N[lang].devName[d.platform] || I18N[lang].devName[d.device_kind === 'mobile' ? 'mobile' : 'pc'];
 
   function showDevices(focusSel) {
@@ -180,8 +199,9 @@
     $('#pfDevCount').textContent = t.devCount(devices.length) + (pages > 1 ? ` · ${t.devPage(devPage + 1, pages)}` : '');
     $('#pfDevPrev').disabled = devPage === 0;
     $('#pfDevNext').disabled = devPage >= pages - 1;
-    note.classList.toggle('bad', devNoteBad);
-    note.textContent = devNote ? t[devNote] : (devices.length ? '' : t.devNone);
+    note.classList.remove('bad');
+    note.textContent = devices.length ? '' : t.devNone;
+    if (devNote) $('#pfDevToast').textContent = t[devNote];     // 언어를 바꾸면 떠 있는 글도 바꿈
 
     devices.slice(devPage * PER, devPage * PER + PER).forEach((d) => {
       const kind = d.device_kind === 'mobile' ? 'mobile' : 'pc';
