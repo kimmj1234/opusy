@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfTools', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -69,7 +69,8 @@
       devRate: '메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.', devLimit: '기기는 10대까지 등록할 수 있어요. 쓰지 않는 기기를 먼저 삭제해 주세요.',
       devSaveFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.', devDelFail: '삭제하지 못했어요. 잠시 후 다시 시도해 주세요.',
       dateTime: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
-      wProfile: '프로필', wActivity: '활동', toolsLabel: '기능 배치 (끌어다 놓거나 눌러서 자리를 고르세요)',
+      dragHint: '끌어다가 흰 상자에 놓아 배치해 주세요.',
+      wProfile: '프로필', wActivity: '활동', toolsLabel: '기능 배치 (끌어다 흰 상자에 놓으세요. 키보드로는 Enter 로 자리를 고를 수 있어요)',
       pickT: (n) => `‘${n}’ 놓을 자리를 골라 주세요`, pickSub: '놓은 자리에 있던 기능은 메뉴바로 돌아가요.', pickRemove: '화면에서 빼기',
       pickWide: '가로', pickTall: '세로', pickFull: '전체', pickNow: (n) => `지금: ${n}`,
       slot: { tl: '왼쪽 위', tr: '오른쪽 위', bl: '왼쪽 아래', br: '오른쪽 아래', top: '위', bottom: '아래', left: '왼쪽', right: '오른쪽', full: '전체' },
@@ -119,7 +120,8 @@
       devRate: 'Too many emails. Please try again in a moment.', devLimit: 'You can register up to 10 devices. Delete one you no longer use first.',
       devSaveFail: 'Could not save. Please try again in a moment.', devDelFail: 'Could not delete. Please try again in a moment.',
       dateTime: (d) => d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      wProfile: 'Profile', wActivity: 'Activity', toolsLabel: 'Arrange features (drag onto the panel, or press to choose a place)',
+      dragHint: 'Drag it onto the white panel to place it.',
+      wProfile: 'Profile', wActivity: 'Activity', toolsLabel: 'Arrange features (drag onto the panel; with a keyboard, press Enter to choose a place)',
       pickT: (n) => `Choose where to put “${n}”`, pickSub: 'Whatever was in that place goes back to the menu bar.', pickRemove: 'Remove from panel',
       pickWide: 'Wide', pickTall: 'Tall', pickFull: 'Full', pickNow: (n) => `Now: ${n}`,
       slot: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right', full: 'Full' },
@@ -175,8 +177,8 @@
   }
 
   // 한 쪽에 3대씩 보여 주고, 각 기기 오른쪽 끝의 ⋯ 버튼으로 수정·삭제·접속기록을 엶
-  // 한 쪽에 보이는 기기 수는 칸 크기에 따라: 한 칸 3대, 가로(두 줄로) 6대, 세로 7대, 전체(두 줄로) 14대
-  const PER_BY = { q: 3, wide: 6, tall: 7, full: 14 };
+  // 한 쪽에 보이는 기기 수는 칸 크기에 따라 늘어남: 한 칸 3대까지, 가로(두 줄로) 6대까지, 세로·전체는 들어가는 만큼
+  const PER_BY = { q: 3, wide: 6, tall: 10, full: 20 };   // 가장 많을 때의 수. 실제로는 칸에 들어가는 만큼만
   const sizeOf = (w) => { const sec = $(`.pf-q[data-w="${w}"]`); return (sec && sec.dataset.size) || 'q'; };
   let devPage = 0;
   let devOpen = null;          // 설정이 열린 기기 { id, mode: 'menu' | 'edit' | 'del' | 'log' }
@@ -224,7 +226,18 @@
       return;
     }
     const size = sizeOf('devices');
-    const PER = PER_BY[size];
+    // 한 쪽에 보이는 기기 수: 칸에 실제로 들어가는 줄 수를 재서 정함 (스크롤도, 아래 '이전으로 돌아가기'와 겹침도 없게)
+    const cols = size === 'wide' || size === 'full' ? 2 : 1;
+    let perCol = PER_BY[size] / cols;
+    const devBox = $('#pfDev');
+    if (devBox.clientHeight && !matchMedia('(max-width: 700px)').matches) {
+      const sc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scale')) || 1;
+      const itemH = Math.max(58, 84 * sc), gap = Math.max(6, 10 * sc);
+      const foot = $('#pfDevFoot');
+      const avail = devBox.clientHeight - devBox.querySelector('.pf-q-title').offsetHeight - parseFloat(getComputedStyle(list).marginTop) - foot.offsetHeight - parseFloat(getComputedStyle(foot).marginTop) - 6;
+      perCol = Math.max(1, Math.min(perCol, Math.floor((avail + gap) / (itemH + gap))));
+    }
+    const PER = perCol * cols;
     const pages = Math.max(1, Math.ceil(devices.length / PER));
     devPage = Math.min(devPage, pages - 1);
     $('#pfDevCount').textContent = t.devCount(devices.length) + (pages > 1 ? ` · ${t.devPage(devPage + 1, pages)}` : '');
@@ -239,6 +252,7 @@
       const open = devOpen && devOpen.id === d.id ? devOpen.mode : '';
       const li = el('li', 'pf-dev-item' + (open ? ' is-open is-' + open : ''));
       li.dataset.id = d.id;
+      li.style.setProperty('--i', list.children.length);
       li.insertAdjacentHTML('afterbegin', ICON[kind]);              // 고정된 아이콘 그림만 HTML 로 넣고, 글자는 textContent 로 넣음
       const box = el('div', 'pf-dev-text');
       if (open === 'edit') {
@@ -291,6 +305,12 @@
       li.append(more);
       list.append(li);
     });
+    // 여러 쪽일 때는 목록 높이를 한 쪽 분량으로 고정: 마지막 쪽에 기기가 적어도 아래 버튼 위치가 바뀌지 않음
+    list.style.minHeight = '';
+    if (pages > 1 && list.firstElementChild) {
+      const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
+      list.style.minHeight = `${perCol * list.firstElementChild.offsetHeight + (perCol - 1) * gap}px`;
+    }
     if (focusSel) {
       const item = list.querySelector(`.pf-dev-item.is-open`);
       const target = item && item.querySelector(focusSel);
@@ -328,8 +348,8 @@
     if (ok) { devOpen = null; setDevNote(''); await reloadDevices(); } else setDevNote('devDelFail', true);
     showDevices();
   }
-  $('#pfDevPrev').addEventListener('click', () => { devPage = Math.max(0, devPage - 1); devOpen = null; showDevices(); });
-  $('#pfDevNext').addEventListener('click', () => { devPage += 1; devOpen = null; showDevices(); });
+  $('#pfDevPrev').addEventListener('click', () => { devPage = Math.max(0, devPage - 1); devOpen = null; showDevices(); slide($('#pfDevList'), 'prev'); });
+  $('#pfDevNext').addEventListener('click', () => { devPage += 1; devOpen = null; showDevices(); slide($('#pfDevList'), 'next'); });
   // 기기 추가: 가입한 이메일로 등록 링크를 보냄. 추가할 기기에서 링크를 열면 그 기기를 등록하는 화면이 열림
   $('#pfDevAdd').addEventListener('click', async () => {
     if (devBusy || !Array.isArray(devices)) return;
@@ -473,7 +493,15 @@
       items[(i + (e.shiftKey ? -1 : 1) + items.length) % items.length].focus();
     }
   });
-  // 끌기: 6px 넘게 움직이면 끌기 시작 → 모양이 나타나고, 원하는 모양 위에서 놓으면 그 자리에 펼쳐짐. 움직이지 않고 떼면(누르기) 모양을 눌러서 고름
+  let hintTimer = 0;
+  function showDragHint() {
+    const h = $('#pfToolsHint');
+    h.classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => h.classList.toggle('show', false), 3000);
+  }
+  // 끌기: 6px 넘게 움직이면 끌기 시작 → 모양이 나타나고, 원하는 모양 위에서 놓으면 그 자리에 펼쳐짐. 움직이지 않고 떼면(누르기) 안내만 뜸.
+  // 마우스로 끌 수 없는 키보드 사용자는 Enter·Space 로 모양 고르기를 열 수 있음
   $$('.pf-tool').forEach((btn) => {
     let start = null, ghost = null, over = null;
     const hit = (x, y) => { const e = document.elementFromPoint(x, y); return e ? e.closest('.pf-zone, .pf-pick-remove') : null; };
@@ -499,6 +527,7 @@
         document.body.append(ghost);
         btn.classList.add('is-drag');
         document.body.classList.add('pf-dragging');
+        $('#pfToolsHint').classList.toggle('show', false);
         openPick(btn.dataset.w, true);
       }
       ghost.style.transform = `translate(${e.clientX - ghost.offsetWidth / 2}px, ${e.clientY - ghost.offsetHeight / 2}px)`;
@@ -510,7 +539,7 @@
       const target = dragged ? hit(e.clientX, e.clientY) : null;
       end();
       if (dragged) { choose(target); closePick(); }
-      else openPick(btn.dataset.w, false);
+      else showDragHint();                           // 끌지 않고 누르기만 하면: 끌어다 놓으라는 안내를 잠깐 보여 줌
     });
     btn.addEventListener('pointercancel', () => { const dragged = start && start.drag; end(); if (dragged) closePick(); });
     btn.addEventListener('click', (e) => { if (e.detail === 0 && !pick) openPick(btn.dataset.w, false); });   // 키보드(Enter·Space)로 누른 경우
@@ -824,6 +853,16 @@
   // 스크롤 없이 보여 주기: 목록은 칸에 들어가는 줄 수만큼만 보이고, 나머지는 아래의 ‹ 1 / 3 › 로 넘김.
   // 한 줄도 들어갈 자리가 없으면(작은 칸의 게시글 목록) 목록을 아예 숨김 → 더 큰 칸에 놓으면 보임
   let rowsPage = 0;
+  // 쪽을 넘길 때: 새 줄들이 넘기는 방향에서 살짝 밀려 들어오며 차례로 나타남
+  function slide(list, dir) {
+    if (!list) return;
+    list.classList.toggle('pf-slide-next', false);
+    list.classList.toggle('pf-slide-prev', false);
+    void list.offsetWidth;                           // 같은 방향으로 연달아 넘겨도 움직임이 다시 시작되게
+    list.classList.add(dir === 'prev' ? 'pf-slide-prev' : 'pf-slide-next');
+    clearTimeout(list.slideTimer);                   // 움직임이 끝나면 표시를 지움 (나중에 다시 그릴 때 또 움직이지 않게)
+    list.slideTimer = setTimeout(() => { list.classList.toggle('pf-slide-next', false); list.classList.toggle('pf-slide-prev', false); }, 1000);
+  }
   function fitRows() {
     const ul = dBody.querySelector('.pf-rows');
     const old = dBody.querySelector('.pf-pager');
@@ -833,6 +872,7 @@
     const sub = ul.previousElementSibling && ul.previousElementSibling.classList.contains('pf-sub') ? ul.previousElementSibling : null;
     rows.forEach((r) => { r.hidden = false; });
     ul.hidden = false;
+    ul.style.minHeight = '';
     if (sub) sub.hidden = false;
     if (!rows.length || !dBody.clientHeight) return;
     const cs = getComputedStyle(ul);
@@ -855,15 +895,18 @@
     if (per < 1) { ul.hidden = true; pager.hidden = true; if (sub) sub.hidden = true; return; }
     const pages = Math.ceil(rows.length / per);
     rowsPage = Math.min(Math.max(0, rowsPage), pages - 1);
-    rows.forEach((r, i) => { r.hidden = i < rowsPage * per || i >= (rowsPage + 1) * per; });
+    rows.forEach((r, i) => { r.hidden = i < rowsPage * per || i >= (rowsPage + 1) * per; r.style.setProperty('--i', i - rowsPage * per); });
+    // 목록 높이를 한 쪽 분량으로 고정: 마지막 쪽에 줄이 적어도 ‹ 1 / 3 › 의 위치가 바뀌지 않음
+    const perCol = per / cols;
+    ul.style.minHeight = `${perCol * rowH + (perCol - 1) * gap}px`;
     label.textContent = t.devPage(rowsPage + 1, pages);
     prev.disabled = rowsPage === 0;
     next.disabled = rowsPage >= pages - 1;
-    prev.addEventListener('click', () => { rowsPage -= 1; fitRows(); const b = dBody.querySelector('.pf-pager-btn:not(:disabled)'); if (b) b.focus(); });
-    next.addEventListener('click', () => { rowsPage += 1; fitRows(); const b = [...dBody.querySelectorAll('.pf-pager-btn:not(:disabled)')].pop(); if (b) b.focus(); });
+    prev.addEventListener('click', () => { rowsPage -= 1; fitRows(); slide(dBody.querySelector('.pf-rows'), 'prev'); const b = dBody.querySelector('.pf-pager-btn:not(:disabled)'); if (b) b.focus(); });
+    next.addEventListener('click', () => { rowsPage += 1; fitRows(); slide(dBody.querySelector('.pf-rows'), 'next'); const b = [...dBody.querySelectorAll('.pf-pager-btn:not(:disabled)')].pop(); if (b) b.focus(); });
   }
   let fitTimer = 0;
-  addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitRows, 80); });
+  addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(() => { fitRows(); if (!devOpen) showDevices(); }, 80); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitRows());
 
   function renderDetail() {

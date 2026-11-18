@@ -417,3 +417,17 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-pager-btn { display: grid; place-items: center; width: max(28px, calc(38px * var(--scale))); height: max(28px, calc(38px * var(--scale))); padding: 0 0 2px; border: 0; border-radius: 50%; background: #f1f1f4; color: #14151F; font: inherit; font-size: max(15px, calc(20px * var(--scale))); line-height: 1; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
 .pf-pager-btn:hover:not(:disabled) { background: #e2e2e8; }
 .pf-pager-btn:disabled { cursor: default; opacity: 0.35; }
+
+/* ===== 쪽 넘김: 위치는 고정, 넘길 때는 새 줄이 넘기는 방향에서 부드럽게 들어옴 ===== */
+.pf-rows { align-content: start; }                 /* 높이를 고정해도 줄이 늘어나지 않게 */
+.pf-slide-next > *, .pf-slide-prev > * { animation: pf-slide-next 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 35ms); }
+.pf-slide-prev > * { animation-name: pf-slide-prev; }
+@keyframes pf-slide-next { from { opacity: 0; transform: translateX(calc(28px * var(--scale))); } to { opacity: 1; transform: none; } }
+@keyframes pf-slide-prev { from { opacity: 0; transform: translateX(calc(-28px * var(--scale))); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pf-slide-next > *, .pf-slide-prev > * { animation: none; } }
+.pf-dev-list { align-content: start; }
+
+/* 메뉴바 기능을 끌지 않고 누르기만 했을 때 잠깐 뜨는 안내 말풍선 */
+#menubar .pf-tools-hint { position: absolute; left: 50%; top: calc(100% - 14px * var(--scale)); margin: 0; padding: max(8px, calc(12px * var(--scale))) max(14px, calc(22px * var(--scale))); border-radius: 999px; background: #26262c; color: #fff; font-size: max(12px, calc(15px * var(--scale))); font-weight: 600; white-space: nowrap; box-shadow: 0 10px 28px rgba(16, 16, 20, 0.18); opacity: 0; transform: translate(-50%, -8px); pointer-events: none; transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+#menubar .pf-tools-hint.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { #menubar .pf-tools-hint { transition: none; } }
