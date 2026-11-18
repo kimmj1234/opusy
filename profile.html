@@ -55,7 +55,8 @@
       <a class="back-link" href="index.html" id="goBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="goBack"></span></a>
 
       <!-- 프로필 사진: 흰 상자의 가로 가운데. 누르면 사진을 고를 수 있음 -->
-      <div class="pf-photo-box is-loading" id="pfPhotoBox">
+      <div class="pf-top is-loading" id="pfTop">
+      <div class="pf-photo-box" id="pfPhotoBox">
         <button type="button" class="pf-photo" id="pfPhoto">
           <img id="pfPhotoImg" alt="" hidden>
           <span class="pf-photo-empty" id="pfPhotoEmpty">
@@ -67,6 +68,19 @@
         <input type="file" id="pfFile" accept="image/*" hidden>
         <p class="msg" id="pfMsg" role="status"></p>
         <button class="text-btn" type="button" id="pfRemove" data-i18n="removePhoto" hidden></button>
+      </div>
+
+      <!-- 사진 오른쪽: 계정에 등록된 정보 (보기만) -->
+      <div class="pf-info">
+        <h2 class="pf-id" id="pfId"></h2>
+        <dl class="pf-list">
+          <div><dt data-i18n="email"></dt><dd id="pfEmail"></dd></div>
+          <div><dt data-i18n="name"></dt><dd id="pfName"></dd></div>
+          <div><dt data-i18n="birth"></dt><dd id="pfBirth"></dd></div>
+          <div><dt data-i18n="phone"></dt><dd id="pfPhone"></dd></div>
+          <div><dt data-i18n="joined"></dt><dd id="pfJoined"></dd></div>
+        </dl>
+      </div>
       </div>
     </div>
   </main>

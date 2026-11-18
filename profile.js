@@ -25,6 +25,8 @@
     ko: {
       pageTitle: '내 프로필 · OPUSY', goBack: '이전으로 돌아가기', profile: '내 프로필', settings: '설정', logout: '로그아웃',
       addPhoto: '사진 추가', changePhoto: '사진 바꾸기', removePhoto: '사진 지우기', photoLabel: '프로필 사진',
+      email: '이메일', name: '이름', birth: '생년월일', phone: '전화번호', joined: '가입일',
+      date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
         uploading: '사진을 올리는 중이에요…',
         notImage: '이미지 파일만 올릴 수 있어요.',
@@ -36,6 +38,8 @@
     en: {
       pageTitle: 'My profile · OPUSY', goBack: 'Go back', profile: 'My profile', settings: 'Settings', logout: 'Logout',
       addPhoto: 'Add photo', changePhoto: 'Change photo', removePhoto: 'Remove photo', photoLabel: 'Profile photo',
+      email: 'Email', name: 'Name', birth: 'Date of birth', phone: 'Phone', joined: 'Joined',
+      date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       m: {
         uploading: 'Uploading your photo…',
         notImage: 'Only image files can be uploaded.',
@@ -56,7 +60,26 @@
     $$('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
     $('#pfPhoto').setAttribute('aria-label', t.photoLabel);
     showMsg(msgKey, msgInfo);
+    showDates();
   }
+  // 계정 정보의 날짜(생년월일·가입일)는 언어에 맞춰 표기
+  let info = { birth: null, joined: null };
+  const localDate = (v) => {            // 'YYYY-MM-DD' 는 시간대 때문에 하루 밀리지 않게 직접 나눠서 만듦
+    if (!v) return null;
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));
+    const d = m && String(v).length === 10 ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(v);
+    return isNaN(d) ? null : d;
+  };
+  function showDates() {
+    const t = I18N[lang];
+    const put = (id, v) => { const d = localDate(v); $(id).textContent = d ? t.date(d) : '–'; };
+    put('#pfBirth', info.birth);
+    put('#pfJoined', info.joined);
+  }
+  const fmtPhone = (v) => {
+    const d = String(v || '').replace(/\D/g, '');
+    return d.length > 7 ? `${d.slice(0, 3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}` : d;
+  };
   // 사진 아래 안내 문구 (언어를 바꾸면 다시 표기). info=true 면 오류가 아닌 진행 안내
   let msgKey = '';
   let msgInfo = false;
@@ -202,15 +225,22 @@
     nameBtn.textContent = shownId;
     nameBtn.title = shownId;
 
-    // 저장된 프로필 사진 불러오기
+    // 저장된 프로필 사진과 계정 정보 불러오기
     uid = u.id;
-    let ok = false;
+    let p = null;
     try {
-      const { data, error } = await sb.from('profiles').select('avatar_path').eq('id', uid).maybeSingle();
-      if (!error && data) { ok = true; setPhoto(data.avatar_path || null); }
+      const { data, error } = await sb.from('profiles').select('username, name, birth_date, phone, created_at, avatar_path').eq('id', uid).maybeSingle();
+      if (!error && data) p = data;
     } catch (e) {}
-    if (!ok) showMsg('load');
-    canEdit = ok;
-    $('#pfPhotoBox').classList.remove('is-loading');
+    const text = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
+    text('#pfId', (p && p.username) || shownId);
+    text('#pfEmail', u.email);
+    text('#pfName', p && p.name);
+    text('#pfPhone', p && fmtPhone(p.phone));
+    info = { birth: p && p.birth_date, joined: (p && p.created_at) || u.created_at };
+    showDates();
+    if (p) setPhoto(p.avatar_path || null); else showMsg('load');
+    canEdit = !!p;
+    $('#pfTop').classList.remove('is-loading');
   })();
 })();

@@ -123,16 +123,28 @@
 }
 .pf-page .back-link { left: calc(40px * var(--scale)); bottom: calc(36px * var(--scale)); }
 
-/* ===== 프로필 사진: 흰 상자의 가로 가운데에 있는 흰 동그라미 (1920×1080 기준 지름 475, 상자 위에서 80) ===== */
-.pf-photo-box {
+/* ===== 프로필 사진: 흰 동그라미 (1920×1080 기준 지름 260, 상자 위에서 80) ===== */
+/* 사진(왼쪽)과 계정 정보(오른쪽)를 한 줄로 묶어 흰 상자의 가로 가운데에 둠 */
+.pf-top {
   position: absolute; top: calc(80px * var(--scale)); left: 50%; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: calc(14px * var(--scale));
+  display: flex; align-items: flex-start; gap: max(28px, calc(72px * var(--scale)));
+  max-width: calc(100% - 48px);
   transition: opacity 0.5s ease;
 }
-.pf-photo-box.is-loading { opacity: 0; pointer-events: none; }
+.pf-top.is-loading { opacity: 0; pointer-events: none; }
+.pf-photo-box { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(14px * var(--scale)); }
+
+/* 계정 정보: 큰 아이디 아래에 항목 이름과 값이 한 줄씩 */
+.pf-info { min-width: 0; padding-top: calc(14px * var(--scale)); }
+.pf-id { max-width: max(260px, calc(620px * var(--scale))); font-size: max(26px, calc(52px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-list { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: max(18px, calc(36px * var(--scale))); row-gap: max(8px, calc(14px * var(--scale))); margin-top: max(14px, calc(26px * var(--scale))); font-size: max(13px, calc(20px * var(--scale))); line-height: 1.4; }
+.pf-list > div { display: contents; }
+.pf-list dt { font-weight: 600; color: #8b8b93; white-space: nowrap; }
+.pf-list dd { font-weight: 500; color: #14151F; max-width: max(220px, calc(520px * var(--scale))); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 700px) { .pf-top { flex-direction: column; align-items: center; } .pf-info { text-align: center; } .pf-list { text-align: left; } }
 .pf-photo {
   position: relative; display: block;
-  width: max(160px, calc(475px * var(--scale))); aspect-ratio: 1;
+  width: max(120px, calc(260px * var(--scale))); aspect-ratio: 1;
   padding: 0; border: 1.5px solid #e4e4e9; border-radius: 50%;
   background: #fff; color: #8b8b93; font: inherit; cursor: pointer; overflow: hidden;
   box-shadow: 0 calc(14px * var(--scale)) calc(44px * var(--scale)) rgba(20, 21, 31, 0.08);
@@ -140,13 +152,12 @@
 }
 .pf-photo:hover { border-color: #c9c9d1; color: #14151F; box-shadow: 0 calc(18px * var(--scale)) calc(54px * var(--scale)) rgba(20, 21, 31, 0.13); }
 .pf-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.pf-photo-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(12px * var(--scale)); font-size: max(13px, calc(20px * var(--scale))); font-weight: 600; }
-.pf-photo-empty svg { width: max(30px, calc(64px * var(--scale))); height: auto; aspect-ratio: 1; }
+.pf-photo-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(12px * var(--scale)); font-size: max(12px, calc(17px * var(--scale))); font-weight: 600; }
+.pf-photo-empty svg { width: max(24px, calc(44px * var(--scale))); height: auto; aspect-ratio: 1; }
 /* 사진이 있을 때 마우스를 올리면 어둡게 덮이며 '사진 바꾸기' */
 .pf-photo-hover { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20, 21, 31, 0.5); color: #fff; font-size: max(13px, calc(20px * var(--scale))); font-weight: 600; opacity: 0; transition: opacity 0.4s ease; }
 .pf-photo.has-img:hover .pf-photo-hover, .pf-photo.has-img:focus-visible .pf-photo-hover { opacity: 1; }
 .pf-photo.is-busy { cursor: progress; }
 .pf-photo.is-busy img, .pf-photo.is-busy .pf-photo-empty { opacity: 0.4; }
-.pf-photo-box .msg { min-height: 1.5em; text-align: center; white-space: nowrap; }
-.pf-photo-box .msg:empty { display: block; }
-.pf-photo-box .text-btn { margin-top: calc(-10px * var(--scale)); height: 32px; }
+.pf-photo-box .msg { width: max(120px, calc(260px * var(--scale))); text-align: center; word-break: keep-all; }
+.pf-photo-box .text-btn { margin-top: 0; height: 28px; }
