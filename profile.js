@@ -1,8 +1,20 @@
-// 내 프로필 페이지: 지금은 틀(메뉴바 + 흰 상자)만 있음. 로그인하지 않았으면 로그인 화면으로 보냄
+// 내 프로필 페이지: 프로필 사진·계정 정보(왼쪽 위)와 등록된 기기(오른쪽 위). 로그인하지 않았으면 로그인 화면으로 보냄
 (() => {
   const CFG = window.OPUSY_SUPABASE;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
+
+  // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
+  // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfName', 'pfBirth', 'pfPhone', 'pfJoined', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
+  const REFETCH = 'opusy.profile.refetch';
+  if (NEED.some((id) => !document.getElementById(id))) {
+    let tried = false;
+    try { tried = sessionStorage.getItem(REFETCH) === '1'; sessionStorage.setItem(REFETCH, '1'); } catch (e) { tried = true; }
+    if (!tried) fetch(location.pathname, { cache: 'reload' }).then(() => location.reload(), () => {});
+    return;
+  }
+  try { sessionStorage.removeItem(REFETCH); } catch (e) {}
 
   // 로그인 정보 보관 위치는 로그인 페이지와 같음: 자동 로그인을 켰으면 localStorage, 껐으면 sessionStorage
   const AUTO_KEY = 'opusy.autoLogin';
@@ -214,7 +226,12 @@
   };
   const dropFile = async (path) => { try { await bucket().remove([path]); } catch (e) {} };
 
-  photoBtn.addEventListener('click', () => { if (canEdit && !busy) fileInput.click(); });
+  photoBtn.addEventListener('click', () => {
+    if (busy) return;
+    if (!canEdit) return showMsg('load');       // 내 정보를 못 불러온 상태: 조용히 무시하지 않고 이유를 알림
+    try { if (fileInput.showPicker) fileInput.showPicker(); else fileInput.click(); }
+    catch (e) { fileInput.click(); }
+  });
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files && fileInput.files[0];
     fileInput.value = '';

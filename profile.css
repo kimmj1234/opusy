@@ -123,11 +123,9 @@
 }
 .pf-page .back-link { left: calc(40px * var(--scale)); bottom: calc(36px * var(--scale)); }
 
-/* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔. 칸 사이에는 옅은 선 ===== */
+/* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔 (칸 사이에 선은 없음) ===== */
 .pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
 .pf-q { min-width: 0; min-height: 0; padding: max(20px, calc(48px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
-.pf-q1, .pf-q3 { border-right: 1px solid #ececf0; }
-.pf-q1, .pf-q2 { border-bottom: 1px solid #ececf0; }
 .pf-q1 { display: flex; align-items: center; justify-content: center; }
 
 /* ===== 왼쪽 위: 프로필 사진(흰 동그라미, 1920×1080 기준 지름 220)과 계정 정보를 한 줄로 묶어 칸 가운데에 둠 ===== */
@@ -166,7 +164,7 @@
 @media (max-width: 700px) {
   .pf-panel { overflow: auto; }
   .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
-  .pf-q { border-right: 0; overflow: visible; }
+  .pf-q { overflow: visible; }
   .pf-q3, .pf-q4 { display: none; }
   .pf-top { flex-direction: column; align-items: center; } .pf-info { text-align: center; } .pf-list { text-align: left; }
 }
