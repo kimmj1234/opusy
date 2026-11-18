@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfTools', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -68,6 +68,11 @@
       devRate: '메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.', devLimit: '기기는 10대까지 등록할 수 있어요. 쓰지 않는 기기를 먼저 삭제해 주세요.',
       devSaveFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.', devDelFail: '삭제하지 못했어요. 잠시 후 다시 시도해 주세요.',
       dateTime: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
+      wProfile: '프로필', wActivity: '활동', toolsLabel: '기능 배치 (끌어다 놓거나 눌러서 자리를 고르세요)',
+      pickT: (n) => `‘${n}’ 놓을 자리를 골라 주세요`, pickSub: '놓은 자리에 있던 기능은 메뉴바로 돌아가요.', pickRemove: '화면에서 빼기',
+      pickWide: '가로', pickTall: '세로', pickFull: '전체', pickNow: (n) => `지금: ${n}`,
+      slot: { tl: '왼쪽 위', tr: '오른쪽 위', bl: '왼쪽 아래', br: '오른쪽 아래', top: '위', bottom: '아래', left: '왼쪽', right: '오른쪽', full: '전체' },
+      layoutFail: '배치를 저장하지 못했어요. 새로고침하면 이전 배치로 돌아가요.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -112,6 +117,11 @@
       devRate: 'Too many emails. Please try again in a moment.', devLimit: 'You can register up to 10 devices. Delete one you no longer use first.',
       devSaveFail: 'Could not save. Please try again in a moment.', devDelFail: 'Could not delete. Please try again in a moment.',
       dateTime: (d) => d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      wProfile: 'Profile', wActivity: 'Activity', toolsLabel: 'Arrange features (drag onto the panel, or press to choose a place)',
+      pickT: (n) => `Choose where to put “${n}”`, pickSub: 'Whatever was in that place goes back to the menu bar.', pickRemove: 'Remove from panel',
+      pickWide: 'Wide', pickTall: 'Tall', pickFull: 'Full', pickNow: (n) => `Now: ${n}`,
+      slot: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right', full: 'Full' },
+      layoutFail: 'Could not save the layout. Refreshing will restore the previous one.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       m: {
@@ -136,6 +146,8 @@
     $('#pfCover').setAttribute('aria-label', t.coverLabel);
     $('#pfTipCover').setAttribute('aria-label', t.tipLabel);
     $('#pfTipPhoto').setAttribute('aria-label', t.tipLabel);
+    $('#pfTools').setAttribute('aria-label', t.toolsLabel);
+    if (pick) fillPick();
     showMsg(msgKey, msgInfo);
     showDevices();
     $('#pfTabs').setAttribute('aria-label', t.tabsLabel);
@@ -313,6 +325,167 @@
   // 설정 칸 바깥을 누르거나 Esc 를 누르면 닫힘
   document.addEventListener('click', (e) => { if (devOpen && !e.target.closest('.pf-dev-item.is-open')) closeDev(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && devOpen) closeDev(true); });
+  // ===== 기능 배치: 메뉴바의 기능을 끌어다 흰 상자에 놓음 =====
+  // 흰 상자는 네 칸(0 왼쪽 위, 1 오른쪽 위, 2 왼쪽 아래, 3 오른쪽 아래). 자리마다 차지하는 칸이 정해져 있음
+  const SLOTS = { tl: [0], tr: [1], bl: [2], br: [3], top: [0, 1], bottom: [2, 3], left: [0, 2], right: [1, 3], full: [0, 1, 2, 3] };
+  const WIDGETS = ['profile', 'devices', 'activity'];
+  const DEFAULT_LAYOUT = { profile: 'tl', devices: 'tr', activity: 'bl' };
+  let layout = { ...DEFAULT_LAYOUT };
+  let pick = null;             // 모양 고르기가 열려 있을 때 { w: 기능, drag: 끌고 있는 중인지 }
+  const wName = (w) => I18N[lang][{ profile: 'wProfile', devices: 'devices', activity: 'wActivity' }[w]];
+  const overlap = (a, b) => SLOTS[a].some((c) => SLOTS[b].includes(c));
+  // 저장돼 있던 값은 그대로 믿지 않고, 아는 기능·아는 자리·서로 겹치지 않는 것만 받아들임
+  function cleanLayout(v) {
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return { ...DEFAULT_LAYOUT };
+    const out = {};
+    WIDGETS.forEach((w) => {
+      const sl = v[w];
+      if (typeof sl === 'string' && Object.prototype.hasOwnProperty.call(SLOTS, sl) && !Object.values(out).some((o) => overlap(o, sl))) out[w] = sl;
+    });
+    return out;
+  }
+  function applyLayout() {
+    $$('.pf-q[data-w]').forEach((sec) => {
+      const sl = layout[sec.dataset.w];
+      if (sl) sec.dataset.slot = sl; else sec.removeAttribute('data-slot');
+      sec.classList.toggle('has-back', !!sl && SLOTS[sl].includes(2));
+    });
+    // 십자 선: 한 기능이 양쪽 칸을 함께 차지하면 그 사이 토막은 숨김
+    const spans = (a, b) => Object.values(layout).some((sl) => SLOTS[sl].includes(a) && SLOTS[sl].includes(b));
+    $('.pf-line-vt').hidden = spans(0, 1);
+    $('.pf-line-vb').hidden = spans(2, 3);
+    $('.pf-line-hl').hidden = spans(0, 2);
+    $('.pf-line-hr').hidden = spans(1, 3);
+    $$('.pf-tool').forEach((b) => b.classList.toggle('is-on', !!layout[b.dataset.w]));
+  }
+  let layoutMsgTimer = 0;
+  async function saveLayout() {
+    if (!uid) return;
+    let ok = false;
+    try { const { error } = await sb.from('profiles').update({ layout }).eq('id', uid); ok = !error; } catch (e) {}
+    if (ok) return;
+    const m = $('#pfLayoutMsg');
+    m.textContent = I18N[lang].layoutFail;
+    m.classList.add('show');
+    clearTimeout(layoutMsgTimer);
+    layoutMsgTimer = setTimeout(() => m.classList.toggle('show', false), 3000);
+  }
+  function place(w, sl) {
+    if (layout[w] === sl) return;
+    WIDGETS.forEach((o) => { if (o !== w && layout[o] && overlap(layout[o], sl)) delete layout[o]; });   // 그 자리에 있던 기능은 메뉴바로
+    layout[w] = sl;
+    applyLayout(); saveLayout();
+  }
+  function unplace(w) {
+    if (!layout[w]) return;
+    delete layout[w];
+    applyLayout(); saveLayout();
+  }
+  // 모양 고르기 화면의 글자: 자리 이름과, 지금 그 자리에 있는 다른 기능
+  function fillPick() {
+    const t = I18N[lang];
+    $('#pfPickTitle').textContent = t.pickT(wName(pick.w));
+    $('#pfPickRemove').hidden = !layout[pick.w];
+    $$('.pf-zone').forEach((z) => {
+      const sl = z.dataset.slot;
+      const there = WIDGETS.filter((o) => o !== pick.w && layout[o] && overlap(layout[o], sl)).map(wName);
+      z.textContent = '';
+      z.append(el('span', '', t.slot[sl]), el('small', '', there.length ? t.pickNow(there.join(' · ')) : ''));
+      z.setAttribute('aria-label', t.slot[sl] + (there.length ? ` (${t.pickNow(there.join(', '))})` : ''));
+      z.classList.toggle('is-mine', layout[pick.w] === sl);
+      z.classList.toggle('is-over', false);
+    });
+    $('#pfPickRemove').classList.toggle('is-over', false);
+  }
+  let pickHide = 0;
+  function openPick(w, drag) {
+    pick = { w, drag };
+    fillPick();
+    const box = $('#pfPick');
+    clearTimeout(pickHide);
+    box.hidden = false;
+    $('#pfGrid').inert = true;                       // 흐려진 뒤쪽 내용은 누르거나 키보드로 갈 수 없게
+    void box.offsetWidth;                            // 나타나는 움직임이 처음 상태에서 시작되게
+    box.classList.add('open');
+    if (!drag) { const z = $('.pf-zone.is-mine') || $('.pf-zone'); z.focus({ preventScroll: true }); }
+  }
+  function closePick(focusBack) {
+    if (!pick) return;
+    const w = pick.w;
+    pick = null;
+    const box = $('#pfPick');
+    box.classList.toggle('open', false);
+    $('#pfGrid').inert = false;
+    clearTimeout(pickHide);
+    pickHide = setTimeout(() => { box.hidden = true; }, 320);
+    if (focusBack) { const b = $(`.pf-tool[data-w="${w}"]`); if (b) b.focus({ preventScroll: true }); }
+  }
+  const choose = (target) => {                       // 놓거나 누른 곳이 자리면 배치, '빼기'면 화면에서 뺌
+    if (!pick || !target) return false;
+    const w = pick.w;
+    if (target.id === 'pfPickRemove') { unplace(w); return true; }
+    if (target.classList.contains('pf-zone')) { place(w, target.dataset.slot); return true; }
+    return false;
+  };
+  $('#pfPick').addEventListener('click', (e) => {
+    if (!pick || pick.drag) return;
+    const target = e.target.closest('.pf-zone, .pf-pick-remove');
+    if (target) { choose(target); closePick(true); }
+    else if (!e.target.closest('.pf-pick-in')) closePick(true);          // 모양 바깥의 흐린 곳을 누르면 닫힘
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!pick || pick.drag) return;
+    if (e.key === 'Escape') { closePick(true); return; }
+    if (e.key === 'Tab') {                           // 키보드 초점이 모양 고르기 안에서만 돌게
+      const items = [...$$('.pf-zone'), $('#pfPickRemove')].filter((b) => !b.hidden);
+      const i = items.indexOf(document.activeElement);
+      e.preventDefault();
+      items[(i + (e.shiftKey ? -1 : 1) + items.length) % items.length].focus();
+    }
+  });
+  // 끌기: 6px 넘게 움직이면 끌기 시작 → 모양이 나타나고, 원하는 모양 위에서 놓으면 그 자리에 펼쳐짐. 움직이지 않고 떼면(누르기) 모양을 눌러서 고름
+  $$('.pf-tool').forEach((btn) => {
+    let start = null, ghost = null, over = null;
+    const hit = (x, y) => { const e = document.elementFromPoint(x, y); return e ? e.closest('.pf-zone, .pf-pick-remove') : null; };
+    const setOver = (z) => { if (over === z) return; if (over) over.classList.toggle('is-over', false); over = z; if (over) over.classList.add('is-over'); };
+    const end = () => {
+      if (ghost) ghost.parentNode.removeChild(ghost);
+      ghost = null; start = null; setOver(null);
+      btn.classList.toggle('is-drag', false);
+      document.body.classList.toggle('pf-dragging', false);
+    };
+    btn.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || start) return;
+      if (pick) closePick();
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId, drag: false };
+      try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    btn.addEventListener('pointermove', (e) => {
+      if (!start || e.pointerId !== start.id) return;
+      if (!start.drag) {
+        if (Math.hypot(e.clientX - start.x, e.clientY - start.y) < 6) return;
+        start.drag = true;
+        ghost = el('div', 'pf-ghost', wName(btn.dataset.w));
+        document.body.append(ghost);
+        btn.classList.add('is-drag');
+        document.body.classList.add('pf-dragging');
+        openPick(btn.dataset.w, true);
+      }
+      ghost.style.transform = `translate(${e.clientX - ghost.offsetWidth / 2}px, ${e.clientY - ghost.offsetHeight / 2}px)`;
+      setOver(hit(e.clientX, e.clientY));
+    });
+    btn.addEventListener('pointerup', (e) => {
+      if (!start || e.pointerId !== start.id) return;
+      const dragged = start.drag;
+      const target = dragged ? hit(e.clientX, e.clientY) : null;
+      end();
+      if (dragged) { choose(target); closePick(); }
+      else openPick(btn.dataset.w, false);
+    });
+    btn.addEventListener('pointercancel', () => { const dragged = start && start.drag; end(); if (dragged) closePick(); });
+    btn.addEventListener('click', (e) => { if (e.detail === 0 && !pick) openPick(btn.dataset.w, false); });   // 키보드(Enter·Space)로 누른 경우
+  });
+
   const localDate = (v) => {            // 'YYYY-MM-DD' 는 시간대 때문에 하루 밀리지 않게 직접 나눠서 만듦
     if (!v) return null;
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));
@@ -695,7 +868,7 @@
     uid = u.id;
     let p = null;
     try {
-      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path').eq('id', uid).maybeSingle();
+      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path, layout').eq('id', uid).maybeSingle();
       if (!error && data) p = data;
     } catch (e) {}
     const text = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
@@ -703,6 +876,9 @@
     text('#pfEmail', u.email);
     if (p) { photo.show(p.avatar_path || null); cover.show(p.cover_path || null); } else showMsg('load');
     canEdit = !!p;
+    layout = cleanLayout(p && p.layout);          // 계정에 저장된 배치 (없으면 기본 배치)
+    applyLayout();
+    $('#pfGrid').classList.remove('is-wait');
     $('#pfTop').classList.remove('is-loading');
 
     // 게시글·팔로워·팔로우·좋아요 숫자와, 고른 항목(처음엔 게시글)의 자세한 내용

@@ -126,9 +126,27 @@
 /* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔 ===== */
 .pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
 .pf-q { min-width: 0; min-height: 0; padding: max(18px, calc(36px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
-/* 작업하는 동안 칸을 알아보기 위한 가운데 십자 선 (작업이 끝나면 이 두 줄을 지움) */
-.pf-q1, .pf-q3 { border-right: 1px solid #ececf0; }
-.pf-q1, .pf-q2 { border-bottom: 1px solid #ececf0; }
+.pf-grid { position: relative; }
+.pf-grid.is-wait > .pf-q { visibility: hidden; }           /* 저장된 배치를 불러올 때까지 숨김 (자리가 바뀌며 깜빡이지 않게) */
+/* 기능이 놓이는 자리: 네 칸 중 한 칸 · 가로 절반 · 세로 절반 · 전체. 자리가 없는 기능은 메뉴바에만 있음 */
+.pf-q:not([data-slot]) { display: none; }
+.pf-q[data-slot="tl"] { grid-area: 1 / 1 / 2 / 2; }
+.pf-q[data-slot="tr"] { grid-area: 1 / 2 / 2 / 3; }
+.pf-q[data-slot="bl"] { grid-area: 2 / 1 / 3 / 2; }
+.pf-q[data-slot="br"] { grid-area: 2 / 2 / 3 / 3; }
+.pf-q[data-slot="top"] { grid-area: 1 / 1 / 2 / 3; }
+.pf-q[data-slot="bottom"] { grid-area: 2 / 1 / 3 / 3; }
+.pf-q[data-slot="left"] { grid-area: 1 / 1 / 3 / 2; }
+.pf-q[data-slot="right"] { grid-area: 1 / 2 / 3 / 3; }
+.pf-q[data-slot="full"] { grid-area: 1 / 1 / 3 / 3; }
+.pf-q.has-back { padding-bottom: max(70px, calc(108px * var(--scale))); }   /* 왼쪽 아래를 차지하면 '이전으로 돌아가기' 자리를 비워 둠 */
+/* 작업하는 동안 칸을 알아보기 위한 가운데 십자 선 (작업이 끝나면 .pf-line 을 지움) */
+.pf-line { position: absolute; background: #ececf0; pointer-events: none; }
+.pf-line[hidden] { display: none; }
+.pf-line-vt, .pf-line-vb { left: 50%; width: 1px; height: 50%; }
+.pf-line-vt { top: 0; } .pf-line-vb { top: 50%; }
+.pf-line-hl, .pf-line-hr { top: 50%; height: 1px; width: 50%; }
+.pf-line-hl { left: 0; } .pf-line-hr { left: 50%; }
 .pf-q1 { display: flex; align-items: stretch; justify-content: flex-start; }   /* 카드가 칸의 위아래를 가득 채움 */
 
 /* ===== 왼쪽 위: 프로필 카드 (1920×1080 기준 치수를 --scale 로 환산). 칸의 위아래를 가득 채우고 남는 높이는 배경 사진이 차지함 ===== */
@@ -229,8 +247,9 @@
 @media (max-width: 700px) {
   .pf-panel { overflow: auto; }
   .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
-  .pf-q { border-right: 0; overflow: visible; }
-  .pf-q4 { display: none; }
+  .pf-q { overflow: visible; }
+  .pf-q[data-slot] { grid-area: auto; }          /* 좁은 화면: 한 줄로 쌓고, 배치 바꾸기는 숨김 */
+  .pf-line, .pf-tools { display: none; }
   .pf-q3 { min-height: 360px; }
   .pf-card { height: auto; } .pf-cover { flex: none; height: 140px; }
 }
@@ -274,7 +293,7 @@
 @media (prefers-reduced-motion: reduce) { .pf-tip-bubble { animation: none; } }
 
 /* ===== 왼쪽 아래: 고른 항목의 자세한 내용 (1920×1080 기준 치수를 --scale 로 환산) ===== */
-.pf-q3 { display: flex; flex-direction: column; padding-bottom: max(70px, calc(108px * var(--scale))); }   /* 아래쪽은 '이전으로 돌아가기' 자리: 이 위까지만 씀 */
+.pf-q3 { display: flex; flex-direction: column; }
 .pf-d-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pf-d-head .pf-q-title { margin-top: 0; }
 .pf-seg { display: flex; padding: 3px; border-radius: 999px; background: #efeff2; }
@@ -320,3 +339,43 @@
 .pf-heart { flex: none; width: max(18px, calc(26px * var(--scale))); height: auto; aspect-ratio: 1; color: #14151F; }
 .pf-heart.out { color: #8b8b93; }
 .pf-row time { flex: none; font-size: max(11px, calc(14px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }
+
+/* ===== 메뉴바의 기능 목록: 끌어다 흰 상자에 놓음 ===== */
+#menubar .pf-tools { display: flex; align-items: center; gap: calc(10px * var(--scale)); }
+#menubar .pf-tool { height: calc(46px * var(--scale)); padding: 0 calc(20px * var(--scale)); border: 1.5px dashed rgba(20, 21, 31, 0.3); border-radius: 999px; background: transparent; color: #14151F; font: inherit; font-size: calc(16px * var(--scale)); font-weight: 600; white-space: nowrap; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; transition: background 0.2s, border-color 0.2s, opacity 0.2s; }
+#menubar .pf-tool.is-on { border-style: solid; border-color: #fff; background: #fff; }      /* 지금 흰 상자에 놓여 있는 기능 */
+#menubar .pf-tool:hover { border-color: #14151F; }
+#menubar .pf-tool.is-drag { opacity: 0.35; cursor: grabbing; }
+.pf-ghost { position: fixed; z-index: 100; left: 0; top: 0; display: flex; align-items: center; height: calc(46px * var(--scale)); padding: 0 calc(20px * var(--scale)); border-radius: 999px; background: #14151F; color: #fff; font-size: calc(16px * var(--scale)); font-weight: 600; white-space: nowrap; pointer-events: none; box-shadow: 0 10px 28px rgba(16, 16, 20, 0.25); will-change: transform; }
+body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
+
+/* ===== 배치 모양 고르기: 흰 상자를 흐리게 덮고 가운데에 모양을 보여 줌 ===== */
+.pf-pick { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; border-radius: inherit; background: rgba(255, 255, 255, 0.62); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); opacity: 0; transition: opacity 0.3s ease; }
+.pf-pick[hidden] { display: none; }
+.pf-pick.open { opacity: 1; }
+.pf-pick-in { display: flex; flex-direction: column; align-items: center; gap: max(12px, calc(22px * var(--scale))); transform: translateY(calc(14px * var(--scale))) scale(0.97); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.pf-pick.open .pf-pick-in { transform: none; }
+.pf-pick-title { margin: 0; font-size: max(16px, calc(26px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; color: #14151F; }
+.pf-pick-quad { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: max(6px, calc(10px * var(--scale))); width: max(280px, calc(520px * var(--scale))); height: max(150px, calc(270px * var(--scale))); }
+.pf-pick-row { display: flex; gap: max(12px, calc(24px * var(--scale))); }
+.pf-pick-tile { display: flex; flex-direction: column; align-items: center; gap: max(6px, calc(10px * var(--scale))); }
+.pf-pick-tile > span { font-size: max(12px, calc(16px * var(--scale))); font-weight: 600; color: #55565f; }
+.pf-pick-box { display: grid; gap: max(4px, calc(6px * var(--scale))); width: max(110px, calc(200px * var(--scale))); height: max(60px, calc(104px * var(--scale))); }
+.pf-pick-box.is-wide { grid-template-rows: 1fr 1fr; }
+.pf-pick-box.is-tall { grid-template-columns: 1fr 1fr; }
+.pf-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 0; padding: 0 6px; border: 1.5px solid #d6d6de; border-radius: max(8px, calc(14px * var(--scale))); background: rgba(255, 255, 255, 0.85); color: #14151F; font: inherit; font-size: max(12px, calc(16px * var(--scale))); font-weight: 700; cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s; }
+.pf-pick-quad .pf-zone { font-size: max(13px, calc(19px * var(--scale))); }
+.pf-zone small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.72em; font-weight: 500; color: #8b8b93; transition: color 0.18s; }
+.pf-zone small:empty { display: none; }
+.pf-pick-box .pf-zone small { display: none; }               /* 작은 상자에는 자리 이름만 */
+.pf-zone.is-mine { border-color: #14151F; border-style: dashed; }                           /* 이 기능이 지금 있는 자리 */
+.pf-zone:hover, .pf-zone:focus-visible, .pf-zone.is-over { background: #14151F; border-color: #14151F; border-style: solid; color: #fff; outline: none; }
+.pf-zone:hover small, .pf-zone:focus-visible small, .pf-zone.is-over small { color: rgba(255, 255, 255, 0.7); }
+.pf-zone.is-over { transform: scale(1.03); }
+.pf-pick-remove { height: max(34px, calc(46px * var(--scale))); padding: 0 max(16px, calc(26px * var(--scale))); border: 1.5px solid #d6d6de; border-radius: 999px; background: rgba(255, 255, 255, 0.85); color: #c62d1f; font: inherit; font-size: max(12px, calc(16px * var(--scale))); font-weight: 600; cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s; }
+.pf-pick-remove[hidden] { display: none; }
+.pf-pick-remove:hover, .pf-pick-remove:focus-visible, .pf-pick-remove.is-over { background: #c62d1f; border-color: #c62d1f; color: #fff; outline: none; }
+.pf-pick-sub { margin: 0; font-size: max(11px, calc(15px * var(--scale))); font-weight: 500; color: #8b8b93; }
+.pf-layout-msg { position: absolute; z-index: 6; left: 50%; bottom: max(14px, calc(28px * var(--scale))); margin: 0; padding: max(8px, calc(12px * var(--scale))) max(14px, calc(22px * var(--scale))); border-radius: 999px; background: #14151F; color: #fff; font-size: max(12px, calc(15px * var(--scale))); font-weight: 600; white-space: nowrap; opacity: 0; transform: translate(-50%, 10px); pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; }
+.pf-layout-msg.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .pf-pick, .pf-pick-in, .pf-zone, .pf-layout-msg { transition: none !important; } }
