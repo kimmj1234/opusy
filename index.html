@@ -37,7 +37,12 @@
           </g>
         </svg>
       </a>
-      <button type="button" class="logout" id="logout" hidden data-i18n="logout">로그아웃</button>
+      <div class="user" id="user" hidden>
+        <button type="button" class="user-name" id="userName" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="user-menu" id="userMenu" hidden>
+          <button type="button" id="logout" data-i18n="logout">로그아웃</button>
+        </div>
+      </div>
     </div>
   </header>
 

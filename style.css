@@ -152,17 +152,25 @@ html, body {
 #menubar .lang button.active { opacity: 1; }
 #menubar .lang span { opacity: 0.4; }
 
-/* 로그아웃 (로그인된 상태에서 login 대신 보임) */
-#menubar .logout {
-  /* login 과 똑같은 크기의 상자를 차지하게 해서, 로그인 여부·언어와 상관없이 KR / ENG 위치가 그대로 있게 함.
-     글자의 오른쪽 끝도 login 글자의 오른쪽 끝(상자 폭의 91.9%)에 맞춤 */
+/* 로그인된 상태: login 대신 사용자 이름이 보이고, 누르면 로그아웃 메뉴가 열림 */
+#menubar .user {
+  /* login 과 똑같은 크기의 상자를 차지하게 해서, 로그인 여부·언어·이름 길이와 상관없이 KR / ENG 위치가 그대로 있게 함 */
+  position: relative;
+  flex: none;
+  width: calc(64px * 494 / 187 * var(--scale));   /* 이름이 길어도 늘어나지 않게 폭을 고정 */
+  height: calc(64px * var(--scale));
+}
+#menubar .user-name {
+  /* 이름은 이 상자 폭까지만 보이고, 넘치는 부분은 ... 으로 줄임. 글자의 오른쪽 끝은 login 글자의 오른쪽 끝(상자 폭의 91.9%)에 맞춤 */
   display: block;
   box-sizing: border-box;
-  height: calc(64px * var(--scale));
-  aspect-ratio: 494 / 187;
+  width: 100%;
+  height: 100%;
   padding: 0 calc(13.7px * var(--scale)) 0 0;
-  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: right;
   border: 0;
   background: none;
   color: inherit;
@@ -173,7 +181,40 @@ html, body {
   cursor: pointer;
   transition: opacity 0.4s;
 }
-#menubar .logout:hover { opacity: 0.55; }
+#menubar .user-name:hover,
+#menubar .user-name[aria-expanded="true"] { opacity: 0.55; }
+#menubar .user-menu {
+  position: absolute;
+  top: calc(100% - 6px * var(--scale));
+  right: calc(13.7px * var(--scale));
+  min-width: calc(132px * var(--scale));
+  padding: calc(6px * var(--scale));
+  border-radius: calc(14px * var(--scale));
+  background: #fff;
+  box-shadow: 0 calc(10px * var(--scale)) calc(30px * var(--scale)) rgba(16, 16, 20, 0.14);
+  animation: user-menu-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#menubar .user-menu button {
+  display: block;
+  width: 100%;
+  padding: calc(11px * var(--scale)) calc(14px * var(--scale));
+  border: 0;
+  border-radius: calc(9px * var(--scale));
+  background: none;
+  color: #15151b;
+  font: inherit;
+  font-size: calc(16px * var(--scale));
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#menubar .user-menu button:hover { background: #f1f1f4; }
+@keyframes user-menu-in {
+  from { opacity: 0; transform: translateY(calc(-6px * var(--scale))); }
+  to   { opacity: 1; transform: none; }
+}
 #menubar [hidden] { display: none !important; }
 
 /* 로그인: 박스는 로고와 같은 64px, 안의 글자만 32px 크기로 축소(32/64). 글자 오른쪽 끝 위치는 유지 */

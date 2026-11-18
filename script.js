@@ -109,7 +109,10 @@
     const cfg = window.OPUSY_SUPABASE;
     const loginLink = document.querySelector('#menubar .login');
     const logoutBtn = document.getElementById('logout');
-    if (!cfg || !loginLink || !logoutBtn) return;
+    const userBox = document.getElementById('user');
+    const nameBtn = document.getElementById('userName');
+    const menu = document.getElementById('userMenu');
+    if (!cfg || !loginLink || !logoutBtn || !userBox || !nameBtn || !menu) return;
     const read = () => {
       try {
         // 자동 로그인을 켰으면 localStorage 에, 껐으면 sessionStorage(창을 닫으면 사라짐)에 들어 있음
@@ -117,7 +120,25 @@
         return s && s.access_token ? s : null;
       } catch (e) { return null; }
     };
-    const render = () => { const on = !!read(); loginLink.hidden = on; logoutBtn.hidden = !on; };
+    // 보여 줄 이름: 가입할 때 적은 이름 → 없으면 아이디 → 없으면 이메일 앞부분
+    const nameOf = (s) => {
+      const u = (s && s.user) || {};
+      const m = u.user_metadata || {};
+      return String(m.name || m.username || (u.email || '').split('@')[0] || '').trim();
+    };
+    const openMenu = (open) => { menu.hidden = !open; nameBtn.setAttribute('aria-expanded', String(open)); };
+    const render = () => {
+      const s = read();
+      loginLink.hidden = !!s;
+      userBox.hidden = !s;
+      const name = nameOf(s);
+      nameBtn.textContent = name;       // 너무 길면 CSS 가 상자 폭에 맞춰 ... 으로 줄임
+      nameBtn.title = name;             // 줄어든 이름은 마우스를 올리면 전체가 보임
+      openMenu(false);
+    };
+    nameBtn.addEventListener('click', (e) => { e.stopPropagation(); openMenu(menu.hidden); });
+    document.addEventListener('click', (e) => { if (!menu.hidden && !userBox.contains(e.target)) openMenu(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openMenu(false); });
     logoutBtn.addEventListener('click', async () => {
       const s = read();
       try {
