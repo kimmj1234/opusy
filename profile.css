@@ -130,15 +130,16 @@
 
 /* ===== 왼쪽 위: 프로필 사진(흰 동그라미, 1920×1080 기준 지름 220)과 계정 정보를 한 줄로 묶어 칸 가운데에 둠 ===== */
 .pf-top {
-  display: flex; align-items: flex-start; gap: max(22px, calc(56px * var(--scale)));
+  display: flex; align-items: center; gap: max(22px, calc(56px * var(--scale)));   /* 동그라미와 글 묶음의 세로 가운데를 맞춤 */
   max-width: 100%;
   transition: opacity 0.5s ease;
 }
 .pf-top.is-loading { opacity: 0; pointer-events: none; }
-.pf-photo-box { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(14px * var(--scale)); }
+.pf-photo-box { position: relative; flex: none; }
+.pf-photo-under { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: max(8px, calc(12px * var(--scale))); }
 
 /* 계정 정보: 큰 아이디 아래에 항목 이름과 값이 한 줄씩 */
-.pf-info { min-width: 0; padding-top: calc(14px * var(--scale)); }
+.pf-info { min-width: 0; }
 .pf-id { max-width: max(200px, calc(480px * var(--scale))); font-size: max(24px, calc(46px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pf-list { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: max(18px, calc(36px * var(--scale))); row-gap: max(8px, calc(14px * var(--scale))); margin-top: max(14px, calc(26px * var(--scale))); font-size: max(13px, calc(20px * var(--scale))); line-height: 1.4; }
 .pf-list > div { display: contents; }
