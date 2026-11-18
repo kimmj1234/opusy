@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611181949">
-  <link rel="stylesheet" href="profile.css?v=202611181949">
+  <link rel="stylesheet" href="login.css?v=202611182000">
+  <link rel="stylesheet" href="profile.css?v=202611182000">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -112,13 +112,13 @@
             <p class="msg" id="pfMsg" role="status"></p>
           </div>
         </div>
-        <!-- 게시글·팔로워·팔로우·좋아요: 아직 해당 기능이 없어서 0 으로 표시 -->
-        <dl class="pf-stats">
-          <div><dd id="pfStatPosts">0</dd><dt data-i18n="posts"></dt></div>
-          <div><dd id="pfStatFollowers">0</dd><dt data-i18n="followers"></dt></div>
-          <div><dd id="pfStatFollowing">0</dd><dt data-i18n="following"></dt></div>
-          <div><dd id="pfStatLikes">0</dd><dt data-i18n="likes"></dt></div>
-        </dl>
+        <!-- 게시글·팔로워·팔로우·좋아요: 하나를 고르면 왼쪽 아래 칸에 그 자세한 내용이 나옴 -->
+        <div class="pf-stats" role="tablist" id="pfTabs">
+          <button type="button" class="pf-stat is-on" role="tab" id="tabPosts" data-view="posts" aria-selected="true" aria-controls="pfDetail"><b id="pfStatPosts">0</b><span data-i18n="posts"></span></button>
+          <button type="button" class="pf-stat" role="tab" id="tabFollowers" data-view="followers" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatFollowers">0</b><span data-i18n="followers"></span></button>
+          <button type="button" class="pf-stat" role="tab" id="tabFollowing" data-view="following" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatFollowing">0</b><span data-i18n="following"></span></button>
+          <button type="button" class="pf-stat" role="tab" id="tabLikes" data-view="likes" aria-selected="false" aria-controls="pfDetail" tabindex="-1"><b id="pfStatLikes">0</b><span data-i18n="likes"></span></button>
+        </div>
       </div>
       </section>
 
@@ -131,7 +131,17 @@
         </div>
       </section>
 
-      <section class="pf-q pf-q3" aria-hidden="true"></section>
+      <!-- 왼쪽 아래: 위에서 고른 항목의 자세한 내용. 아래쪽은 '이전으로 돌아가기' 자리라 비워 둠 -->
+      <section class="pf-q pf-q3" id="pfDetail" role="tabpanel" aria-labelledby="tabPosts" aria-live="polite">
+        <div class="pf-d-head">
+          <h2 class="pf-q-title" id="pfDetailTitle"></h2>
+          <div class="pf-seg" id="pfSeg" role="group" hidden>
+            <button type="button" class="pf-seg-btn is-on" data-dir="received" data-i18n="segRecv"></button>
+            <button type="button" class="pf-seg-btn" data-dir="given" data-i18n="segGave"></button>
+          </div>
+        </div>
+        <div class="pf-d-body" id="pfDetailBody"></div>
+      </section>
       <section class="pf-q pf-q4" aria-hidden="true"></section>
       </div>
     </div>
@@ -139,6 +149,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611181949"></script>
+  <script defer src="profile.js?v=202611182000"></script>
 </body>
 </html>

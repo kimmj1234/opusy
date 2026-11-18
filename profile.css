@@ -161,10 +161,14 @@
 .pf-actions .msg { text-align: right; word-break: keep-all; font-size: max(11px, calc(15px * var(--scale))); }
 .pf-actions .msg:empty { display: none; }
 /* 구분선 아래: 게시글·팔로워·팔로우·좋아요. 값은 크게, 이름은 그 아래에 작게 */
-.pf-stats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: max(8px, calc(14px * var(--scale))); margin-top: max(12px, calc(24px * var(--scale))); padding-top: max(12px, calc(24px * var(--scale))); border-top: 1px solid #e4e4e9; text-align: center; }
-.pf-stats > div { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.pf-stats dd { order: 1; font-size: max(20px, calc(38px * var(--scale))); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; color: #14151F; }
-.pf-stats dt { order: 2; margin-top: max(4px, calc(8px * var(--scale))); font-size: max(12px, calc(19px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }
+.pf-stats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: max(6px, calc(10px * var(--scale))); margin-top: max(12px, calc(22px * var(--scale))); padding-top: max(10px, calc(18px * var(--scale))); border-top: 1px solid #e4e4e9; }
+/* 네 개 중 하나를 고르는 버튼: 고른 것은 옅은 회색 바탕으로 표시 */
+.pf-stat { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: max(6px, calc(10px * var(--scale))) 0; border: 0; border-radius: max(10px, calc(16px * var(--scale))); background: transparent; color: #8b8b93; font: inherit; cursor: pointer; transition: background-color 0.35s ease, color 0.35s ease; }
+.pf-stat b { font-size: max(20px, calc(38px * var(--scale))); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; color: #14151F; }
+.pf-stat span { margin-top: max(2px, calc(6px * var(--scale))); font-size: max(12px, calc(19px * var(--scale))); font-weight: 500; white-space: nowrap; }
+.pf-stat:hover { background: #f6f6f8; }
+.pf-stat.is-on { background: #f1f1f4; color: #14151F; }
+.pf-stat.is-on span { font-weight: 700; }
 
 /* ===== 오른쪽 위: 등록된 기기 ===== */
 .pf-q2 { display: flex; }
@@ -186,7 +190,8 @@
   .pf-panel { overflow: auto; }
   .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
   .pf-q { border-right: 0; overflow: visible; }
-  .pf-q3, .pf-q4 { display: none; }
+  .pf-q4 { display: none; }
+  .pf-q3 { min-height: 360px; }
   .pf-card { height: auto; } .pf-cover { flex: none; height: 140px; }
 }
 .pf-photo {
@@ -227,3 +232,51 @@
 .pf-tip-bubble li + li { margin-top: max(2px, calc(4px * var(--scale))); }
 @keyframes pf-tip-in { from { opacity: 0; transform: translateY(-6px); } }
 @media (prefers-reduced-motion: reduce) { .pf-tip-bubble { animation: none; } }
+
+/* ===== 왼쪽 아래: 고른 항목의 자세한 내용 (1920×1080 기준 치수를 --scale 로 환산) ===== */
+.pf-q3 { display: flex; flex-direction: column; padding-bottom: max(70px, calc(108px * var(--scale))); }   /* 아래쪽은 '이전으로 돌아가기' 자리: 이 위까지만 씀 */
+.pf-d-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pf-d-head .pf-q-title { margin-top: 0; }
+.pf-seg { display: flex; padding: 3px; border-radius: 999px; background: #efeff2; }
+.pf-seg[hidden] { display: none; }
+.pf-seg-btn { height: max(26px, calc(38px * var(--scale))); padding: 0 max(12px, calc(20px * var(--scale))); border: 0; border-radius: 999px; background: transparent; color: #55565f; font: inherit; font-size: max(12px, calc(16px * var(--scale))); font-weight: 700; white-space: nowrap; cursor: pointer; transition: background-color 0.35s ease, color 0.35s ease; }
+.pf-seg-btn.is-on { background: #fff; color: #14151F; box-shadow: 0 1px 4px rgba(20, 21, 31, 0.14); }
+.pf-d-body { flex: 1 1 auto; min-height: 0; margin-top: max(10px, calc(18px * var(--scale))); padding-right: 4px; overflow-y: auto; animation: pf-view-in 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes pf-view-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .pf-d-body { animation: none; } }
+.pf-d-note { font-size: max(12px, calc(17px * var(--scale))); font-weight: 500; line-height: 1.6; color: #8b8b93; word-break: keep-all; }
+.pf-d-note.bad { color: #c62d1f; }
+/* 게시글: 숫자 요약 + 최근 7일 막대 + 게시글별 조회수 */
+.pf-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: max(6px, calc(10px * var(--scale))); }
+.pf-metric { padding: max(8px, calc(14px * var(--scale))) max(10px, calc(16px * var(--scale))); border-radius: max(10px, calc(16px * var(--scale))); background: #f1f1f4; }
+.pf-metric b { display: block; font-size: max(18px, calc(30px * var(--scale))); font-weight: 800; line-height: 1.15; }
+.pf-metric span { display: block; margin-top: 2px; font-size: max(11px, calc(15px * var(--scale))); font-weight: 500; color: #55565f; }
+.pf-sub { margin: max(12px, calc(20px * var(--scale))) 0 max(6px, calc(10px * var(--scale))); font-size: max(12px, calc(16px * var(--scale))); font-weight: 700; color: #55565f; }
+.pf-chart { display: flex; align-items: flex-end; gap: max(6px, calc(12px * var(--scale))); height: max(70px, calc(110px * var(--scale))); }
+.pf-chart > div { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.pf-chart i { display: block; width: 100%; max-width: max(28px, calc(46px * var(--scale))); min-height: 3px; border-radius: 6px 6px 3px 3px; background: #14151F; transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.pf-chart i.zero { background: #e4e4e9; }
+.pf-chart small { font-size: max(10px, calc(13px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }
+.pf-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: max(5px, calc(8px * var(--scale))); }
+.pf-row { display: flex; align-items: center; gap: max(8px, calc(14px * var(--scale))); padding: max(8px, calc(12px * var(--scale))) max(10px, calc(16px * var(--scale))); border-radius: max(10px, calc(14px * var(--scale))); background: #f6f6f8; min-width: 0; }
+.pf-row-main { flex: 1 1 auto; min-width: 0; }
+.pf-row-main strong { display: block; font-size: max(13px, calc(18px * var(--scale))); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-row-main span { display: block; margin-top: 2px; font-size: max(11px, calc(14px * var(--scale))); font-weight: 500; color: #8b8b93; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-row-end { flex: none; display: flex; align-items: center; gap: max(6px, calc(10px * var(--scale))); }
+.pf-views { flex: none; text-align: right; }
+.pf-views b { display: block; font-size: max(14px, calc(20px * var(--scale))); font-weight: 800; }
+.pf-views u { display: block; width: max(50px, calc(90px * var(--scale))); height: 4px; margin-top: 4px; border-radius: 2px; background: #e4e4e9; text-decoration: none; overflow: hidden; }
+.pf-views u i { display: block; height: 100%; border-radius: 2px; background: #14151F; }
+/* 팔로워·팔로우: 사람 목록 */
+.pf-av { flex: none; display: grid; place-items: center; width: max(28px, calc(44px * var(--scale))); aspect-ratio: 1; border-radius: 50%; background: #14151F; color: #fff; font-size: max(12px, calc(18px * var(--scale))); font-weight: 700; text-transform: uppercase; overflow: hidden; }
+.pf-av img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pf-tag { padding: 3px 10px; border-radius: 999px; background: #e4e4e9; color: #55565f; font-size: max(10px, calc(13px * var(--scale))); font-weight: 600; white-space: nowrap; }
+.pf-mini { height: max(26px, calc(36px * var(--scale))); padding: 0 max(10px, calc(16px * var(--scale))); border: 1.5px solid #14151F; border-radius: 999px; background: transparent; color: #14151F; font: inherit; font-size: max(11px, calc(15px * var(--scale))); font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 0.35s ease, color 0.35s ease; }
+.pf-mini:hover { background: #14151F; color: #fff; }
+.pf-mini.solid { background: #14151F; color: #fff; }
+.pf-mini.solid:hover { background: #5a5a62; border-color: #5a5a62; }
+.pf-mini:disabled { opacity: 0.4; cursor: progress; }
+/* 좋아요 기록 */
+.pf-heart { flex: none; width: max(18px, calc(26px * var(--scale))); height: auto; aspect-ratio: 1; color: #14151F; }
+.pf-heart.out { color: #8b8b93; }
+.pf-row time { flex: none; font-size: max(11px, calc(14px * var(--scale))); font-weight: 500; color: #8b8b93; white-space: nowrap; }

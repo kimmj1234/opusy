@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -40,6 +40,18 @@
       addCover: '배경 사진 추가', changeCover: '배경 사진 바꾸기', removeCover: '배경 지우기', coverLabel: '배경 사진',
       posts: '게시글', followers: '팔로워', following: '팔로우', likes: '좋아요',
       tipLabel: '업로드 안내 보기',
+      tabsLabel: '내 활동', loading: '불러오는 중…',
+      dPostsT: '게시글 조회 지표', dFollowersT: '나를 팔로우한 사람', dFollowingT: '내가 팔로우한 사람', dLikesT: '좋아요 기록',
+      segRecv: '받은 좋아요', segGave: '보낸 좋아요',
+      mViews: '총 조회수', mWeek: '최근 7일 조회수', mAvg: '게시글당 평균',
+      chartT: '최근 7일 조회수', listT: '게시글별 조회수',
+      viewsN: (n) => `조회 ${n}`, likesN: (n) => `좋아요 ${n}`,
+      emptyPosts: '아직 올린 게시글이 없어요. 글을 올리면 조회수 지표가 여기에 쌓여요.',
+      emptyFollowers: '아직 나를 팔로우한 사람이 없어요.', emptyFollowing: '아직 팔로우한 사람이 없어요.',
+      emptyRecv: '아직 받은 좋아요가 없어요.', emptyGave: '아직 보낸 좋아요가 없어요.',
+      since: (d) => `${d}부터`, followBack: '맞팔로우', unfollow: '팔로우 취소', followingTag: '팔로우 중', followsMeTag: '나를 팔로우',
+      likeRecv: (u) => `${u} 님이 내 글을 좋아해요`, likeGave: (u) => `${u} 님의 글에 좋아요를 눌렀어요`,
+      dFail: '목록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.', actFail: '처리하지 못했어요. 잠시 후 다시 시도해 주세요.',
       tipPhotoT: '프로필 사진', tipPhotoSize: '권장 크기: 640 × 640px (정사각형)',
       tipPhotoFit: '가운데를 기준으로 동그랗게 잘려서 보여요.',
       tipCoverT: '배경 사진', tipCoverSize: '권장 크기: 1600 × 230px (가로로 아주 긴 7 : 1)',
@@ -64,6 +76,18 @@
       addCover: 'Add cover photo', changeCover: 'Change cover photo', removeCover: 'Remove cover', coverLabel: 'Cover photo',
       posts: 'Posts', followers: 'Followers', following: 'Following', likes: 'Likes',
       tipLabel: 'Show upload tips',
+      tabsLabel: 'My activity', loading: 'Loading…',
+      dPostsT: 'Post view metrics', dFollowersT: 'People following me', dFollowingT: 'People I follow', dLikesT: 'Like history',
+      segRecv: 'Received', segGave: 'Given',
+      mViews: 'Total views', mWeek: 'Views, last 7 days', mAvg: 'Average per post',
+      chartT: 'Views in the last 7 days', listT: 'Views by post',
+      viewsN: (n) => `${n} views`, likesN: (n) => `${n} likes`,
+      emptyPosts: 'No posts yet. View metrics will build up here once you post.',
+      emptyFollowers: 'No one is following you yet.', emptyFollowing: 'You are not following anyone yet.',
+      emptyRecv: 'No likes received yet.', emptyGave: 'No likes given yet.',
+      since: (d) => `since ${d}`, followBack: 'Follow back', unfollow: 'Unfollow', followingTag: 'Following', followsMeTag: 'Follows you',
+      likeRecv: (u) => `${u} liked your post`, likeGave: (u) => `You liked ${u}'s post`,
+      dFail: 'Could not load this list. Please refresh in a moment.', actFail: 'Could not complete that. Please try again in a moment.',
       tipPhotoT: 'Profile photo', tipPhotoSize: 'Recommended size: 640 × 640px (square)',
       tipPhotoFit: 'It is cropped to a circle around the center.',
       tipCoverT: 'Cover photo', tipCoverSize: 'Recommended size: 1600 × 230px (a very wide 7 : 1)',
@@ -98,6 +122,8 @@
     $('#pfTipPhoto').setAttribute('aria-label', t.tipLabel);
     showMsg(msgKey, msgInfo);
     showDevices();
+    $('#pfTabs').setAttribute('aria-label', t.tabsLabel);
+    renderDetail();
   }
   // 등록된 기기 목록 (언어를 바꾸면 다시 그림). devices: null=아직 안 불러옴, false=실패, 배열=목록
   let devices = null;
@@ -308,6 +334,192 @@
     photo.rm.disabled = on; cover.rm.disabled = on;
   }
 
+  // ===== 활동 상세: 위의 게시글·팔로워·팔로우·좋아요 중 하나를 고르면 왼쪽 아래 칸에 그 내용이 나옴 =====
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const fmtN = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
+  const shortDate = (iso) => { const d = localDate(iso); return d ? I18N[lang].date(d) : ''; };
+  const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 2.8 4.5 6.4 4.5c2 0 3.6 1.1 5.6 3.2 2-2.1 3.6-3.2 5.6-3.2 3.6 0 5.5 3.7 4 7.2C19.5 16.4 12 21 12 21Z"/></svg>';
+  const detail = { view: 'posts', dir: 'received', data: {}, err: false, actErr: false, seq: 0 };
+  const tabBtns = $$('#pfTabs .pf-stat');
+  const dBody = $('#pfDetailBody');
+  const TITLE = { posts: 'dPostsT', followers: 'dFollowersT', following: 'dFollowingT', likes: 'dLikesT' };
+  const TABID = { posts: 'tabPosts', followers: 'tabFollowers', following: 'tabFollowing', likes: 'tabLikes' };
+
+  async function loadStats() {            // 서버 함수 my_stats 가 내 숫자를 세어서 돌려줌 (실패하면 그대로 둠)
+    try {
+      const { data, error } = await sb.rpc('my_stats');
+      const r = !error && Array.isArray(data) ? data[0] : null;
+      if (r) {
+        $('#pfStatPosts').textContent = fmtN(r.posts);
+        $('#pfStatFollowers').textContent = fmtN(r.followers);
+        $('#pfStatFollowing').textContent = fmtN(r.following);
+        $('#pfStatLikes').textContent = fmtN(r.likes);
+      }
+    } catch (e) {}
+  }
+
+  function avatar(name, path) {
+    const a = el('span', 'pf-av');
+    const initial = String(name || '?').slice(0, 1);
+    if (path) {
+      const im = new Image();
+      im.alt = '';
+      im.onerror = () => { a.textContent = initial; };
+      im.src = publicUrl(path);
+      a.append(im);
+    } else a.textContent = initial;
+    return a;
+  }
+
+  function renderPosts(d, t) {
+    const posts = d.posts, series = d.series;
+    const total = posts.reduce((n, p) => n + Number(p.views || 0), 0);
+    const week = series.reduce((n, x) => n + Number(x.views || 0), 0);
+    const avg = posts.length ? Math.round((total / posts.length) * 10) / 10 : 0;
+    const m = el('div', 'pf-metrics');
+    [[total, t.mViews], [week, t.mWeek], [avg, t.mAvg]].forEach(([v, label]) => {
+      const c = el('div', 'pf-metric');
+      c.append(el('b', null, fmtN(v)), el('span', null, label));
+      m.append(c);
+    });
+    dBody.append(m);
+
+    dBody.append(el('p', 'pf-sub', t.chartT));
+    const max = Math.max(1, ...series.map((x) => Number(x.views || 0)));
+    const chart = el('div', 'pf-chart');
+    series.forEach((x) => {
+      const col = el('div');
+      col.title = `${x.day}: ${fmtN(x.views)}`;
+      const bar = el('i', Number(x.views) ? '' : 'zero');
+      bar.style.height = `${Math.max(3, Math.round((Number(x.views || 0) / max) * 100))}%`;
+      const d0 = localDate(x.day);
+      col.append(bar, el('small', null, d0 ? `${d0.getMonth() + 1}/${d0.getDate()}` : ''));
+      chart.append(col);
+    });
+    dBody.append(chart);
+
+    dBody.append(el('p', 'pf-sub', t.listT));
+    if (!posts.length) { dBody.append(el('p', 'pf-d-note', t.emptyPosts)); return; }
+    const top = Math.max(1, ...posts.map((p) => Number(p.views || 0)));
+    const ul = el('ul', 'pf-rows');
+    posts.forEach((p) => {
+      const li = el('li', 'pf-row');
+      const main = el('div', 'pf-row-main');
+      main.append(el('strong', null, p.excerpt || '–'), el('span', null, `${shortDate(p.created_at)} · ${t.likesN(fmtN(p.likes))}`));
+      const views = el('div', 'pf-views');
+      const bar = el('u'); const fill = el('i');
+      fill.style.width = `${Math.round((Number(p.views || 0) / top) * 100)}%`;
+      bar.append(fill);
+      views.append(el('b', null, fmtN(p.views)), bar);
+      li.append(main, views);
+      ul.append(li);
+    });
+    dBody.append(ul);
+  }
+
+  function renderPeople(rows, t, kind) {
+    if (!rows.length) { dBody.append(el('p', 'pf-d-note', kind === 'followers' ? t.emptyFollowers : t.emptyFollowing)); return; }
+    const ul = el('ul', 'pf-rows');
+    rows.forEach((r) => {
+      const li = el('li', 'pf-row');
+      const main = el('div', 'pf-row-main');
+      main.append(el('strong', null, r.username), el('span', null, t.since(shortDate(r.followed_at))));
+      const end = el('div', 'pf-row-end');
+      if (kind === 'followers') {
+        if (r.i_follow) end.append(el('span', 'pf-tag', t.followingTag));
+        else { const b = el('button', 'pf-mini solid', t.followBack); b.type = 'button'; b.addEventListener('click', () => act('follow_user', r.username, b)); end.append(b); }
+      } else {
+        if (r.follows_me) end.append(el('span', 'pf-tag', t.followsMeTag));
+        const b = el('button', 'pf-mini', t.unfollow); b.type = 'button'; b.addEventListener('click', () => act('unfollow_user', r.username, b));
+        end.append(b);
+      }
+      li.append(avatar(r.username, r.avatar_path), main, end);
+      ul.append(li);
+    });
+    dBody.append(ul);
+  }
+
+  function renderLikes(rows, t) {
+    const list = rows.filter((r) => (detail.dir === 'received') === (r.direction === 'received'));
+    if (!list.length) { dBody.append(el('p', 'pf-d-note', detail.dir === 'received' ? t.emptyRecv : t.emptyGave)); return; }
+    const ul = el('ul', 'pf-rows');
+    list.forEach((r) => {
+      const li = el('li', 'pf-row');
+      const icon = el('span', 'pf-heart' + (r.direction === 'received' ? '' : ' out'));
+      icon.innerHTML = HEART;                                     // 고정된 하트 그림만 HTML 로 넣음
+      const main = el('div', 'pf-row-main');
+      main.append(el('strong', null, r.direction === 'received' ? t.likeRecv(r.username) : t.likeGave(r.username)), el('span', null, r.excerpt || '–'));
+      li.append(icon, main, el('time', null, shortDate(r.created_at)));
+      ul.append(li);
+    });
+    dBody.append(ul);
+  }
+
+  function renderDetail() {
+    const t = I18N[lang], v = detail.view;
+    tabBtns.forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    $('#pfDetail').setAttribute('aria-labelledby', TABID[v]);
+    $('#pfDetailTitle').textContent = t[TITLE[v]];
+    $('#pfSeg').hidden = v !== 'likes';
+    $$('#pfSeg .pf-seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.dir === detail.dir));
+    dBody.textContent = '';
+    const d = detail.data[v];
+    if (d === undefined) { dBody.append(el('p', detail.err ? 'pf-d-note bad' : 'pf-d-note', detail.err ? t.dFail : t.loading)); return; }
+    if (detail.actErr) dBody.append(el('p', 'pf-d-note bad', t.actFail));
+    if (v === 'posts') renderPosts(d, t);
+    else if (v === 'likes') renderLikes(d, t);
+    else renderPeople(d, t, v);
+  }
+
+  async function loadDetail() {
+    const v = detail.view, my = ++detail.seq;
+    detail.err = false;
+    renderDetail();
+    let d;
+    try {
+      if (v === 'posts') {
+        const [a, b] = await Promise.all([sb.rpc('my_post_stats'), sb.rpc('my_views_series', { p_days: 7 })]);
+        if (a.error || b.error) throw new Error('load');
+        d = { posts: a.data || [], series: b.data || [] };
+      } else {
+        const r = await sb.rpc({ followers: 'my_followers', following: 'my_following', likes: 'my_like_history' }[v]);
+        if (r.error) throw new Error('load');
+        d = r.data || [];
+      }
+    } catch (e) {
+      if (my === detail.seq) { detail.err = detail.data[v] === undefined; renderDetail(); }
+      return;
+    }
+    if (my !== detail.seq) return;           // 그 사이 다른 항목을 골랐으면 이 결과는 버림
+    detail.data[v] = d;
+    detail.actErr = false;
+    renderDetail();
+  }
+  function selectView(v) { detail.view = v; loadDetail(); }
+
+  // 맞팔로우 / 팔로우 취소
+  async function act(fn, username, btn) {
+    btn.disabled = true;
+    let ok = false;
+    try { const { error } = await sb.rpc(fn, { p_username: username }); ok = !error; } catch (e) {}
+    if (!ok) { detail.actErr = true; renderDetail(); return; }
+    detail.actErr = false;
+    await Promise.all([loadDetail(), loadStats()]);
+  }
+
+  tabBtns.forEach((b, i) => {
+    b.addEventListener('click', () => selectView(b.dataset.view));
+    b.addEventListener('keydown', (e) => {          // 좌우 방향키 · Home · End 로 항목 이동
+      const k = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      const to = e.key === 'Home' ? 0 : e.key === 'End' ? tabBtns.length - 1 : k ? (i + k + tabBtns.length) % tabBtns.length : -1;
+      if (to < 0) return;
+      e.preventDefault();
+      tabBtns[to].focus();
+      selectView(tabBtns[to].dataset.view);
+    });
+  });
+  $$('#pfSeg .pf-seg-btn').forEach((b) => b.addEventListener('click', () => { detail.dir = b.dataset.dir; renderDetail(); }));
+
   // ===== 시작: 로그인 확인 =====
   applyLang();
   (async () => {
@@ -337,18 +549,9 @@
     canEdit = !!p;
     $('#pfTop').classList.remove('is-loading');
 
-    // 게시글·팔로워·팔로우·좋아요: 서버 함수 my_stats 가 내 숫자를 세어서 돌려줌 (실패하면 0 그대로 둠)
-    try {
-      const { data, error } = await sb.rpc('my_stats');
-      const r = !error && Array.isArray(data) ? data[0] : null;
-      if (r) {
-        const n = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
-        $('#pfStatPosts').textContent = n(r.posts);
-        $('#pfStatFollowers').textContent = n(r.followers);
-        $('#pfStatFollowing').textContent = n(r.following);
-        $('#pfStatLikes').textContent = n(r.likes);
-      }
-    } catch (e) {}
+    // 게시글·팔로워·팔로우·좋아요 숫자와, 고른 항목(처음엔 게시글)의 자세한 내용
+    await loadStats();
+    selectView('posts');
 
     // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·운영체제·등록일만 돌려줌
     try {
