@@ -148,7 +148,8 @@
     logoutBtn.addEventListener('click', async () => {
       const s = read();
       try {
-        if (s) await fetch(`${cfg.url}/auth/v1/logout`, { method: 'POST', headers: { apikey: cfg.key, Authorization: `Bearer ${s.access_token}` } });
+        // scope=local: 이 브라우저의 로그인만 끝냄 (빼면 다른 기기·브라우저의 로그인까지 전부 끊김)
+        if (s) await fetch(`${cfg.url}/auth/v1/logout?scope=local`, { method: 'POST', headers: { apikey: cfg.key, Authorization: `Bearer ${s.access_token}` } });
       } catch (e) {}
       try { localStorage.removeItem(cfg.storageKey); sessionStorage.removeItem(cfg.storageKey); } catch (e) {}
       render();
