@@ -123,10 +123,14 @@
 }
 .pf-page .back-link { left: calc(40px * var(--scale)); bottom: calc(36px * var(--scale)); }
 
-/* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔 (칸 사이에 선은 없음) ===== */
+/* ===== 네 등분: 흰 상자의 가운데를 기준으로 가로·세로를 반씩 나눔 ===== */
 .pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
 .pf-q { min-width: 0; min-height: 0; padding: max(20px, calc(48px * var(--scale))) max(20px, calc(56px * var(--scale))); overflow: hidden; }
-.pf-q1 { display: flex; align-items: center; justify-content: center; }
+/* 작업하는 동안 칸을 알아보기 위한 가운데 십자 선 (작업이 끝나면 이 두 줄을 지움) */
+.pf-q1, .pf-q3 { border-right: 1px solid #ececf0; }
+.pf-q1, .pf-q2 { border-bottom: 1px solid #ececf0; }
+/* 왼쪽 위 묶음은 가로로는 칸 가운데, 세로로는 위쪽에 붙여서 오른쪽 칸의 제목과 같은 높이에서 시작 */
+.pf-q1 { display: flex; align-items: flex-start; justify-content: center; }
 
 /* ===== 왼쪽 위: 프로필 사진(흰 동그라미, 1920×1080 기준 지름 220)과 계정 정보를 한 줄로 묶어 칸 가운데에 둠 ===== */
 .pf-top {
@@ -150,7 +154,7 @@
 .pf-q2 { display: flex; }
 .pf-dev { display: flex; flex-direction: column; width: 100%; min-height: 0; transition: opacity 0.5s ease; }
 .pf-dev.is-loading { opacity: 0; }
-.pf-q-title { flex: none; display: flex; align-items: baseline; gap: max(8px, calc(12px * var(--scale))); font-size: max(18px, calc(30px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.pf-q-title { margin-top: calc(4px * var(--scale));   /* 글자 크기가 달라 생기는 차이만큼 내려서, 왼쪽 아이디 글자의 윗선과 맞춤 */ flex: none; display: flex; align-items: baseline; gap: max(8px, calc(12px * var(--scale))); font-size: max(18px, calc(30px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
 .pf-count { font-size: max(13px, calc(20px * var(--scale))); font-weight: 600; color: #8b8b93; letter-spacing: 0; }
 .pf-dev-list { flex: 0 1 auto; min-height: 0; margin-top: max(12px, calc(22px * var(--scale))); padding: 0; list-style: none; display: flex; flex-direction: column; gap: max(6px, calc(10px * var(--scale))); overflow-y: auto; }
 .pf-dev-item { flex: none; display: flex; align-items: center; gap: max(12px, calc(18px * var(--scale))); padding: max(10px, calc(16px * var(--scale))) max(14px, calc(22px * var(--scale))); border-radius: 14px; background: #f1f1f4; }
@@ -165,7 +169,7 @@
 @media (max-width: 700px) {
   .pf-panel { overflow: auto; }
   .pf-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; }
-  .pf-q { overflow: visible; }
+  .pf-q { border-right: 0; overflow: visible; }
   .pf-q3, .pf-q4 { display: none; }
   .pf-top { flex-direction: column; align-items: center; } .pf-info { text-align: center; } .pf-list { text-align: left; }
 }
