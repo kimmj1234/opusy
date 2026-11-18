@@ -77,6 +77,7 @@
         expired: '링크가 만료됐거나 이미 사용됐어요. 재설정 메일을 다시 받아 주세요.',
         devUnsupported: '이 브라우저에서는 장치 등록을 쓸 수 없어요. 최신 Chrome, Safari, Edge로 다시 시도해 주세요.',
         devCancel: '장치 등록이 취소됐어요. 버튼을 다시 눌러 등록해 주세요.',
+        pwLeaked: '유출된 적이 있는 비밀번호예요. 다른 비밀번호를 써 주세요.',
         devTls: '이 브라우저가 사이트의 보안 연결을 아직 신뢰하지 않아 기기 확인을 할 수 없어요. 브라우저를 완전히 종료한 뒤 다시 열어 주세요.',
         devFail: '장치를 등록하지 못했어요. 다시 시도해 주세요.',
         devExpired: '시간이 지나 등록이 만료됐어요. 버튼을 다시 눌러 주세요.',
@@ -158,6 +159,7 @@
         expired: 'This link has expired or was already used. Request a new reset email.',
         devUnsupported: 'Device registration is not available in this browser. Try the latest Chrome, Safari or Edge.',
         devCancel: 'Device registration was cancelled. Press the button to try again.',
+        pwLeaked: 'This password has appeared in a data leak. Please choose a different one.',
         devTls: 'This browser does not trust the secure connection to this site yet, so device check is blocked. Quit the browser completely and open it again.',
         devFail: 'Could not register this device. Please try again.',
         devExpired: 'The registration timed out. Press the button again.',
@@ -399,6 +401,7 @@
   // 등록한 기기로 확인하고 로그인. 성공하면 토큰, 아니면 { error }
   async function deviceLogin(id, pw, d) {
     if (!window.PublicKeyCredential || !navigator.credentials || !window.isSecureContext) return { error: 'nodevice' };
+    if (!d.credentials || !d.credentials.length) return { error: 'nodevice' };   // 등록된 기기가 없는 계정: 이메일 확인 후 기기 등록으로
     let as;
     try {
       as = await navigator.credentials.get({
@@ -425,6 +428,7 @@
     if (out.error === 'device_expired') return { error: 'devExpired' };
     if (out.error === 'device_unverified') return { error: 'devNoLock' };
     if (out.error === 'invalid_credentials') return { error: 'login' };
+    if (out.error === 'rate') return { error: 'rate' };
     return { error: 'devFail' };
   }
 
@@ -522,7 +526,7 @@
         body: JSON.stringify({ identifier: id, password: pw }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) return fail(f, data.error === 'email_not_confirmed' ? 'unconfirmed' : 'login');
+      if (!res.ok) return fail(f, data.error === 'email_not_confirmed' ? 'unconfirmed' : data.error === 'rate' ? 'rate' : 'login');
       try { localStorage.setItem(AUTO_KEY, $('#auto-login').checked ? '1' : '0'); } catch (err) {}   // 자동 로그인 선택 저장
       let tokens = data;
       if (data.step === 'device') {
@@ -715,6 +719,7 @@
         if (e2 === 'email_format') { goStep(2); return fail(f, 'emailFmt', f.email); }
         if (e2 === 'id_taken' || e2 === 'id_format') { goStep(1); return fail(f, e2 === 'id_taken' ? 'idTaken' : 'idFormat', f.username); }
         if (e2 === 'password') { goStep(3); return fail(f, 'pw', f.password); }
+        if (e2 === 'password_leaked') { goStep(3); return fail(f, 'pwLeaked', f.password); }
         if (e2 === 'name' || e2 === 'birth' || e2 === 'phone') { goStep(4); return fail(f, e2); }
         if (e2 === 'rate') return fail(f, 'rate');
         if (e2 === 'device_expired') return fail(f, 'devExpired');
@@ -826,7 +831,7 @@
     try {
       if (findMode === 'id') {
         const { data, error } = await sb.rpc('find_username', { p_name: name, p_email: email });
-        if (error) return fail(f, 'network');
+        if (error) return fail(f, /rate_limited/.test(error.message || '') ? 'rate' : 'network');
         if (!data) return fail(f, 'notFound');
         foundId = data;                       // 서버가 앞 두 글자만 남기고 가려서 돌려줌
         $('.msg', f).hidden = true;
@@ -867,10 +872,16 @@
       if (!u || !u.user) return fail(f, 'expired');
       const { data: prof } = await sb.from('profiles').select('username').eq('id', u.user.id).maybeSingle();
       if (prof && similarToId(pw, prof.username)) return fail(f, 'pwSimilar', f.password);
-      const { error } = await sb.auth.updateUser({ password: pw });
-      if (error) {
-        if (/different|same/i.test(error.message)) return fail(f, 'samePw', f.password);
-        if (/weak|password/i.test(error.message)) return fail(f, 'pw', f.password);
+      // 새 비밀번호는 서버 함수가 저장함 (서버만 아는 값으로 변환해서 저장)
+      const { data: s } = await sb.auth.getSession();
+      if (!s || !s.session) return fail(f, 'expired');
+      const res = await fn('password', { action: 'reset', password: pw }, s.session.access_token);
+      if (!res.ok) {
+        const out = await res.json().catch(() => ({}));
+        if (out.error === 'unauthorized') return fail(f, 'expired');
+        if (out.error === 'similar') return fail(f, 'pwSimilar', f.password);
+        if (out.error === 'password_leaked') return fail(f, 'pwLeaked', f.password);
+        if (out.error === 'password') return fail(f, 'pw', f.password);
         return fail(f, 'generic');
       }
       await sb.auth.signOut();                // 새 비밀번호로 다시 로그인하게 함
