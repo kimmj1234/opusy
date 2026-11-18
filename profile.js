@@ -127,7 +127,7 @@
       slot: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right', full: 'Full' },
       layoutFail: 'Could not save the layout. Refreshing will restore the previous one.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
-      date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       m: {
         uploading: 'Uploading your photo…',
         notImage: 'Only image files can be uploaded.',
@@ -232,9 +232,9 @@
     const devBox = $('#pfDev');
     if (devBox.clientHeight && !matchMedia('(max-width: 700px)').matches) {
       const sc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scale')) || 1;
-      const itemH = Math.max(58, 84 * sc), gap = Math.max(6, 10 * sc);
+      const itemH = Math.max(54, 78 * sc), gap = Math.max(6, 10 * sc);   // CSS 의 기기 상자 높이·간격과 같은 값
       const foot = $('#pfDevFoot');
-      const avail = devBox.clientHeight - devBox.querySelector('.pf-q-title').offsetHeight - parseFloat(getComputedStyle(list).marginTop) - foot.offsetHeight - parseFloat(getComputedStyle(foot).marginTop) - 6;
+      const avail = devBox.clientHeight - devBox.querySelector('.pf-q-title').offsetHeight - parseFloat(getComputedStyle(list).marginTop) - foot.offsetHeight - parseFloat(getComputedStyle(foot).marginTop) - parseFloat(getComputedStyle(devBox.querySelector('.pf-q-title')).marginTop) - 1;
       perCol = Math.max(1, Math.min(perCol, Math.floor((avail + gap) / (itemH + gap))));
     }
     const PER = perCol * cols;
@@ -455,6 +455,7 @@
     clearTimeout(pickHide);
     box.hidden = false;
     $('#pfGrid').inert = true;                       // 흐려진 뒤쪽 내용은 누르거나 키보드로 갈 수 없게
+    $('.pf-panel').classList.add('is-picking');
     void box.offsetWidth;                            // 나타나는 움직임이 처음 상태에서 시작되게
     box.classList.add('open');
     if (!drag) { const z = $('.pf-zone.is-mine') || $('.pf-zone'); z.focus({ preventScroll: true }); }
@@ -466,6 +467,7 @@
     const box = $('#pfPick');
     box.classList.toggle('open', false);
     $('#pfGrid').inert = false;
+    $('.pf-panel').classList.toggle('is-picking', false);
     clearTimeout(pickHide);
     pickHide = setTimeout(() => { box.hidden = true; }, 320);
     if (focusBack) { const b = $(`.pf-tool[data-w="${w}"]`); if (b) b.focus({ preventScroll: true }); }
@@ -507,6 +509,7 @@
     const hit = (x, y) => { const e = document.elementFromPoint(x, y); return e ? e.closest('.pf-zone, .pf-pick-remove') : null; };
     const setOver = (z) => { if (over === z) return; if (over) over.classList.toggle('is-over', false); over = z; if (over) over.classList.add('is-over'); };
     const end = () => {
+      if (start && start.raf) cancelAnimationFrame(start.raf);
       if (ghost) ghost.parentNode.removeChild(ghost);
       ghost = null; start = null; setOver(null);
       btn.classList.toggle('is-drag', false);
@@ -525,13 +528,21 @@
         start.drag = true;
         ghost = el('div', 'pf-ghost', wName(btn.dataset.w));
         document.body.append(ghost);
+        start.hw = ghost.offsetWidth / 2; start.hh = ghost.offsetHeight / 2;   // 크기는 한 번만 잼
         btn.classList.add('is-drag');
         document.body.classList.add('pf-dragging');
         $('#pfToolsHint').classList.toggle('show', false);
         openPick(btn.dataset.w, true);
       }
-      ghost.style.transform = `translate(${e.clientX - ghost.offsetWidth / 2}px, ${e.clientY - ghost.offsetHeight / 2}px)`;
-      setOver(hit(e.clientX, e.clientY));
+      // 마우스는 화면보다 훨씬 자주 움직이므로, 조각 옮기기와 자리 찾기는 화면 한 장에 한 번만 함 (버벅임 방지)
+      start.x2 = e.clientX; start.y2 = e.clientY;
+      if (start.raf) return;
+      start.raf = requestAnimationFrame(() => {
+        if (!start || !ghost) return;
+        start.raf = 0;
+        ghost.style.transform = `translate3d(${start.x2 - start.hw}px, ${start.y2 - start.hh}px, 0)`;
+        setOver(hit(start.x2, start.y2));
+      });
     });
     btn.addEventListener('pointerup', (e) => {
       if (!start || e.pointerId !== start.id) return;
@@ -867,7 +878,16 @@
     const ul = dBody.querySelector('.pf-rows');
     const old = dBody.querySelector('.pf-pager');
     if (old) old.parentNode.removeChild(old);
-    if (!ul) return;
+    if (!ul) {
+      // 목록 대신 '아직 없어요' 안내만 있을 때: 작은 칸에서 아래로 넘치면 안내와 그 제목을 숨김
+      const note = dBody.querySelector('.pf-d-col .pf-d-note');
+      if (note) {
+        const head = note.previousElementSibling;
+        note.hidden = false; if (head) head.hidden = false;
+        if (dBody.clientHeight && note.getBoundingClientRect().bottom > dBody.getBoundingClientRect().bottom + 1) { note.hidden = true; if (head) head.hidden = true; }
+      }
+      return;
+    }
     const rows = [...ul.children];
     const sub = ul.previousElementSibling && ul.previousElementSibling.classList.contains('pf-sub') ? ul.previousElementSibling : null;
     rows.forEach((r) => { r.hidden = false; });
