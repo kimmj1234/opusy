@@ -204,11 +204,12 @@ html, body {
   visibility: hidden;
   pointer-events: none;
   transform: translateY(calc(-14px * var(--scale)));
+  /* 닫힐 때: 열릴 때의 반대 순서. 먼저 오른쪽으로 짧아지고, 끝날 즈음 위로 올라가며 사라짐 */
   transition:
-    width 0.38s var(--menu-ease),
-    transform 0.3s var(--menu-ease),
-    opacity 0.22s ease,
-    visibility 0s linear 0.38s;
+    width 0.46s cubic-bezier(0.5, 0, 0.2, 1),
+    transform 0.36s cubic-bezier(0.4, 0, 0.6, 1) 0.24s,
+    opacity 0.28s ease 0.3s,
+    visibility 0s linear 0.6s;
 }
 #menubar .user-menu.open {
   width: calc(600px * var(--scale));
@@ -238,8 +239,11 @@ html, body {
   cursor: pointer;
   opacity: 0;
   transform: translateX(calc(14px * var(--scale)));
-  transition: background 0.2s, opacity 0.2s ease, transform 0.2s ease;
+  /* 닫힐 때: 제자리에서 왼쪽 항목부터 차례로 흐려짐 (옆으로 밀리는 움직임은 다 사라진 뒤에 되돌림) */
+  transition: background 0.2s, opacity 0.22s ease calc((2 - var(--n, 0)) * 0.05s), transform 0s linear 0.6s;
 }
+/* 맨 오른쪽 항목은 닫히는 동안 그대로 있다가 상자와 함께 사라짐 (빈 상자만 올라가 보이지 않게) */
+#menubar .user-menu:not(.open) button:last-child { transition: background 0.2s, opacity 0s linear 0.6s, transform 0s linear 0.6s; }
 #menubar .user-menu.open button {
   opacity: 1;
   transform: none;
