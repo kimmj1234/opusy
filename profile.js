@@ -378,7 +378,8 @@
     });
     devOpen = null;
     showDevices();                                   // 한 쪽에 보이는 기기 수가 달라짐
-    if (detail.days !== daysFor()) { if (detail.view === 'posts' && detail.started) loadDetail(); }   // 그래프 기간이 달라짐
+    if (detail.days !== daysFor() && detail.view === 'posts' && detail.started) loadDetail();   // 그래프 기간이 달라짐
+    else if (detail.started) fitRows();              // 칸 크기가 달라졌으니 들어가는 줄 수를 다시 셈
     // 십자 선: 한 기능이 양쪽 칸을 함께 차지하면 그 사이 토막은 숨김
     const spans = (a, b) => Object.values(layout).some((sl) => SLOTS[sl].includes(a) && SLOTS[sl].includes(b));
     $('.pf-line-vt').hidden = spans(0, 1);
@@ -820,7 +821,56 @@
     dBody.append(ul);
   }
 
+  // 스크롤 없이 보여 주기: 목록은 칸에 들어가는 줄 수만큼만 보이고, 나머지는 아래의 ‹ 1 / 3 › 로 넘김.
+  // 한 줄도 들어갈 자리가 없으면(작은 칸의 게시글 목록) 목록을 아예 숨김 → 더 큰 칸에 놓으면 보임
+  let rowsPage = 0;
+  function fitRows() {
+    const ul = dBody.querySelector('.pf-rows');
+    const old = dBody.querySelector('.pf-pager');
+    if (old) old.parentNode.removeChild(old);
+    if (!ul) return;
+    const rows = [...ul.children];
+    const sub = ul.previousElementSibling && ul.previousElementSibling.classList.contains('pf-sub') ? ul.previousElementSibling : null;
+    rows.forEach((r) => { r.hidden = false; });
+    ul.hidden = false;
+    if (sub) sub.hidden = false;
+    if (!rows.length || !dBody.clientHeight) return;
+    const cs = getComputedStyle(ul);
+    const gap = parseFloat(cs.rowGap) || 0;
+    const cols = cs.display === 'grid' ? cs.gridTemplateColumns.split(' ').filter(Boolean).length : 1;
+    const rowH = rows[0].offsetHeight;
+    const avail = dBody.clientHeight - (ul.getBoundingClientRect().top - dBody.getBoundingClientRect().top);
+    const fit = (h) => Math.max(0, Math.floor((h + gap) / (rowH + gap))) * cols;
+    let per = fit(avail);
+    if (per >= rows.length) { rowsPage = 0; return; }
+    // 다 들어가지 않으면 쪽 넘김 줄을 넣고, 그 높이를 뺀 만큼만 보여 줌
+    const t = I18N[lang];
+    const pager = el('div', 'pf-pager');
+    const prev = el('button', 'pf-pager-btn', '‹'), next = el('button', 'pf-pager-btn', '›'), label = el('span');
+    prev.type = next.type = 'button';
+    prev.setAttribute('aria-label', t.devPrev); next.setAttribute('aria-label', t.devNext);
+    pager.append(prev, label, next);
+    ul.after(pager);
+    per = fit(avail - pager.offsetHeight - parseFloat(getComputedStyle(pager).marginTop || 0));
+    if (per < 1) { ul.hidden = true; pager.hidden = true; if (sub) sub.hidden = true; return; }
+    const pages = Math.ceil(rows.length / per);
+    rowsPage = Math.min(Math.max(0, rowsPage), pages - 1);
+    rows.forEach((r, i) => { r.hidden = i < rowsPage * per || i >= (rowsPage + 1) * per; });
+    label.textContent = t.devPage(rowsPage + 1, pages);
+    prev.disabled = rowsPage === 0;
+    next.disabled = rowsPage >= pages - 1;
+    prev.addEventListener('click', () => { rowsPage -= 1; fitRows(); const b = dBody.querySelector('.pf-pager-btn:not(:disabled)'); if (b) b.focus(); });
+    next.addEventListener('click', () => { rowsPage += 1; fitRows(); const b = [...dBody.querySelectorAll('.pf-pager-btn:not(:disabled)')].pop(); if (b) b.focus(); });
+  }
+  let fitTimer = 0;
+  addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitRows, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitRows());
+
   function renderDetail() {
+    drawDetail();
+    fitRows();
+  }
+  function drawDetail() {
     const t = I18N[lang], v = detail.view;
     tabBtns.forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
     $('#pfDetail').setAttribute('aria-labelledby', TABID[v]);
@@ -864,7 +914,7 @@
     detail.actErr = false;
     renderDetail();
   }
-  function selectView(v) { detail.view = v; loadDetail(); }
+  function selectView(v) { detail.view = v; rowsPage = 0; loadDetail(); }
 
   // 맞팔로우 / 팔로우 취소
   async function act(fn, username, btn) {
@@ -887,7 +937,7 @@
       selectView(tabBtns[to].dataset.view);
     });
   });
-  $$('#pfSeg .pf-seg-btn').forEach((b) => b.addEventListener('click', () => { detail.dir = b.dataset.dir; renderDetail(); }));
+  $$('#pfSeg .pf-seg-btn').forEach((b) => b.addEventListener('click', () => { detail.dir = b.dataset.dir; rowsPage = 0; renderDetail(); }));
 
   // ===== 시작: 로그인 확인 =====
   applyLang();
