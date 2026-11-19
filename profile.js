@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfDevDetail', 'pfDevSum', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfEdit', 'pfEditForm', 'pfEditMsg', 'pfEditSave', 'pfEditCancel', 'pfEditTagCount', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfActTabs', 'pfDevDetail', 'pfDevSum', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfEdit', 'pfEditForm', 'pfEditMsg', 'pfEditSave', 'pfEditCancel', 'pfEditTagCount', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -87,6 +87,7 @@
       ddRename: '이름 바꾸기', ddDelete: '삭제', ddReg: '등록일', ddLast: '마지막 접속', ddPlace: '위치', ddIp: 'IP', ddLog: '접속 기록', ddLogN: (n) => `최근 ${n}회`,
       ddNoLog: '아직 접속 기록이 없어요. 이 기기로 로그인하면 여기에 쌓여요.', ddMore: (n) => `외 ${n}회 더 있어요`, ddNone: '왼쪽에서 기기를 고르면 자세한 정보가 보여요.', ddNever: '기록 없음', ddUnknown: '알 수 없음',
       sumPc: (n) => `컴퓨터 ${n}`, sumMobile: (n) => `휴대폰 ${n}`, sumIdle: (n) => `30일 넘게 안 쓴 기기 ${n}`,
+      mLikesRecv: '받은 좋아요', rangeLabel: '기간', rangeN: (n) => `${n}일`, actTabsLabel: '활동 고르기', segCount: (a, n) => `${a} ${n}`,
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -150,6 +151,7 @@
       ddRename: 'Rename', ddDelete: 'Delete', ddReg: 'Registered', ddLast: 'Last sign-in', ddPlace: 'Location', ddIp: 'IP', ddLog: 'Sign-in history', ddLogN: (n) => `${n} recent`,
       ddNoLog: 'No sign-ins yet. They will appear here when you sign in with this device.', ddMore: (n) => `${n} more`, ddNone: 'Pick a device on the left to see its details.', ddNever: 'Never', ddUnknown: 'Unknown',
       sumPc: (n) => `${n} computer${n === 1 ? '' : 's'}`, sumMobile: (n) => `${n} phone${n === 1 ? '' : 's'}`, sumIdle: (n) => `${n} unused for 30+ days`,
+      mLikesRecv: 'Likes received', rangeLabel: 'Range', rangeN: (n) => `${n}d`, actTabsLabel: 'Choose activity', segCount: (a, n) => `${a} ${n}`,
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       m: {
@@ -560,7 +562,7 @@
     showDevices();                                   // 한 쪽에 보이는 기기 수가 달라짐
     renderExtra();                                   // 프로필이 전체 화면이면 더 많은 정보를 그림
     if (detail.days !== daysFor() && detail.view === 'posts' && detail.started) loadDetail();   // 그래프 기간이 달라짐
-    else if (detail.started) fitRows();              // 칸 크기가 달라졌으니 들어가는 줄 수를 다시 셈
+    else if (detail.started) renderDetail();         // 칸 크기·프로필 유무가 달라졌으니 다시 그림 (고르기 표시, 들어가는 줄 수)
     // 십자 선: 한 기능이 양쪽 칸을 함께 차지하면 그 사이 토막은 숨김
     const spans = (a, b) => Object.values(layout).some((sl) => SLOTS[sl].includes(a) && SLOTS[sl].includes(b));
     $('.pf-line-vt').hidden = spans(0, 1);
@@ -1201,13 +1203,16 @@
   const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 2.8 4.5 6.4 4.5c2 0 3.6 1.1 5.6 3.2 2-2.1 3.6-3.2 5.6-3.2 3.6 0 5.5 3.7 4 7.2C19.5 16.4 12 21 12 21Z"/></svg>';
   // 조회수 그래프 기간도 칸 크기에 따라: 한 칸 7일, 가로·세로 14일, 전체 30일
   const DAYS_BY = { q: 7, wide: 14, tall: 14, full: 30 };
-  const daysFor = () => DAYS_BY[sizeOf('activity')];
+  const RANGES = [7, 30, 90];
+  let actRange = 30;                          // 전체 화면에서 고른 조회수 기간
+  const daysFor = () => (sizeOf('activity') === 'full' ? actRange : DAYS_BY[sizeOf('activity')]);
   const detail = { view: 'posts', dir: 'received', data: {}, err: false, actErr: false, seq: 0 };
   const tabBtns = $$('#pfTabs .pf-stat');
   const dBody = $('#pfDetailBody');
   const TITLE = { posts: 'dPostsT', followers: 'dFollowersT', following: 'dFollowingT', likes: 'dLikesT' };
   const TABID = { posts: 'tabPosts', followers: 'tabFollowers', following: 'tabFollowing', likes: 'tabLikes' };
 
+  let stats = null;                         // 게시글·팔로워·팔로우·좋아요 수 (좋아요 받은/보낸 구분 표시에도 씀)
   async function loadStats() {            // 서버 함수 my_stats 가 내 숫자를 세어서 돌려줌 (실패하면 그대로 둠)
     try {
       const { data, error } = await sb.rpc('my_stats');
@@ -1217,6 +1222,8 @@
         $('#pfStatFollowers').textContent = fmtN(r.followers);
         $('#pfStatFollowing').textContent = fmtN(r.following);
         $('#pfStatLikes').textContent = fmtN(r.likes);
+        stats = r;
+        $$('#pfActTabs [data-count]').forEach((x) => { x.textContent = fmtN(r[x.dataset.count]); });
       }
     } catch (e) {}
   }
@@ -1244,14 +1251,30 @@
     const left = el('div', 'pf-d-col'), right = el('div', 'pf-d-col');   // 칸이 넓으면 왼쪽(지표·그래프)과 오른쪽(게시글 목록)으로 나뉨
     dBody.classList.add('is-split');
     dBody.append(left, right);
-    [[total, t.mViews], [week, t.mWeek(nDays)], [avg, t.mAvg]].forEach(([v, label]) => {
+    const full = sizeOf('activity') === 'full';
+    const likesSum = posts.reduce((n, p) => n + Number(p.likes || 0), 0);
+    const cells = [[total, t.mViews], [week, t.mWeek(nDays)], [avg, t.mAvg]];
+    if (full) cells.push([likesSum, t.mLikesRecv]);      // 전체 화면: 받은 좋아요까지 네 칸
+    m.classList.toggle('is-four', full);
+    cells.forEach(([v, label]) => {
       const c = el('div', 'pf-metric');
       c.append(el('b', null, fmtN(v)), el('span', null, label));
       m.append(c);
     });
     left.append(m);
 
-    left.append(el('p', 'pf-sub', t.chartT(nDays)));
+    const sub = el('p', 'pf-sub', t.chartT(nDays));
+    if (full) {                                    // 전체 화면: 그래프 기간을 7·30·90일 중에서 고름
+      const rg = el('div', 'pf-seg pf-range');
+      rg.setAttribute('role', 'group'); rg.setAttribute('aria-label', t.rangeLabel);
+      RANGES.forEach((n) => {
+        const bt = el('button', 'pf-seg-btn' + (n === actRange ? ' is-on' : ''), t.rangeN(n));
+        bt.type = 'button'; bt.setAttribute('aria-pressed', String(n === actRange));
+        bt.addEventListener('click', () => { if (actRange !== n) { actRange = n; loadDetail(); } });
+        rg.append(bt);
+      });
+      const hd = el('div', 'pf-sub-row'); hd.append(sub, rg); left.append(hd);
+    } else left.append(sub);
     const max = Math.max(1, ...series.map((x) => Number(x.views || 0)));
     const chart = el('div', 'pf-chart');
     const step = Math.ceil(series.length / 8);                    // 날짜 글자는 겹치지 않게 며칠에 한 번만
@@ -1400,7 +1423,18 @@
     tabBtns.forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
     $('#pfDetail').setAttribute('aria-labelledby', TABID[v]);
     $('#pfDetailTitle').textContent = t[TITLE[v]];
+    // 활동 칸의 고르기: 프로필이 흰 상자에 없거나(숫자 네 개를 누를 수 없음) 전체 화면이면 보임
+    const ownTabs = sizeOf('activity') === 'full' || !layout.profile;
+    $('#pfActTabs').hidden = !ownTabs;
+    $('#pfActTabs').setAttribute('aria-label', t.actTabsLabel);
+    $('#pfDetail').classList.toggle('has-tabs', ownTabs);
+    $$('#pfActTabs .pf-act-tab').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)); });
     $('#pfSeg').hidden = v !== 'likes';
+    if (v === 'likes' && Array.isArray(detail.data.likes)) {   // 받은·보낸 좋아요 수를 버튼에 함께 표시
+      const rows = detail.data.likes;
+      const rc = rows.filter((r) => r.direction === 'received').length, gc = rows.length - rc;
+      $$('#pfSeg .pf-seg-btn').forEach((b) => { b.textContent = t.segCount(b.dataset.dir === 'received' ? t.segRecv : t.segGave, fmtN(b.dataset.dir === 'received' ? rc : gc)); });
+    }
     $$('#pfSeg .pf-seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.dir === detail.dir));
     dBody.textContent = '';
     dBody.classList.toggle('is-split', false);
@@ -1440,6 +1474,7 @@
     renderDetail();
   }
   function selectView(v) { detail.view = v; rowsPage = 0; loadDetail(); }
+  document.querySelectorAll('#pfActTabs .pf-act-tab').forEach((b) => b.addEventListener('click', () => { if (detail.view !== b.dataset.view) selectView(b.dataset.view); }));
 
   // 맞팔로우 / 팔로우 취소
   async function act(fn, username, btn) {

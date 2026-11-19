@@ -621,3 +621,28 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-q[data-w="devices"][data-size="full"] .pf-dev-main { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; min-height: 0; }
 .pf-q[data-w="devices"][data-size="full"] .pf-dev-detail { grid-column: 2; grid-row: 2; }
 @media (max-width: 700px) { .pf-q[data-w="devices"][data-size] .pf-dev-main { display: contents; } }
+
+/* ===== 활동 칸 ===== */
+/* 활동 칸 자체의 고르기 (프로필이 없을 때·전체 화면) */
+.pf-d-head { flex-wrap: wrap; row-gap: max(8px, calc(12px * var(--scale))); }
+.pf-act-tabs { display: flex; gap: max(4px, calc(6px * var(--scale))); padding: 3px; border-radius: max(12px, calc(16px * var(--scale))); background: #efeff2; }
+.pf-act-tabs[hidden] { display: none; }
+.pf-act-tab { display: flex; align-items: baseline; gap: max(4px, calc(6px * var(--scale))); height: max(30px, calc(42px * var(--scale))); padding: 0 max(10px, calc(16px * var(--scale))); border: 0; border-radius: max(10px, calc(13px * var(--scale))); background: transparent; color: #55565f; font: inherit; font-size: max(12px, calc(15px * var(--scale))); font-weight: 600; white-space: nowrap; cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; align-items: center; }
+.pf-act-tab b { font-size: 1.1em; font-weight: 800; color: #14151F; }
+.pf-act-tab:hover { color: #14151F; }
+.pf-act-tab.is-on { background: #fff; color: #14151F; box-shadow: 0 1px 4px rgba(20, 21, 31, 0.14); }
+/* 프로필 없이 작은 칸: 고르기가 제목 역할을 함 (제목은 숨김) */
+.pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-d-head > .pf-q-title { display: none; }
+.pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-act-tab b { display: none; }
+/* 전체 화면: 지표 네 칸, 기간 고르기, 그래프는 남는 높이를 채움, 목록은 여러 줄 */
+.pf-metrics.is-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pf-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: max(12px, calc(20px * var(--scale))) 0 max(6px, calc(10px * var(--scale))); }
+.pf-sub-row .pf-sub { margin: 0; }
+.pf-range .pf-seg-btn { height: max(24px, calc(32px * var(--scale))); padding: 0 max(10px, calc(14px * var(--scale))); font-size: max(11px, calc(14px * var(--scale))); }
+.pf-q[data-w="activity"][data-size="full"] .pf-d-body.is-split { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); height: 100%; }
+.pf-q[data-w="activity"][data-size="full"] .pf-d-body.is-split > .pf-d-col:first-child { display: flex; flex-direction: column; min-height: 0; }
+.pf-q[data-w="activity"][data-size="full"] .pf-d-body.is-split .pf-chart { flex: 1 1 auto; height: auto; min-height: max(110px, calc(180px * var(--scale))); }
+.pf-q[data-w="activity"][data-size="full"] .pf-chart > div { gap: 6px; }
+.pf-q[data-w="activity"][data-size="full"] .pf-d-body:not(.is-split) .pf-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .pf-q[data-w="activity"][data-size="full"] .pf-d-body:not(.is-split) .pf-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .pf-metrics.is-four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
