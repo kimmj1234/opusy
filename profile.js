@@ -508,21 +508,26 @@
     let start = null, ghost = null, over = null;
     const hit = (x, y) => { const e = document.elementFromPoint(x, y); return e ? e.closest('.pf-zone, .pf-pick-remove') : null; };
     const setOver = (z) => { if (over === z) return; if (over) over.classList.toggle('is-over', false); over = z; if (over) over.classList.add('is-over'); };
-    const end = () => {
+    let end = () => {
       if (start && start.raf) cancelAnimationFrame(start.raf);
       if (ghost) ghost.parentNode.removeChild(ghost);
       ghost = null; start = null; setOver(null);
       btn.classList.toggle('is-drag', false);
       document.body.classList.toggle('pf-dragging', false);
     };
-    btn.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || start) return;
-      if (pick) closePick();
-      start = { x: e.clientX, y: e.clientY, id: e.pointerId, drag: false };
-      try { btn.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    btn.addEventListener('pointermove', (e) => {
+    // 끌기의 끝은 버튼이 아니라 창 전체에서 받음: 마우스를 어디서 떼든, 떼는 신호를 놓치든 끌기가 걸린 채 남지 않게 함
+    const finish = (x, y, drop) => {
+      if (!start) return;
+      const dragged = start.drag;
+      const target = dragged && drop ? hit(x, y) : null;
+      end();
+      if (dragged) { try { choose(target); } finally { closePick(); } }   // 배치 중 문제가 생겨도 모양 고르기는 반드시 닫힘
+      else if (drop) showDragHint();                 // 끌지 않고 누르기만 하면: 끌어다 놓으라는 안내를 잠깐 보여 줌
+    };
+    const onMove = (e) => {
       if (!start || e.pointerId !== start.id) return;
+      // 버튼을 뗐다는 신호를 놓친 경우(창 밖에서 뗌 등): 버튼이 눌려 있지 않으면 그 자리에서 놓은 것으로 처리
+      if (e.pointerType === 'mouse' && e.buttons === 0) { finish(e.clientX, e.clientY, true); return; }
       if (!start.drag) {
         if (Math.hypot(e.clientX - start.x, e.clientY - start.y) < 6) return;
         start.drag = true;
@@ -543,16 +548,28 @@
         ghost.style.transform = `translate3d(${start.x2 - start.hw}px, ${start.y2 - start.hh}px, 0)`;
         setOver(hit(start.x2, start.y2));
       });
+    };
+    const onUp = (e) => { if (start && e.pointerId === start.id) finish(e.clientX, e.clientY, true); };
+    const onCancel = () => finish(0, 0, false);
+    const onKey = (e) => { if (e.key === 'Escape' && start && start.drag) { e.stopPropagation(); finish(0, 0, false); } };   // 끄는 중 Esc: 취소
+    const listen = (on) => {
+      const f = on ? 'addEventListener' : 'removeEventListener';
+      window[f]('pointermove', onMove, true);
+      window[f]('pointerup', onUp, true);
+      window[f]('pointercancel', onCancel, true);
+      window[f]('blur', onCancel);
+      document[f]('keydown', onKey, true);
+    };
+    const end0 = end;
+    end = () => { listen(false); end0(); };
+    btn.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      if (start) finish(0, 0, false);                // 앞선 끌기가 남아 있었다면 먼저 정리
+      if (pick) closePick();
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId, drag: false };
+      try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+      listen(true);
     });
-    btn.addEventListener('pointerup', (e) => {
-      if (!start || e.pointerId !== start.id) return;
-      const dragged = start.drag;
-      const target = dragged ? hit(e.clientX, e.clientY) : null;
-      end();
-      if (dragged) { choose(target); closePick(); }
-      else showDragHint();                           // 끌지 않고 누르기만 하면: 끌어다 놓으라는 안내를 잠깐 보여 줌
-    });
-    btn.addEventListener('pointercancel', () => { const dragged = start && start.drag; end(); if (dragged) closePick(); });
     btn.addEventListener('click', (e) => { if (e.detail === 0 && !pick) openPick(btn.dataset.w, false); });   // 키보드(Enter·Space)로 누른 경우
   });
 
