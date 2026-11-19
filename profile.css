@@ -655,3 +655,27 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 /* 프로필 없이 작은 칸: 고르기가 제목 자리(왼쪽 끝)에 고정, 받은·보낸 버튼은 오른쪽 끝 */
 .pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-d-head > .pf-act-tabs { order: 0; margin-left: 0; }
 .pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-d-head > .pf-seg { margin-left: auto; }
+
+/* ===== 한글·영어 어느 쪽이든 상자 크기를 같게: 글자 길이에 따라 늘거나 줄지 않도록 폭을 정해 둠 (넘치는 글자는 … 으로) ===== */
+#menubar .pf-tool, .pf-dev-pill, .pf-act-tab, .pf-seg-btn, .pf-tag, .pf-mini, .pf-e-btn, .pf-pill, .pf-x-edit, .pf-pick-remove {
+  box-sizing: border-box; justify-content: center; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 6px; padding-right: 6px;
+}
+#menubar .pf-tool { width: calc(132px * var(--scale)); }                                 /* 메뉴바 기능 세 개: 같은 폭 */
+#menubar .pf-tools-hint { width: calc(400px * var(--scale)); box-sizing: border-box; text-align: center; white-space: normal; }
+.pf-dev-pill { width: max(64px, calc(92px * var(--scale))); }                           /* 기기 ⋯ 메뉴: 수정·삭제·접속기록 / 저장·취소 / 삭제·취소 / 닫기 */
+.pf-dd-acts .pf-dev-pill { width: max(84px, calc(120px * var(--scale))); }              /* 기기 자세한 정보: 이름 바꾸기·삭제 */
+.pf-dev-ask { width: max(150px, calc(230px * var(--scale))); flex: none; }               /* 삭제 확인 문구 자리도 같은 폭 */
+.pf-act-tab { width: max(96px, calc(132px * var(--scale))); }                            /* 활동 고르기 (숫자 포함) */
+.pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-act-tab { width: max(66px, calc(96px * var(--scale))); }
+#pfSeg .pf-seg-btn { width: max(108px, calc(160px * var(--scale))); }                    /* 받은·보낸 좋아요 */
+.pf-range .pf-seg-btn { width: max(40px, calc(58px * var(--scale))); }                   /* 7·30·90일 */
+.pf-tag { display: inline-block; width: max(66px, calc(92px * var(--scale))); }          /* 팔로우 중 · 나를 팔로우 */
+.pf-mini { width: max(80px, calc(112px * var(--scale))); }                               /* 맞팔로우 · 팔로우 취소 */
+.pf-e-btn { width: max(88px, calc(124px * var(--scale))); }                              /* 프로필 수정: 취소 · 저장 */
+.pf-pill { width: max(110px, calc(160px * var(--scale))); }                              /* 사진 지우기 · 배경 지우기 */
+.pf-x-edit { width: max(52px, calc(70px * var(--scale))); }                              /* 소개 · 분야의 수정 */
+.pf-pick-remove { width: max(150px, calc(220px * var(--scale))); }                       /* 화면에서 빼기 */
+/* 전체 화면: 받은·보낸 좋아요 버튼은 고르기 바로 왼쪽에 붙임 (제목 글자 길이와 상관없이 같은 자리) */
+.pf-q[data-w="activity"][data-size="full"] .pf-d-head > .pf-seg { margin-left: auto; }
+.pf-q[data-w="activity"][data-size="full"] .pf-d-head:has(> .pf-seg:not([hidden])) > .pf-act-tabs { margin-left: 0; }
+.pf-range .pf-seg-btn { width: max(50px, calc(72px * var(--scale))); }

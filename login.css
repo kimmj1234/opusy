@@ -262,3 +262,5 @@ a:focus-visible, button:focus-visible { outline: 3px solid #3B3FF0; outline-offs
 .text-btn { margin-top: -8px; height: 40px; border: 0; background: none; color: #55565f; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: color 0.3s ease; }
 .text-btn:hover { color: #14151F; }
 .notice .device { padding-top: 0; }
+/* 비밀번호 보기 버튼: 한글(보기·숨기기)·영어(Show·Hide) 어느 쪽이든 같은 폭 */
+.eye { width: 48px; padding: 0; text-align: center; }

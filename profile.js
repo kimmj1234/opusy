@@ -70,7 +70,7 @@
       devSaveFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.', devDelFail: '삭제하지 못했어요. 잠시 후 다시 시도해 주세요.',
       dateTime: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
       dragHint: '끌어다가 흰 상자에 놓아 배치해 주세요.',
-      wProfile: '프로필', wActivity: '활동', toolsLabel: '기능 배치 (끌어다 흰 상자에 놓으세요. 키보드로는 Enter 로 자리를 고를 수 있어요)',
+      wProfile: '프로필', wActivity: '활동', toolDevices: '등록된 기기', toolsLabel: '기능 배치 (끌어다 흰 상자에 놓으세요. 키보드로는 Enter 로 자리를 고를 수 있어요)',
       pickT: (n) => `‘${n}’ 놓을 자리를 골라 주세요`, pickSub: '놓은 자리에 있던 기능은 메뉴바로 돌아가요.', pickRemove: '화면에서 빼기',
       pickWide: '가로', pickTall: '세로', pickFull: '전체', pickNow: (n) => `지금: ${n}`,
       slot: { tl: '왼쪽 위', tr: '오른쪽 위', bl: '왼쪽 아래', br: '오른쪽 아래', top: '위', bottom: '아래', left: '왼쪽', right: '오른쪽', full: '전체' },
@@ -134,7 +134,7 @@
       devSaveFail: 'Could not save. Please try again in a moment.', devDelFail: 'Could not delete. Please try again in a moment.',
       dateTime: (d) => d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       dragHint: 'Drag it onto the white panel to place it.',
-      wProfile: 'Profile', wActivity: 'Activity', toolsLabel: 'Arrange features (drag onto the panel; with a keyboard, press Enter to choose a place)',
+      wProfile: 'Profile', wActivity: 'Activity', toolDevices: 'Devices', toolsLabel: 'Arrange features (drag onto the panel; with a keyboard, press Enter to choose a place)',
       pickT: (n) => `Choose where to put “${n}”`, pickSub: 'Whatever was in that place goes back to the menu bar.', pickRemove: 'Remove from panel',
       pickWide: 'Wide', pickTall: 'Tall', pickFull: 'Full', pickNow: (n) => `Now: ${n}`,
       slot: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right', full: 'Full' },
@@ -537,7 +537,7 @@
   const DEFAULT_LAYOUT = { profile: 'tl', devices: 'tr', activity: 'bl' };
   let layout = { ...DEFAULT_LAYOUT };
   let pick = null;             // 모양 고르기가 열려 있을 때 { w: 기능, drag: 끌고 있는 중인지 }
-  const wName = (w) => I18N[lang][{ profile: 'wProfile', devices: 'devices', activity: 'wActivity' }[w]];
+  const wName = (w) => I18N[lang][{ profile: 'wProfile', devices: 'toolDevices', activity: 'wActivity' }[w]];
   const overlap = (a, b) => SLOTS[a].some((c) => SLOTS[b].includes(c));
   // 저장돼 있던 값은 그대로 믿지 않고, 아는 기능·아는 자리·서로 겹치지 않는 것만 받아들임
   function cleanLayout(v) {
