@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfEdit', 'pfEditForm', 'pfEditMsg', 'pfEditSave', 'pfEditCancel', 'pfEditTagCount', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -80,6 +80,10 @@
       xCareer: (n) => `경력 ${n}년`, xDone: (n) => `프로필 완성도 ${n}%`, xNoPosts: '아직 올린 게시글이 없어요.', xNoFans: '아직 나를 팔로우한 사람이 없어요.',
       xFans: (n) => `${n}명이 팔로우하고 있어요`, xActSum: (n) => `최근 1년 ${n}회`, xActSumM: (m, n) => `최근 ${m}개월 ${n}회`, xActCell: (d, n) => `${d}: 활동 ${n}회`, xActLabel: (n) => `최근 1년 동안의 활동 기록, 모두 ${n}회`,
       xLoadFail: '불러오지 못했어요.', iEmail: '이메일',
+      eEdit: '수정', eTitle: '프로필 수정', eHeadline: '한 줄 소개', eBio: '자기소개', eField: '분야', eCareer: '경력', eYears: '년', eTags: '관심 태그',
+      eHeadlinePh: '예) 사람을 연결하는 프로덕트를 만드는 디자이너', eBioPh: '어떤 일을 해 왔고, 지금 무엇에 관심이 있는지 적어 보세요.', eFieldPh: '예) 프로덕트 디자인', eCareerPh: '0~60', eTagsPh: '쉼표로 나눠 적어요. 예) UX, 브랜딩, 멘토링 (최대 8개)',
+      eCancel: '취소', eSave: '저장', eSaving: '저장하는 중…', eSaved: '프로필을 저장했어요.', eFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      eTooLong: '글자 수가 너무 많아요. 오른쪽 위 숫자를 확인해 주세요.', eCareerBad: '경력은 0부터 60까지의 숫자로 적어 주세요.', eTagsMany: '관심 태그는 8개까지 적을 수 있어요.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -136,6 +140,10 @@
       xCareer: (n) => `${n} yrs experience`, xDone: (n) => `Profile ${n}% complete`, xNoPosts: 'No posts yet.', xNoFans: 'No followers yet.',
       xFans: (n) => `${n} followers`, xActSum: (n) => `${n} in the last year`, xActSumM: (m, n) => `${n} in the last ${m} months`, xActCell: (d, n) => `${d}: ${n} activities`, xActLabel: (n) => `Activity over the last year, ${n} in total`,
       xLoadFail: 'Could not load.', iEmail: 'Email',
+      eEdit: 'Edit', eTitle: 'Edit profile', eHeadline: 'Headline', eBio: 'About me', eField: 'Field', eCareer: 'Experience', eYears: 'yrs', eTags: 'Interest tags',
+      eHeadlinePh: 'e.g. Designer building products that connect people', eBioPh: 'What you have done and what interests you now.', eFieldPh: 'e.g. Product design', eCareerPh: '0–60', eTagsPh: 'Separate with commas, e.g. UX, Branding, Mentoring (up to 8)',
+      eCancel: 'Cancel', eSave: 'Save', eSaving: 'Saving…', eSaved: 'Profile saved.', eFail: 'Could not save. Please try again in a moment.',
+      eTooLong: 'Too many characters. Check the counters.', eCareerBad: 'Enter experience as a number from 0 to 60.', eTagsMany: 'You can add up to 8 interest tags.',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       m: {
@@ -155,6 +163,7 @@
     document.documentElement.lang = lang;
     document.title = t.pageTitle;
     $$('[data-i18n]').forEach((el) => { const v = t[el.dataset.i18n]; if (typeof v === 'string') el.textContent = v; });
+    $$('[data-i18n-ph]').forEach((el) => { const v = t[el.dataset.i18nPh]; if (typeof v === 'string') el.placeholder = v; });
     $$('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
     $('#pfPhoto').setAttribute('aria-label', t.photoLabel);
     $('#pfCover').setAttribute('aria-label', t.coverLabel);
@@ -851,6 +860,117 @@
   //  · 자기소개: 들어가는 줄 수만큼   · 최근 게시글: 들어가는 줄 수 × 2개 (최대 8개)
   //  · 활동 기록: 칸이 정사각형에 가깝게 되는 만큼의 주(13~53주)   · 팔로워 얼굴: 폭에 들어가는 만큼
   //  · 그래도 넘치면 덜 중요한 상자(팔로워 → 분야·태그)부터 숨김
+  // ===== 프로필 수정: 소개(한 줄 소개·자기소개)와 분야·경력·관심 태그를 직접 고침 =====
+  const LIMIT = { headline: 60, bio: 500, field: 30 };
+  let editOpen = false, editBack = null, editBusy = false, savedMsgTimer = 0;
+  const editForm = $('#pfEditForm');
+  const fieldOf = (n) => editForm.elements[n];
+  // 태그: 쉼표로 나눠서 앞의 # 은 떼고, 같은 것은 하나만, 20자까지, 8개까지
+  const parseTags = (v) => {
+    const out = [];
+    String(v || '').split(/[,，]/).forEach((x) => {
+      const g = x.trim().replace(/^#+/, '').trim().slice(0, 20);
+      if (g && !out.some((o) => o.toLowerCase() === g.toLowerCase())) out.push(g);
+    });
+    return out;
+  };
+  function countChars() {
+    $$('#pfEditForm .pf-e-count[data-for]').forEach((c) => {
+      const n = String(fieldOf(c.dataset.for).value || '').length;
+      c.textContent = `${n} / ${LIMIT[c.dataset.for]}`;
+      c.classList.toggle('bad', n > LIMIT[c.dataset.for]);
+    });
+    const tags = parseTags(fieldOf('tags').value);
+    const tc = $('#pfEditTagCount');
+    tc.textContent = `${tags.length} / 8`;
+    tc.classList.toggle('bad', tags.length > 8);
+  }
+  function setEditMsg(text, bad) { const m = $('#pfEditMsg'); m.textContent = text || ''; m.classList.toggle('bad', !!bad); }
+  function openEdit(focusName, backBtn) {
+    if (!canEdit) { showMsg('load'); return; }
+    const ab = about || {};
+    fieldOf('headline').value = ab.headline || '';
+    fieldOf('bio').value = ab.bio || '';
+    fieldOf('field').value = ab.field || '';
+    fieldOf('career').value = ab.career_years != null ? String(ab.career_years) : '';
+    fieldOf('tags').value = Array.isArray(ab.tags) ? ab.tags.join(', ') : '';
+    setEditMsg('');
+    countChars();
+    editOpen = true; editBack = backBtn || null;
+    const box = $('#pfEdit');
+    box.hidden = false;
+    $('#pfGrid').inert = true;
+    $('.pf-panel').classList.add('is-editing');
+    void box.offsetWidth;
+    box.classList.add('open');
+    const f = fieldOf(focusName) || fieldOf('headline');
+    f.focus({ preventScroll: true });
+    if (f.setSelectionRange && f.type !== 'number') f.setSelectionRange(f.value.length, f.value.length);
+  }
+  function closeEdit() {
+    if (!editOpen) return;
+    editOpen = false;
+    const box = $('#pfEdit');
+    box.classList.toggle('open', false);
+    $('#pfGrid').inert = false;
+    $('.pf-panel').classList.toggle('is-editing', false);
+    setTimeout(() => { if (!editOpen) box.hidden = true; }, 320);
+    if (editBack && editBack.isConnected) editBack.focus({ preventScroll: true });
+  }
+  editForm.addEventListener('input', () => { countChars(); setEditMsg(''); });
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (editBusy) return;
+    const t = I18N[lang];
+    const val = (n) => String(fieldOf(n).value || '').trim();
+    const headline = val('headline'), bio = val('bio'), field = val('field');
+    const careerRaw = val('career');
+    const tags = parseTags(fieldOf('tags').value);
+    // 저장 전 확인: 글자 수 · 경력 숫자 · 태그 수
+    for (const n of ['headline', 'bio', 'field']) {
+      if (val(n).length > LIMIT[n]) { setEditMsg(t.eTooLong, true); fieldOf(n).focus(); return; }
+    }
+    let career = null;
+    if (careerRaw) {
+      if (!/^\d{1,2}$/.test(careerRaw) || Number(careerRaw) > 60) { setEditMsg(t.eCareerBad, true); fieldOf('career').focus(); return; }
+      career = Number(careerRaw);
+    }
+    if (tags.length > 8) { setEditMsg(t.eTagsMany, true); fieldOf('tags').focus(); return; }
+    const row = { headline: headline || null, bio: bio || null, field: field || null, career_years: career, tags: tags.length ? tags : null };
+    editBusy = true;
+    $('#pfEditSave').disabled = true;
+    setEditMsg(t.eSaving);
+    let ok = false;
+    try {
+      const { data, error } = await sb.from('profiles').update(row).eq('id', uid).select('id');
+      ok = !error && Array.isArray(data) && data.length > 0;
+    } catch (err) {}
+    editBusy = false;
+    $('#pfEditSave').disabled = false;
+    if (!ok) { setEditMsg(t.eFail, true); return; }
+    about = { ...(about || {}), ...row };
+    closeEdit();
+    renderExtra();
+    const m = $('#pfLayoutMsg');                         // 흰 상자 아래에 '저장했어요'를 잠깐 띄움
+    m.textContent = t.eSaved;
+    m.classList.add('show');
+    clearTimeout(savedMsgTimer);
+    savedMsgTimer = setTimeout(() => m.classList.toggle('show', false), 2500);
+  });
+  $('#pfEditCancel').addEventListener('click', closeEdit);
+  $('#pfEdit').addEventListener('mousedown', (e) => { if (e.target === e.currentTarget) closeEdit(); });   // 바깥의 흐린 곳을 누르면 닫힘
+  document.addEventListener('keydown', (e) => {
+    if (!editOpen) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeEdit(); return; }
+    if (e.key === 'Tab') {                               // 키보드 초점이 수정 창 안에서만 돌게
+      const items = [...editForm.querySelectorAll('input, textarea, button')].filter((x) => !x.disabled);
+      const i = items.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (!e.shiftKey && i === items.length - 1) { e.preventDefault(); items[0].focus(); }
+    }
+  });
+  $$('.pf-x-edit').forEach((b) => b.addEventListener('click', () => openEdit(b.dataset.focus, b)));
+
   let fitRaf = 0;
   function fitFull() {
     if (sizeOf('profile') !== 'full' || !extra.loaded) return;

@@ -535,3 +535,38 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-q1[data-size="full"] .pf-x-posts { align-content: start; }
 /* 계정 정보 네 칸은 폭이 넉넉하면 한 줄로 (세로 공간을 소개 글에 더 줌) */
 .pf-q1[data-size="full"] .pf-x-info.is-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* ===== 프로필 수정 창: 흰 상자 가운데에 뜨고 뒤쪽은 흐려짐 ===== */
+.pf-panel.is-editing .pf-grid, .pf-panel.is-editing .back-link { filter: blur(max(8px, calc(14px * var(--scale)))); opacity: 0.8; }
+.pf-x-edit { margin-left: auto; height: max(24px, calc(32px * var(--scale))); padding: 0 max(10px, calc(14px * var(--scale))); border: 1.5px solid #e4e4e9; border-radius: 999px; background: #fff; color: #14151F; font: inherit; font-size: max(11px, calc(14px * var(--scale))); font-weight: 600; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+.pf-x-edit:hover { background: #f1f1f4; border-color: #d6d6de; }
+.pf-x-t { align-items: center; }
+.pf-edit { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; border-radius: inherit; background: rgba(255, 255, 255, 0.42); opacity: 0; transition: opacity 0.3s ease; }
+.pf-edit[hidden] { display: none; }
+.pf-edit.open { opacity: 1; }
+.pf-edit-in { box-sizing: border-box; display: flex; flex-direction: column; gap: max(10px, calc(16px * var(--scale))); width: min(calc(100% - 32px), max(340px, calc(720px * var(--scale)))); max-height: calc(100% - 32px); padding: max(18px, calc(36px * var(--scale))) max(18px, calc(40px * var(--scale))); border-radius: max(16px, calc(24px * var(--scale))); background: #fff; box-shadow: 0 20px 60px rgba(16, 16, 20, 0.18); transform: translateY(calc(14px * var(--scale))) scale(0.97); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.pf-edit.open .pf-edit-in { transform: none; }
+.pf-edit-title { margin: 0 0 2px; font-size: max(17px, calc(28px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; color: #14151F; }
+.pf-e-row { display: flex; flex-direction: column; gap: max(4px, calc(7px * var(--scale))); min-width: 0; }
+.pf-e-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: max(12px, calc(16px * var(--scale))); font-weight: 700; color: #55565f; }
+.pf-e-count { font-size: 0.9em; font-weight: 500; color: #a3a3ab; }
+.pf-e-count.bad { color: #c62d1f; }
+.pf-e-row input, .pf-e-row textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: max(8px, calc(12px * var(--scale))) max(10px, calc(16px * var(--scale))); border: 1.5px solid #e4e4e9; border-radius: max(10px, calc(14px * var(--scale))); background: #f6f6f8; color: #14151F; font: inherit; font-size: max(14px, calc(18px * var(--scale))); font-weight: 500; outline: none; transition: border-color 0.2s, background 0.2s; }
+.pf-e-row textarea { resize: none; line-height: 1.55; height: calc(4 * 1.55em + 2 * max(8px, calc(12px * var(--scale)))); overflow: hidden; }
+.pf-e-row input:focus, .pf-e-row textarea:focus { border-color: #14151F; background: #fff; }
+.pf-e-row input::placeholder, .pf-e-row textarea::placeholder { color: #a3a3ab; }
+.pf-e-two { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: max(10px, calc(16px * var(--scale))); }
+.pf-e-unit { position: relative; display: block; }
+.pf-e-unit input { padding-right: 2.6em; }
+.pf-e-unit em { position: absolute; right: max(10px, calc(16px * var(--scale))); top: 50%; transform: translateY(-50%); font-style: normal; font-size: max(13px, calc(17px * var(--scale))); font-weight: 600; color: #8b8b93; pointer-events: none; }
+.pf-e-msg { margin: 0; min-height: 1.4em; font-size: max(12px, calc(15px * var(--scale))); font-weight: 600; color: #55565f; }
+.pf-e-msg.bad { color: #c62d1f; }
+.pf-e-actions { display: flex; justify-content: flex-end; gap: max(8px, calc(12px * var(--scale))); }
+.pf-e-btn { height: max(38px, calc(52px * var(--scale))); padding: 0 max(18px, calc(30px * var(--scale))); border: 1.5px solid #e4e4e9; border-radius: 999px; background: #fff; color: #14151F; font: inherit; font-size: max(13px, calc(17px * var(--scale))); font-weight: 700; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
+.pf-e-btn:hover { background: #f1f1f4; }
+.pf-e-btn.is-main { border-color: #14151F; background: #14151F; color: #fff; }
+.pf-e-btn.is-main:hover { background: #2c2d3a; }
+.pf-e-btn:disabled { opacity: 0.5; cursor: progress; }
+@media (prefers-reduced-motion: reduce) { .pf-edit, .pf-edit-in { transition: none !important; } }
+
+.pf-x-bio { white-space: pre-line; }   /* 자기소개의 줄바꿈을 그대로 보여 줌 */
