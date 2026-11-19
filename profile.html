@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>내 프로필 · OPUSY</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="login.css?v=202611191500">
-  <link rel="stylesheet" href="profile.css?v=202611191500">
+  <link rel="stylesheet" href="login.css?v=202611191700">
+  <link rel="stylesheet" href="profile.css?v=202611191700">
   <script>
     // 메뉴바 크기를 메인 페이지와 똑같이: 1920×1080 기준 배율
     const fit = () => document.documentElement.style.setProperty('--scale', Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -176,7 +176,8 @@
       <!-- 오른쪽 위: 이 계정에 등록된 기기 (보기만) -->
       <section class="pf-q pf-q2" data-w="devices" data-slot="tr">
         <div class="pf-dev is-loading" id="pfDev">
-          <h2 class="pf-q-title"><span data-i18n="devices"></span><span class="pf-count" id="pfDevCount"></span></h2>
+          <h2 class="pf-q-title"><span data-i18n="devices"></span><span class="pf-count" id="pfDevCount"></span><span class="pf-dev-sum" id="pfDevSum"></span></h2>
+          <div class="pf-dev-main">
           <ul class="pf-dev-list" id="pfDevList"></ul>
           <p class="pf-dev-note" id="pfDevNote" role="status"></p>
           <!-- 한 쪽에 기기 3대씩: 이전 페이지 · 기기 추가 · 다음 페이지.
@@ -189,6 +190,9 @@
             </div>
             <p class="pf-dev-toast" id="pfDevToast" role="status" aria-live="polite"></p>
           </div>
+          </div>
+          <!-- 전체 화면일 때만: 고른 기기의 자세한 정보와 접속 기록 -->
+          <aside class="pf-dev-detail" id="pfDevDetail" aria-live="polite"></aside>
         </div>
       </section>
 
@@ -258,6 +262,6 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="supabase-config.js"></script>
-  <script defer src="profile.js?v=202611191500"></script>
+  <script defer src="profile.js?v=202611191700"></script>
 </body>
 </html>

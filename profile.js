@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfEdit', 'pfEditForm', 'pfEditMsg', 'pfEditSave', 'pfEditCancel', 'pfEditTagCount', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfDevDetail', 'pfDevSum', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfEdit', 'pfEditForm', 'pfEditMsg', 'pfEditSave', 'pfEditCancel', 'pfEditTagCount', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -84,6 +84,9 @@
       eHeadlinePh: '예) 사람을 연결하는 프로덕트를 만드는 디자이너', eBioPh: '어떤 일을 해 왔고, 지금 무엇에 관심이 있는지 적어 보세요.', eFieldPh: '예) 프로덕트 디자인', eCareerPh: '0~60', eTagsPh: '쉼표로 나눠 적어요. 예) UX, 브랜딩, 멘토링 (최대 8개)',
       eCancel: '취소', eSave: '저장', eSaving: '저장하는 중…', eSaved: '프로필을 저장했어요.', eFail: '저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
       eTooLong: '글자 수가 너무 많아요. 오른쪽 위 숫자를 확인해 주세요.', eCareerBad: '경력은 0부터 60까지의 숫자로 적어 주세요.', eTagsMany: '관심 태그는 8개까지 적을 수 있어요.',
+      ddRename: '이름 바꾸기', ddDelete: '삭제', ddReg: '등록일', ddLast: '마지막 접속', ddPlace: '위치', ddIp: 'IP', ddLog: '접속 기록', ddLogN: (n) => `최근 ${n}회`,
+      ddNoLog: '아직 접속 기록이 없어요. 이 기기로 로그인하면 여기에 쌓여요.', ddMore: (n) => `외 ${n}회 더 있어요`, ddNone: '왼쪽에서 기기를 고르면 자세한 정보가 보여요.', ddNever: '기록 없음', ddUnknown: '알 수 없음',
+      sumPc: (n) => `컴퓨터 ${n}`, sumMobile: (n) => `휴대폰 ${n}`, sumIdle: (n) => `30일 넘게 안 쓴 기기 ${n}`,
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -144,6 +147,9 @@
       eHeadlinePh: 'e.g. Designer building products that connect people', eBioPh: 'What you have done and what interests you now.', eFieldPh: 'e.g. Product design', eCareerPh: '0–60', eTagsPh: 'Separate with commas, e.g. UX, Branding, Mentoring (up to 8)',
       eCancel: 'Cancel', eSave: 'Save', eSaving: 'Saving…', eSaved: 'Profile saved.', eFail: 'Could not save. Please try again in a moment.',
       eTooLong: 'Too many characters. Check the counters.', eCareerBad: 'Enter experience as a number from 0 to 60.', eTagsMany: 'You can add up to 8 interest tags.',
+      ddRename: 'Rename', ddDelete: 'Delete', ddReg: 'Registered', ddLast: 'Last sign-in', ddPlace: 'Location', ddIp: 'IP', ddLog: 'Sign-in history', ddLogN: (n) => `${n} recent`,
+      ddNoLog: 'No sign-ins yet. They will appear here when you sign in with this device.', ddMore: (n) => `${n} more`, ddNone: 'Pick a device on the left to see its details.', ddNever: 'Never', ddUnknown: 'Unknown',
+      sumPc: (n) => `${n} computer${n === 1 ? '' : 's'}`, sumMobile: (n) => `${n} phone${n === 1 ? '' : 's'}`, sumIdle: (n) => `${n} unused for 30+ days`,
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       m: {
@@ -194,6 +200,92 @@
     set('#pfBirth', info && day(info.birth));
     set('#pfPhone', info && info.phone);
     set('#pfJoined', info && day(info.joined));
+  }
+
+  // ===== 등록된 기기 · 전체 화면: 왼쪽 목록에서 고른 기기의 자세한 정보와 접속 기록을 오른쪽에 보여 줌 =====
+  let devSel = null;                                  // 고른 기기 id
+  let devLogins = null;                               // 접속 기록: null=아직, false=실패, 배열
+  let devLoginsLoading = false;
+  async function loadDevLogins() {
+    if (devLoginsLoading) return;
+    devLoginsLoading = true;
+    try {
+      const { data, error } = await sb.rpc('my_device_logins', { p_limit: 300 });
+      devLogins = !error && Array.isArray(data) ? data : false;
+    } catch (e) { devLogins = false; }
+    devLoginsLoading = false;
+    if (sizeOf('devices') === 'full') renderDevDetail();
+  }
+  const placeOf = (d) => [d.city ?? d.last_city, d.region ?? d.last_region, d.country ?? d.last_country].filter((v, i, a) => v && a.indexOf(v) === i).join(', ');
+  function devSummary(t) {
+    const pc = devices.filter((d) => d.device_kind !== 'mobile').length;
+    const idle = devices.filter((d) => !d.last_used_at || Date.now() - new Date(d.last_used_at) > 30 * 864e5).length;
+    return [t.sumPc(pc), t.sumMobile(devices.length - pc), idle ? t.sumIdle(idle) : ''].filter(Boolean).join(' · ');
+  }
+  function renderDevDetail() {
+    const box = $('#pfDevDetail');
+    if (sizeOf('devices') !== 'full' || !Array.isArray(devices)) { box.textContent = ''; return; }
+    const t = I18N[lang];
+    box.textContent = '';
+    const d = devices.find((x) => x.id === devSel);
+    if (!d) { box.append(el('p', 'pf-dd-note', devices.length ? t.ddNone : t.devNone)); return; }
+    const kind = d.device_kind === 'mobile' ? 'mobile' : 'pc';
+    // 머리: 큰 아이콘 · 이름 · 종류 · 버튼
+    const head = el('div', 'pf-dd-head');
+    const ic = el('span', 'pf-dd-icon'); ic.innerHTML = ICON[kind];
+    const who = el('div', 'pf-dd-who');
+    const nm = el('strong', '', devLabel(d)); nm.title = devLabel(d);
+    who.append(nm, el('span', '', [t.devName[kind], d.platform && t.devName[d.platform] && t.devName[d.platform] !== devLabel(d) ? t.devName[d.platform] : ''].filter(Boolean).join(' · ')));
+    const acts = el('div', 'pf-dd-acts');
+    const goTo = (mode, sel) => {                     // 그 기기가 있는 쪽으로 넘긴 뒤 목록에서 수정·삭제를 엶
+      const per = Math.max(1, $$('#pfDevList .pf-dev-item').length);
+      const idx = devices.indexOf(d);
+      if (idx >= 0) devPage = Math.floor(idx / per);
+      openDev(d.id, mode, sel);
+    };
+    acts.append(pill(t.ddRename, () => goTo('edit', '.pf-dev-input')), pill(t.ddDelete, () => goTo('del', '.pf-dev-pill.is-danger'), 'is-ghost-danger'));
+    head.append(ic, who, acts);
+    // 정보 네 칸
+    const at = d.last_used_at ? new Date(d.last_used_at) : null;
+    const reg = localDate(d.created_at);
+    const info = el('dl', 'pf-dd-info');
+    [[t.ddReg, reg ? t.date(reg) : t.ddUnknown], [t.ddLast, at && !isNaN(at) ? t.dateTime(at) : t.ddNever], [t.ddPlace, placeOf(d) || t.ddUnknown], [t.ddIp, d.last_ip || t.ddUnknown]].forEach(([k, v]) => {
+      const row = el('div'); const dd = el('dd', '', v); dd.title = v; row.append(el('dt', '', k), dd); info.append(row);
+    });
+    // 접속 기록
+    const logs = Array.isArray(devLogins) ? devLogins.filter((l) => l.device_id === d.id) : [];
+    const ht = el('h3', 'pf-dd-t', t.ddLog);
+    const small = el('small', '', logs.length ? t.ddLogN(logs.length) : '');
+    ht.append(small);
+    const ul = el('ul', 'pf-dd-log');
+    box.append(head, info, ht, ul);
+    if (devLogins === null) { ul.append(el('li', 'pf-dd-empty', t.loading)); if (!devLoginsLoading) loadDevLogins(); return; }
+    if (devLogins === false) { ul.append(el('li', 'pf-dd-empty', t.xLoadFail)); return; }
+    if (!logs.length) { ul.append(el('li', 'pf-dd-empty', t.ddNoLog)); return; }
+    logs.forEach((l, i) => {
+      const li = el('li', 'pf-dd-row');
+      const when = new Date(l.at);
+      li.append(el('b', '', isNaN(when) ? '–' : t.dateTime(when)), el('span', '', placeOf(l) || t.ddUnknown), el('em', '', l.ip || ''));
+      if (i === 0) li.classList.add('is-last');
+      ul.append(li);
+    });
+    fitDevLog();
+  }
+  // 접속 기록은 남는 높이에 들어가는 줄 수만큼만 보여 주고, 나머지는 '외 N회'로 알려 줌 (스크롤 없음)
+  function fitDevLog() {
+    const box = $('#pfDevDetail'), ul = box.querySelector('.pf-dd-log');
+    if (!ul) return;
+    const rows = [...ul.querySelectorAll('.pf-dd-row')];
+    const old = ul.querySelector('.pf-dd-more'); if (old) old.remove();
+    rows.forEach((r) => { r.hidden = false; });
+    if (!rows.length) return;
+    const gap = parseFloat(getComputedStyle(ul).rowGap) || 0;
+    const rowH = rows[0].offsetHeight;
+    const avail = box.getBoundingClientRect().bottom - parseFloat(getComputedStyle(box).paddingBottom) - ul.getBoundingClientRect().top;
+    let fit = Math.max(0, Math.floor((avail + gap) / (rowH + gap)));
+    if (fit < rows.length) fit = Math.max(0, fit - 1);  // '외 N회' 줄 자리
+    rows.forEach((r, i) => { r.hidden = i >= fit; });
+    if (fit < rows.length) ul.append(el('li', 'pf-dd-more', I18N[lang].ddMore(rows.length - fit)));
   }
 
   // 한 쪽에 3대씩 보여 주고, 각 기기 오른쪽 끝의 ⋯ 버튼으로 수정·삭제·접속기록을 엶
@@ -247,7 +339,7 @@
     }
     const size = sizeOf('devices');
     // 한 쪽에 보이는 기기 수: 칸에 실제로 들어가는 줄 수를 재서 정함 (스크롤도, 아래 '이전으로 돌아가기'와 겹침도 없게)
-    const cols = size === 'wide' || size === 'full' ? 2 : 1;
+    const cols = size === 'wide' ? 2 : 1;            // 전체 화면은 왼쪽 목록 한 줄 + 오른쪽 자세한 정보
     let perCol = PER_BY[size] / cols;
     const devBox = $('#pfDev');
     if (devBox.clientHeight && !matchMedia('(max-width: 700px)').matches) {
@@ -255,9 +347,16 @@
       const itemH = Math.max(54, 78 * sc), gap = Math.max(6, 10 * sc);   // CSS 의 기기 상자 높이·간격과 같은 값
       const foot = $('#pfDevFoot');
       const avail = devBox.clientHeight - devBox.querySelector('.pf-q-title').offsetHeight - parseFloat(getComputedStyle(list).marginTop) - foot.offsetHeight - parseFloat(getComputedStyle(foot).marginTop) - parseFloat(getComputedStyle(devBox.querySelector('.pf-q-title')).marginTop) - 1;
-      perCol = Math.max(1, Math.min(perCol, Math.floor((avail + gap) / (itemH + gap))));
+      // 전체 화면은 칸 아래 여백을 줄였으므로, 왼쪽 목록은 '이전으로 돌아가기' 자리만큼 덜 씀
+      const backRoom = size === 'full' && devBox.closest('.pf-q').classList.contains('has-back') ? Math.max(70, 108 * sc) - Math.max(18, 36 * sc) : 0;
+      perCol = Math.max(1, Math.min(perCol, Math.floor((avail - backRoom + gap) / (itemH + gap))));
     }
     const PER = perCol * cols;
+    if (!devices.some((x) => x.id === devSel)) {
+      const used = devices.filter((x) => x.last_used_at).sort((p, q) => new Date(q.last_used_at) - new Date(p.last_used_at));
+      devSel = (used[0] || devices[0] || {}).id || null;
+    }
+    $('#pfDevSum').textContent = size === 'full' && devices.length ? devSummary(t) : '';
     const pages = Math.max(1, Math.ceil(devices.length / PER));
     devPage = Math.min(devPage, pages - 1);
     $('#pfDevCount').textContent = t.devCount(devices.length) + (pages > 1 ? ` · ${t.devPage(devPage + 1, pages)}` : '');
@@ -273,6 +372,14 @@
       const li = el('li', 'pf-dev-item' + (open ? ' is-open is-' + open : ''));
       li.dataset.id = d.id;
       li.style.setProperty('--i', list.children.length);
+      if (size === 'full') {                         // 전체 화면: 눌러서 오른쪽에 자세히 볼 기기를 고름
+        li.classList.toggle('is-sel', d.id === devSel);
+        li.tabIndex = 0;
+        li.setAttribute('aria-current', d.id === devSel ? 'true' : 'false');
+        const pickDev = () => { if (devSel !== d.id) { devSel = d.id; showDevices(); const n = $(`.pf-dev-item[data-id="${d.id}"]`); if (n) n.focus({ preventScroll: true }); } };
+        li.addEventListener('click', (e) => { if (!e.target.closest('.pf-dev-more, .pf-dev-acts, .pf-dev-input')) pickDev(); });
+        li.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === li) { e.preventDefault(); pickDev(); } });
+      }
       li.insertAdjacentHTML('afterbegin', ICON[kind]);              // 고정된 아이콘 그림만 HTML 로 넣고, 글자는 textContent 로 넣음
       const box = el('div', 'pf-dev-text');
       if (open === 'edit') {
@@ -288,8 +395,11 @@
         const name = el('strong', '', devLabel(d)); name.title = devLabel(d);
         const dt = localDate(d.created_at);
         // 칸이 넓거나 길면 등록일 옆에 마지막 접속 시각도 함께 보여 줌
+        // 칸 크기에 따라 부제가 늘어남: 한 칸 = 등록일, 가로 = + 마지막 접속, 세로 = + 위치, 전체 = 마지막 접속(자세한 건 오른쪽)
         const at = size !== 'q' && d.last_used_at ? new Date(d.last_used_at) : null;
-        const sub = [dt ? t.devOn(t.date(dt)) : '', at && !isNaN(at) ? t.devLastShort(t.dateTime(at)) : ''].filter(Boolean).join(' · ');
+        const last = at && !isNaN(at) ? t.devLastShort(t.dateTime(at)) : '';
+        const parts = size === 'full' ? [last || (dt ? t.devOn(t.date(dt)) : '')] : [dt ? t.devOn(t.date(dt)) : '', last, size === 'tall' ? placeOf(d) : ''];
+        const sub = parts.filter(Boolean).join(' · ');
         const subEl = el('span', '', sub); subEl.title = sub;
         box.append(name, subEl);
       }
@@ -331,6 +441,7 @@
       const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
       list.style.minHeight = `${perCol * list.firstElementChild.offsetHeight + (perCol - 1) * gap}px`;
     }
+    renderDevDetail();
     if (focusSel) {
       const item = list.querySelector(`.pf-dev-item.is-open`);
       const target = item && item.querySelector(focusSel);

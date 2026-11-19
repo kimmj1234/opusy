@@ -570,3 +570,52 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 @media (prefers-reduced-motion: reduce) { .pf-edit, .pf-edit-in { transition: none !important; } }
 
 .pf-x-bio { white-space: pre-line; }   /* 자기소개의 줄바꿈을 그대로 보여 줌 */
+
+/* ===== 등록된 기기 · 전체 화면: 왼쪽 목록(쪽 넘김·기기 추가) | 오른쪽 고른 기기의 자세한 정보와 접속 기록 ===== */
+.pf-dev-detail, .pf-dev-sum { display: none; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); grid-template-rows: auto auto auto auto minmax(0, 1fr); column-gap: max(20px, calc(48px * var(--scale))); align-content: start; height: 100%; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev > .pf-q-title { grid-column: 1 / -1; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-list, .pf-q[data-w="devices"][data-size="full"] .pf-dev-note, .pf-q[data-w="devices"][data-size="full"] .pf-dev-foot { grid-column: 1; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-detail { grid-column: 2; grid-row: 2 / -1; display: flex; flex-direction: column; min-height: 0; margin-top: max(12px, calc(22px * var(--scale))); padding: max(16px, calc(30px * var(--scale))) max(16px, calc(32px * var(--scale))); border-radius: max(14px, calc(22px * var(--scale))); background: #f6f6f8; overflow: hidden; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-sum { display: inline; margin-left: max(8px, calc(12px * var(--scale))); font-size: max(12px, calc(17px * var(--scale))); font-weight: 600; color: #8b8b93; letter-spacing: 0; }
+.pf-dev-item[tabindex] { cursor: pointer; outline: none; transition: box-shadow 0.2s, background 0.2s; }
+.pf-dev-item[tabindex]:hover { background: #e9e9ee; }
+.pf-dev-item[tabindex]:focus-visible { box-shadow: inset 0 0 0 2px #8b8b93; }
+.pf-dev-item.is-sel { box-shadow: inset 0 0 0 2px #14151F !important; background: #fff; }
+.pf-dev-item.is-sel .pf-dev-acts { background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff max(16px, calc(28px * var(--scale)))); }
+.pf-dd-head { flex: none; display: flex; align-items: center; gap: max(12px, calc(20px * var(--scale))); }
+.pf-dd-icon { flex: none; display: grid; place-items: center; width: max(48px, calc(80px * var(--scale))); aspect-ratio: 1; border-radius: max(12px, calc(20px * var(--scale))); background: #fff; color: #14151F; }
+.pf-dd-icon svg { width: 52%; height: auto; }
+.pf-dd-who { flex: 1; min-width: 0; }
+.pf-dd-who strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: max(16px, calc(28px * var(--scale))); font-weight: 800; letter-spacing: -0.02em; color: #14151F; }
+.pf-dd-who span { display: block; margin-top: 2px; font-size: max(12px, calc(16px * var(--scale))); font-weight: 500; color: #8b8b93; }
+.pf-dd-acts { flex: none; display: flex; gap: max(6px, calc(8px * var(--scale))); }
+.pf-dd-acts .pf-dev-pill { animation: none; }
+.pf-dev-pill.is-ghost-danger { color: #c62d1f; }
+.pf-dev-pill.is-ghost-danger:hover { background: #c62d1f; color: #fff; }
+.pf-dd-info { flex: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: max(6px, calc(10px * var(--scale))); margin: max(14px, calc(26px * var(--scale))) 0 0; }
+.pf-dd-info > div { min-width: 0; padding: max(8px, calc(14px * var(--scale))) max(12px, calc(18px * var(--scale))); border-radius: max(10px, calc(14px * var(--scale))); background: #fff; }
+.pf-dd-info dt { font-size: max(11px, calc(14px * var(--scale))); font-weight: 500; color: #8b8b93; }
+.pf-dd-info dd { margin: 2px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: max(13px, calc(19px * var(--scale))); font-weight: 700; color: #14151F; }
+.pf-dd-t { flex: none; display: flex; align-items: baseline; gap: 8px; margin: max(14px, calc(26px * var(--scale))) 0 max(6px, calc(10px * var(--scale))); font-size: max(12px, calc(17px * var(--scale))); font-weight: 700; color: #55565f; }
+.pf-dd-t small { font-size: 0.9em; font-weight: 500; color: #8b8b93; }
+.pf-dd-log { flex: 1 1 auto; min-height: 0; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: max(4px, calc(6px * var(--scale))); overflow: hidden; }
+.pf-dd-row { flex: none; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 0.8fr); align-items: center; gap: max(8px, calc(14px * var(--scale))); padding: max(7px, calc(11px * var(--scale))) max(12px, calc(16px * var(--scale))); border-radius: max(8px, calc(12px * var(--scale))); background: #fff; font-size: max(12px, calc(15px * var(--scale))); }
+.pf-dd-row[hidden] { display: none; }
+.pf-dd-row > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-dd-row b { font-weight: 700; color: #14151F; }
+.pf-dd-row span { font-weight: 500; color: #55565f; }
+.pf-dd-row em { font-style: normal; font-weight: 500; color: #8b8b93; text-align: right; }
+.pf-dd-row.is-last { box-shadow: inset 3px 0 0 #14151F; }
+.pf-dd-empty, .pf-dd-more, .pf-dd-note { flex: none; margin: 0; font-size: max(12px, calc(15px * var(--scale))); font-weight: 500; color: #8b8b93; }
+.pf-dd-more { padding-left: max(12px, calc(16px * var(--scale))); }
+@media (max-width: 700px) { .pf-q[data-w="devices"][data-size] .pf-dev { display: flex; } .pf-q[data-w="devices"][data-size] .pf-dev-detail { display: none; } }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-list { display: flex; flex-direction: column; }   /* 전체 화면 목록은 한 줄 (자세한 정보는 오른쪽) */
+/* 전체 화면 기기: 오른쪽 자세한 정보는 맨 아래까지 (왼쪽 목록은 기기 수 계산에서 이전으로 돌아가기 자리를 뺌) */
+.pf-q[data-w="devices"][data-size="full"].has-back { padding-bottom: max(18px, calc(36px * var(--scale))); }
+/* 왼쪽 묶음(목록·안내·버튼): 평소에는 없는 것처럼, 전체 화면에서는 왼쪽 단 */
+.pf-dev-main { display: contents; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev { grid-template-rows: auto minmax(0, 1fr); }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-main { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; min-height: 0; }
+.pf-q[data-w="devices"][data-size="full"] .pf-dev-detail { grid-column: 2; grid-row: 2; }
+@media (max-width: 700px) { .pf-q[data-w="devices"][data-size] .pf-dev-main { display: contents; } }
