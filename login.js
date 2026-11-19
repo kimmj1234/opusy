@@ -51,7 +51,7 @@
         },
       },
       stepSub: ['사용할 아이디를 정해 주세요', '이메일을 입력해 주세요', '비밀번호를 만들어 주세요', '내 정보를 알려 주세요', '마지막으로 이 기기를 등록해요'],
-      h: { id: '영문 소문자, 숫자, 밑줄(_) 4~20자', idOk: '사용할 수 있는 아이디예요.', idTaken: '이미 사용 중인 아이디예요.' },
+      h: { id: '영문 소문자, 숫자, 밑줄(_) 4~20자', idOk: '사용할 수 있는 아이디예요.', idTaken: '이미 사용 중인 아이디예요.', idBlocked: '쓸 수 없는 아이디예요. 운영자로 오해될 수 있거나 부적절한 말이 들어 있어요.' },
       notice: '메일함에서 인증 링크를 눌러 가입을 마무리해 주세요. 메일이 안 보이면 스팸함도 확인해 보세요.',
       noticeResetSent: '가입된 이메일이라면 비밀번호를 다시 정할 수 있는 링크를 보냈어요. 메일이 안 보이면 스팸함도 확인해 보세요.',
       noticePwChanged: '새 비밀번호로 로그인해 주세요.',
@@ -98,6 +98,8 @@
         pwMatch: '비밀번호가 서로 달라요.',
         agree: '약관에 동의해 주세요.',
         idTaken: '이미 사용 중인 아이디예요.',
+        idBlocked: '쓸 수 없는 아이디예요. 운영자·관리자로 오해될 수 있거나 부적절한 말이 들어 있어요.',
+        phoneTaken: '이 전화번호로 이미 가입한 계정이 있어요. 한 사람당 계정은 1개만 만들 수 있어요. 로그인하거나 아이디 찾기를 이용해 주세요.',
         emailTaken: '이미 가입된 이메일이에요. 로그인하거나 비밀번호를 찾아보세요.',
         rate: '요청이 너무 많아요. 잠시 뒤 다시 시도해 주세요.',
       },
@@ -134,7 +136,7 @@
         },
       },
       stepSub: ['Choose your ID', 'Enter your email', 'Create a password', 'Tell us about you', 'Last, register this device'],
-      h: { id: 'a-z, 0-9, underscore (_), 4-20 characters', idOk: 'This ID is available.', idTaken: 'This ID is already taken.' },
+      h: { id: 'a-z, 0-9, underscore (_), 4-20 characters', idOk: 'This ID is available.', idTaken: 'This ID is already taken.', idBlocked: 'This ID is not allowed. It could be mistaken for staff or contains inappropriate words.' },
       notice: 'Click the verification link in your inbox to finish signing up. If you do not see it, check your spam folder.',
       noticeResetSent: 'If that email is registered, we sent a link to set a new password. Check your spam folder too.',
       noticePwChanged: 'Please log in with your new password.',
@@ -181,6 +183,8 @@
         pwMatch: 'The passwords do not match.',
         agree: 'Please agree to the terms.',
         idTaken: 'This ID is already taken.',
+        idBlocked: 'This ID is not allowed. It could be mistaken for staff or contains inappropriate words.',
+        phoneTaken: 'An account already exists with this phone number. Only one account per person is allowed. Please log in or find your ID.',
         emailTaken: 'This email is already registered. Try logging in or resetting your password.',
         rate: 'Too many requests. Please try again in a moment.',
       },
@@ -245,12 +249,13 @@
   }
 
   // ===== 화면 문구 =====
-  let idState = null;   // 'ok' | 'taken' | null
+  let idState = null;   // 'ok' | 'taken' | 'blocked' | null
   function refreshIdHint() {
     const h = $('#su-id-hint');
     h.classList.remove('ok', 'bad');
     if (idState === 'ok') { h.textContent = T('h.idOk'); h.classList.add('ok'); }
     else if (idState === 'taken') { h.textContent = T('h.idTaken'); h.classList.add('bad'); }
+    else if (idState === 'blocked') { h.textContent = T('h.idBlocked'); h.classList.add('bad'); }
     else h.textContent = T('h.id');
   }
 
@@ -587,9 +592,10 @@
   });
   async function checkId() {
     const value = suId.value;
-    const { data, error } = await sb.rpc('username_available', { p_username: value });
+    // 서버가 아이디 상태를 알려 줌: ok · taken(이미 있음) · blocked(운영자로 오해될 수 있거나 부적절한 말) · format
+    const { data, error } = await sb.rpc('username_status', { p_username: value });
     if (value !== suId.value || error) return;
-    idState = data ? 'ok' : 'taken';
+    idState = data === 'ok' ? 'ok' : data === 'blocked' ? 'blocked' : data === 'taken' ? 'taken' : null;
     refreshIdHint();
   }
 
@@ -628,9 +634,11 @@
       if (u.length < 4) return bad('idShort', f.username, [u.length]);
       if (u.length > 20) return bad('idLong', f.username, [u.length]);
       if (!RE_ID.test(u)) return bad('idFormat', f.username);
-      const { data: free, error } = await sb.rpc('username_available', { p_username: u });
+      const { data: stt, error } = await sb.rpc('username_status', { p_username: u });
       if (error) return bad('network');
-      if (!free) { idState = 'taken'; refreshIdHint(); return bad('idTaken', f.username); }
+      if (stt === 'blocked') { idState = 'blocked'; refreshIdHint(); return bad('idBlocked', f.username); }
+      if (stt === 'taken') { idState = 'taken'; refreshIdHint(); return bad('idTaken', f.username); }
+      if (stt !== 'ok') return bad('idFormat', f.username);
       idState = 'ok'; refreshIdHint();
     } else if (step === 2) {
       if (!RE_EMAIL.test(f.email.value.trim())) return bad('emailFmt', f.email);
@@ -651,6 +659,13 @@
       if (!birthOk(f.birth.value)) return bad('birth', f.birth);
       if (!phoneOk(f.phone.value)) return bad('phone', f.phone);
       if (!f.agree.checked) return bad('agree', f.agree);
+      // 한 사람당 계정 1개: 이 번호로 이미 가입했는지 기기 등록(지문 등) 전에 확인
+      try {
+        const r = await fn('signup', { action: 'check_phone', phone: f.phone.value.replace(/\D/g, '') });
+        const o = await r.json().catch(() => ({}));
+        if (o.status === 'taken') return bad('phoneTaken', f.phone);
+        if (o.error === 'rate') return bad('rate');
+      } catch (err) { return bad('network'); }
     }
     return true;
   }
@@ -732,6 +747,8 @@
         if (e2 === 'email_taken') { goStep(2); return fail(f, 'emailTaken', f.email); }
         if (e2 === 'email_format') { goStep(2); return fail(f, 'emailFmt', f.email); }
         if (e2 === 'id_taken' || e2 === 'id_format') { goStep(1); return fail(f, e2 === 'id_taken' ? 'idTaken' : 'idFormat', f.username); }
+        if (e2 === 'id_blocked') { goStep(1); idState = 'blocked'; refreshIdHint(); return fail(f, 'idBlocked', f.username); }
+        if (e2 === 'phone_taken') { goStep(4); return fail(f, 'phoneTaken', f.phone); }
         if (e2 === 'password') { goStep(3); return fail(f, 'pw', f.password); }
         if (e2 === 'password_leaked') { goStep(3); return fail(f, 'pwLeaked', f.password); }
         if (e2 === 'name' || e2 === 'birth' || e2 === 'phone') { goStep(4); return fail(f, e2); }

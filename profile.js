@@ -1277,6 +1277,9 @@
     } else left.append(sub);
     const max = Math.max(1, ...series.map((x) => Number(x.views || 0)));
     const chart = el('div', 'pf-chart');
+    // 막대 사이 간격은 날 수에 맞춰 줄임 (90일이면 간격만으로 칸을 넘어가 버리므로)
+    if (series.length > 45) chart.classList.add('is-dense');
+    else if (series.length > 16) chart.classList.add('is-mid');
     const step = Math.ceil(series.length / 8);                    // 날짜 글자는 겹치지 않게 며칠에 한 번만
     series.forEach((x, i) => {
       const col = el('div');

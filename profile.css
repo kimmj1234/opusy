@@ -679,3 +679,15 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-q[data-w="activity"][data-size="full"] .pf-d-head > .pf-seg { margin-left: auto; }
 .pf-q[data-w="activity"][data-size="full"] .pf-d-head:has(> .pf-seg:not([hidden])) > .pf-act-tabs { margin-left: 0; }
 .pf-range .pf-seg-btn { width: max(50px, calc(72px * var(--scale))); }
+/* 조회수 그래프: 날 수가 많으면 막대 사이 간격과 둥근 모서리를 줄이고, 날짜 글자는 막대 폭과 상관없이 가운데에 */
+.pf-chart.is-mid { gap: max(3px, calc(6px * var(--scale))); }
+.pf-chart.is-dense { gap: 1px; }
+.pf-q[data-w="activity"][data-size="full"] .pf-chart.is-dense > div { gap: 4px; }
+.pf-chart.is-dense i { border-radius: 2px 2px 1px 1px; }
+.pf-chart > div { position: relative; }
+.pf-chart small { overflow: visible; }
+/* 전체 화면 활동: 게시글이 없어도 그래프가 칸 높이를 채우게 (줄 높이를 칸에 맞춤) */
+.pf-q[data-w="activity"][data-size="full"] .pf-d-body.is-split { grid-template-rows: minmax(0, 1fr); align-content: stretch; }
+/* 맨 앞·맨 뒤 날짜 글자는 칸 밖으로 나가지 않게 막대 바깥쪽 끝에 맞춤 */
+.pf-chart > div:first-child small { align-self: flex-start; }
+.pf-chart > div:last-child small { align-self: flex-end; }
