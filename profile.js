@@ -6,7 +6,7 @@
 
   // 브라우저에 남아 있던 예전 화면(HTML)에 새 스크립트가 붙으면 필요한 칸이 없어 멈추게 됨.
   // 그럴 때는 화면을 한 번만 새로 받아 와서 다시 엶.
-  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
+  const NEED = ['pfTop', 'pfPhoto', 'pfFile', 'pfCover', 'pfCoverFile', 'pfCoverImg', 'pfCoverEmpty', 'pfCoverRemove', 'pfTabs', 'pfSeg', 'pfDetailTitle', 'pfDetailBody', 'pfTipCover', 'pfTipPhoto', 'pfMsg', 'pfRemove', 'pfId', 'pfEmail', 'pfStatPosts', 'pfDev', 'pfDevList', 'pfDevCount', 'pfDevNote', 'pfDevPrev', 'pfDevAdd', 'pfDevNext', 'pfDevFoot', 'pfDevToast', 'pfInfo', 'pfExtra', 'pfXPosts', 'pfXHeat', 'pfTools', 'pfToolsHint', 'pfGrid', 'pfPick', 'pfPickRemove', 'pfLayoutMsg'];
   const REFETCH = 'opusy.profile.refetch';
   if (NEED.some((id) => !document.getElementById(id))) {
     let tried = false;
@@ -75,6 +75,11 @@
       pickWide: '가로', pickTall: '세로', pickFull: '전체', pickNow: (n) => `지금: ${n}`,
       slot: { tl: '왼쪽 위', tr: '오른쪽 위', bl: '왼쪽 아래', br: '오른쪽 아래', top: '위', bottom: '아래', left: '왼쪽', right: '오른쪽', full: '전체' },
       layoutFail: '배치를 저장하지 못했어요. 새로고침하면 이전 배치로 돌아가요.',
+      xAbout: '소개', xField: '분야 · 경력', xAccount: '계정 정보', xRecent: '최근 게시글', xActivity: '활동 기록', xFollowers: '팔로워',
+      xNoHeadline: '아직 한 줄 소개가 없어요.', xNoBio: '자기소개를 적으면 여기에 보여요.', xNoField: '분야와 경력을 아직 적지 않았어요.', xNoTags: '관심 태그가 없어요.',
+      xCareer: (n) => `경력 ${n}년`, xDone: (n) => `프로필 완성도 ${n}%`, xNoPosts: '아직 올린 게시글이 없어요.', xNoFans: '아직 나를 팔로우한 사람이 없어요.',
+      xFans: (n) => `${n}명이 팔로우하고 있어요`, xActSum: (n) => `최근 1년 ${n}회`, xActSumM: (m, n) => `최근 ${m}개월 ${n}회`, xActCell: (d, n) => `${d}: 활동 ${n}회`, xActLabel: (n) => `최근 1년 동안의 활동 기록, 모두 ${n}회`,
+      xLoadFail: '불러오지 못했어요.', iEmail: '이메일',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android 기기', pc: '컴퓨터', mobile: '휴대폰' },
       date: (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`,
       m: {
@@ -126,6 +131,11 @@
       pickWide: 'Wide', pickTall: 'Tall', pickFull: 'Full', pickNow: (n) => `Now: ${n}`,
       slot: { tl: 'Top left', tr: 'Top right', bl: 'Bottom left', br: 'Bottom right', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right', full: 'Full' },
       layoutFail: 'Could not save the layout. Refreshing will restore the previous one.',
+      xAbout: 'About', xField: 'Field · Experience', xAccount: 'Account', xRecent: 'Recent posts', xActivity: 'Activity', xFollowers: 'Followers',
+      xNoHeadline: 'No headline yet.', xNoBio: 'Your introduction will appear here.', xNoField: 'No field or experience yet.', xNoTags: 'No interest tags yet.',
+      xCareer: (n) => `${n} yrs experience`, xDone: (n) => `Profile ${n}% complete`, xNoPosts: 'No posts yet.', xNoFans: 'No followers yet.',
+      xFans: (n) => `${n} followers`, xActSum: (n) => `${n} in the last year`, xActSumM: (m, n) => `${n} in the last ${m} months`, xActCell: (d, n) => `${d}: ${n} activities`, xActLabel: (n) => `Activity over the last year, ${n} in total`,
+      xLoadFail: 'Could not load.', iEmail: 'Email',
       devName: { mac: 'Mac', windows: 'Windows PC', ios: 'iPhone · iPad', android: 'Android device', pc: 'Computer', mobile: 'Phone' },
       date: (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       m: {
@@ -154,6 +164,7 @@
     if (pick) fillPick();
     showMsg(msgKey, msgInfo);
     showInfo();
+    renderExtra();
     showDevices();
     $('#pfTabs').setAttribute('aria-label', t.tabsLabel);
     renderDetail();
@@ -398,6 +409,7 @@
     });
     devOpen = null;
     showDevices();                                   // 한 쪽에 보이는 기기 수가 달라짐
+    renderExtra();                                   // 프로필이 전체 화면이면 더 많은 정보를 그림
     if (detail.days !== daysFor() && detail.view === 'posts' && detail.started) loadDetail();   // 그래프 기간이 달라짐
     else if (detail.started) fitRows();              // 칸 크기가 달라졌으니 들어가는 줄 수를 다시 셈
     // 십자 선: 한 기능이 양쪽 칸을 함께 차지하면 그 사이 토막은 숨김
@@ -751,6 +763,179 @@
   }
 
   // ===== 활동 상세: 위의 게시글·팔로워·팔로우·좋아요 중 하나를 고르면 왼쪽 아래 칸에 그 내용이 나옴 =====
+  // ===== 전체 화면 프로필: 한 칸일 때보다 정보가 더 많이 보임 =====
+  let about = null;                                   // 소개·분야·경력·태그 (profiles 행에서)
+  const extra = { loaded: false, loading: false, err: false, posts: [], days: [], fans: [] };
+  const WEEKS = 53;                                   // 활동 기록: 최근 1년(53주)을 한 칸 = 하루로
+  async function loadExtra() {
+    if (extra.loading || extra.loaded) return;
+    extra.loading = true;
+    const today = new Date();
+    const days = (WEEKS - 1) * 7 + today.getDay() + 1;   // 맨 오른쪽 줄이 이번 주(일~토)가 되게
+    try {
+      const [a, b, c] = await Promise.all([sb.rpc('my_post_stats'), sb.rpc('my_activity_days', { p_days: days }), sb.rpc('my_followers')]);
+      if (a.error || b.error || c.error) throw new Error('load');
+      extra.posts = a.data || []; extra.days = b.data || []; extra.fans = c.data || [];
+      extra.loaded = true; extra.err = false;
+    } catch (e) { extra.err = true; }
+    extra.loading = false;
+    renderExtra();
+  }
+  function renderExtra() {
+    if (sizeOf('profile') !== 'full') return;
+    const t = I18N[lang];
+    const ab = about || {};
+    const muted = (node, text, empty) => { node.textContent = text || empty; node.classList.toggle('is-empty', !text); };
+    // ① 소개
+    muted($('#pfXHeadline'), ab.headline, t.xNoHeadline);
+    muted($('#pfXBio'), ab.bio, t.xNoBio);
+    // ② 분야 · 경력 · 태그
+    const fieldTxt = [ab.field, ab.career_years != null ? t.xCareer(ab.career_years) : ''].filter(Boolean).join(' · ');
+    muted($('#pfXField'), fieldTxt, t.xNoField);
+    const tags = $('#pfXTags'); tags.textContent = '';
+    const list = Array.isArray(ab.tags) ? ab.tags.filter(Boolean) : [];
+    if (list.length) list.forEach((g) => tags.append(el('span', 'pf-x-tag', '#' + g)));
+    else tags.append(el('span', 'pf-x-tag is-empty', t.xNoTags));
+    // ③ 계정 정보 + 완성도
+    const dl = $('#pfXInfo'); dl.textContent = '';
+    const day = (v) => { const d = localDate(v); return d ? t.date(d) : ''; };
+    [[t.iName, info && info.name], [t.iBirth, info && day(info.birth)], [t.iPhone, info && info.phone], [t.iJoined, info && day(info.joined)]].forEach(([k, v]) => {
+      const row = el('div'); row.append(el('dt', '', k), el('dd', '', v || '–')); row.lastChild.title = v || ''; dl.append(row);
+    });
+    const checks = [!$('#pfPhotoImg').hidden, !$('#pfCoverImg').hidden, !!(info && info.name), !!ab.headline, !!ab.bio, !!ab.field, ab.career_years != null, list.length > 0];
+    const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    $('#pfXDoneTxt').textContent = t.xDone(pct);
+    $('#pfXDoneBar').style.width = pct + '%';
+    // ④ 최근 게시글 · ⑤ 활동 기록 · ⑥ 팔로워 (처음 전체 화면이 됐을 때 한 번만 불러옴)
+    if (!extra.loaded) { if (!extra.loading) loadExtra(); }
+    const posts = $('#pfXPosts'); posts.textContent = '';
+    const heat = $('#pfXHeat'); heat.textContent = '';
+    const fans = $('#pfXFans'); fans.textContent = '';
+    if (!extra.loaded) {
+      const msg = extra.err ? t.xLoadFail : t.loading;
+      [posts, heat, fans].forEach((n) => n.append(el('p', 'pf-x-note', msg)));
+      $('#pfXActSum').textContent = '';
+      return;
+    }
+    if (!extra.posts.length) posts.append(el('p', 'pf-x-note', t.xNoPosts));
+    extra.posts.slice(0, 8).forEach((p) => {
+      const c = el('div', 'pf-x-post');
+      const title = el('strong', '', p.excerpt || '–'); title.title = p.excerpt || '';
+      c.append(title, el('span', '', `${shortDate(p.created_at)} · ${t.viewsN(fmtN(p.views))} · ${t.likesN(fmtN(p.likes))}`));
+      posts.append(c);
+    });
+    const total = extra.days.reduce((n, d) => n + Number(d.n || 0), 0);
+    const top = Math.max(1, ...extra.days.map((d) => Number(d.n || 0)));
+    $('#pfXActSum').textContent = t.xActSum(fmtN(total));
+    heat.setAttribute('aria-label', t.xActLabel(fmtN(total)));
+    extra.days.forEach((d) => {
+      const n = Number(d.n || 0);
+      const lv = n === 0 ? 0 : Math.min(4, Math.ceil((n / top) * 4));
+      const cell = el('i', 'lv' + lv);
+      const dd = localDate(d.day);
+      cell.title = t.xActCell(dd ? t.date(dd) : d.day, n);
+      cell.dataset.n = n;
+      heat.append(cell);
+    });
+    if (!extra.fans.length) fans.append(el('p', 'pf-x-note', t.xNoFans));
+    else {
+      const faces = el('div', 'pf-x-faces');
+      extra.fans.slice(0, 24).forEach((f) => { const a = avatar(f.username, f.avatar_path); a.title = f.username; faces.append(a); });
+      faces.append(el('span', 'pf-av pf-x-more', ''));   // '+N': 폭에 맞춰 fitFull 이 채움
+      fans.append(faces, el('span', 'pf-x-fans-txt', t.xFans(fmtN(extra.fans.length))));
+    }
+    fitFull();
+  }
+
+  // 전체 화면 프로필을 칸 크기에 맞춤: 창 크기가 바뀔 때마다 다시 계산해서 스크롤 없이 빈틈없이 채움
+  //  · 자기소개: 들어가는 줄 수만큼   · 최근 게시글: 들어가는 줄 수 × 2개 (최대 8개)
+  //  · 활동 기록: 칸이 정사각형에 가깝게 되는 만큼의 주(13~53주)   · 팔로워 얼굴: 폭에 들어가는 만큼
+  //  · 그래도 넘치면 덜 중요한 상자(팔로워 → 분야·태그)부터 숨김
+  let fitRaf = 0;
+  function fitFull() {
+    if (sizeOf('profile') !== 'full' || !extra.loaded) return;
+    const ex = $('#pfExtra');
+    if (!ex.clientHeight) return;
+    const t = I18N[lang];
+    const [L, R] = $$('#pfExtra .pf-x-col');
+    const num = (v) => parseFloat(v) || 0;
+    const inner = (c) => c.clientHeight - num(getComputedStyle(c).paddingBottom);
+    const gapOf = (c) => num(getComputedStyle(c).rowGap);
+    const used = (c) => [...c.children].filter((x) => !x.hidden).reduce((n, x, i) => n + x.offsetHeight + (i ? gapOf(c) : 0), 0);
+    const titleH = (box) => { const h = box.querySelector('.pf-x-t'); return h.offsetHeight + num(getComputedStyle(h).marginBottom); };
+    $$('#pfExtra [data-drop]').forEach((x) => { x.hidden = false; });
+    // 계정 정보: 한 칸 폭이 150px 이상 되면 네 칸을 한 줄로 (세로 공간을 소개 글에 더 줌)
+    const infoEl = $('#pfXInfo');
+    infoEl.classList.toggle('is-row', infoEl.clientWidth / 4 >= 150);
+
+    // ----- 오른쪽 단: 최근 게시글 줄 수 → 남는 높이로 활동 기록 → 그래도 남으면 상자 사이를 고르게 벌림 -----
+    const posts = $('#pfXPosts'), heat = $('#pfXHeat');
+    const postsBox = $('#pfXRecent'), heatBox = $('#pfXActivity'), fansBox = $('#pfXFans').closest('.pf-x-box');
+    const cards = [...posts.querySelectorAll('.pf-x-post')];
+    posts.style.height = ''; posts.style.gridTemplateRows = ''; heat.style.height = '';
+    cards.forEach((c) => { c.hidden = false; });
+    const cells = [...heat.querySelectorAll('i')];
+    cells.forEach((c) => { c.hidden = false; });
+    const heatMin = num(getComputedStyle(heat).minHeight) || 54;
+    const avail = inner(R) - gapOf(R) * 2 - fansBox.offsetHeight - titleH(postsBox) - titleH(heatBox);
+    let postsH = posts.offsetHeight;
+    if (cards.length) {
+      const pg = num(getComputedStyle(posts).rowGap);
+      const cardH = Math.max(...cards.slice(0, 2).map((c) => c.offsetHeight));
+      const fitRows = Math.floor((avail - heatMin + pg) / (cardH + pg));
+      const rows = Math.max(1, Math.min(4, Math.ceil(cards.length / 2), fitRows));
+      cards.forEach((c, i) => { c.hidden = i >= rows * 2; });
+      postsH = rows * cardH + (rows - 1) * pg;
+      posts.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
+      posts.style.height = `${postsH}px`;
+    }
+    if (cells.length) {
+      const g = num(getComputedStyle(heat).columnGap) || 2;
+      const W = heat.clientWidth;
+      const room = Math.max(heatMin, avail - postsH);
+      // 한 칸이 정사각형이 되도록: 높이로 정한 칸 크기만큼 폭에 들어가는 주 수(13~53주), 칸이 너무 커지면 높이를 줄임
+      const byH = (room - g * 6) / 7;
+      const weeks = Math.max(13, Math.min(WEEKS, Math.floor((W + g) / (byH + g))));
+      const cell = (W - g * (weeks - 1)) / weeks;
+      heat.style.height = `${Math.min(room, cell * 7 + g * 6)}px`;
+      const hide = Math.max(0, cells.length - ((weeks - 1) * 7 + (cells.length % 7 || 7)));
+      cells.forEach((c, i) => { c.hidden = i < hide; });
+      heat.style.gridTemplateColumns = `repeat(${weeks}, minmax(0, 1fr))`;
+      const shown = cells.slice(hide).reduce((n, c) => n + Number(c.dataset.n || 0), 0);
+      $('#pfXActSum').textContent = weeks >= 52 ? t.xActSum(fmtN(shown)) : t.xActSumM(Math.round(weeks / 4.35), fmtN(shown));
+    }
+    // 팔로워 얼굴: 폭에 들어가는 만큼
+    const faces = $('#pfXFans .pf-x-faces');
+    if (faces) {
+      const all = [...faces.querySelectorAll('.pf-av:not(.pf-x-more)')];
+      const more = faces.querySelector('.pf-x-more');
+      all.forEach((x) => { x.hidden = false; });
+      const one = all[0] ? all[0].getBoundingClientRect().width * 0.8 : 30;
+      const txt = $('#pfXFans .pf-x-fans-txt');
+      const room = $('#pfXFans').clientWidth - (txt ? txt.offsetWidth + 24 : 0) - one * 1.5;
+      const fit = Math.max(1, Math.min(all.length, Math.floor(room / one)));
+      all.forEach((x, i) => { x.hidden = i >= fit; });
+      const rest = extra.fans.length - fit;
+      if (more) { more.hidden = rest <= 0; more.textContent = '+' + fmtN(rest); }
+    }
+
+    // ----- 왼쪽 단: 자기소개를 한 줄로 두고 잰 뒤, 남는 높이만큼 줄을 늘림 (글이 그보다 짧으면 글 길이까지만) -----
+    const bio = $('#pfXBio');
+    const lh = num(getComputedStyle(bio).lineHeight) || 20;
+    bio.style.webkitLineClamp = 'unset'; bio.style.maxHeight = 'none';
+    const textLines = Math.max(1, Math.round(bio.scrollHeight / lh));
+    bio.style.webkitLineClamp = '1'; bio.style.maxHeight = `${lh}px`;
+    const spare = inner(L) - used(L);
+    const lines = Math.max(1, Math.min(textLines, 1 + Math.floor(spare / lh)));
+    bio.style.webkitLineClamp = String(lines); bio.style.maxHeight = `${lines * lh}px`;
+
+    // 그래도 넘치면 덜 중요한 상자(팔로워 → 분야·태그)부터 숨김
+    ['1', '2'].forEach((lv) => {
+      [L, R].forEach((col) => { if (used(col) > inner(col) + 1) col.querySelectorAll(`[data-drop="${lv}"]`).forEach((x) => { x.hidden = true; }); });
+    });
+  }
+  if (window.ResizeObserver) new ResizeObserver(() => { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitFull); }).observe($('#pfExtra'));
+
   const fmtN = (v) => new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'ko-KR').format(Number(v) || 0);
   const shortDate = (iso) => { const d = localDate(iso); return d ? I18N[lang].date(d) : ''; };
   const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 2.8 4.5 6.4 4.5c2 0 3.6 1.1 5.6 3.2 2-2.1 3.6-3.2 5.6-3.2 3.6 0 5.5 3.7 4 7.2C19.5 16.4 12 21 12 21Z"/></svg>';
@@ -1039,13 +1224,14 @@
     uid = u.id;
     let p = null;
     try {
-      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path, layout, name, birth_date, phone, created_at').eq('id', uid).maybeSingle();
+      const { data, error } = await sb.from('profiles').select('username, avatar_path, cover_path, layout, name, birth_date, phone, created_at, headline, bio, field, career_years, tags').eq('id', uid).maybeSingle();
       if (!error && data) p = data;
     } catch (e) {}
     const text = (id, v) => { $(id).textContent = v || '–'; $(id).title = v || ''; };
     text('#pfId', (p && p.username) || shownId);
     text('#pfEmail', u.email);
     info = p ? { name: p.name, birth: p.birth_date, phone: p.phone, joined: p.created_at } : null;
+    about = p ? { headline: p.headline, bio: p.bio, field: p.field, career_years: p.career_years, tags: p.tags } : null;
     showInfo();
     if (p) { photo.show(p.avatar_path || null); cover.show(p.cover_path || null); } else showMsg('load');
     canEdit = !!p;
