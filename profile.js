@@ -202,6 +202,27 @@
     set('#pfJoined', info && day(info.joined));
   }
 
+  // ===== 접속 기록: 자동 로그인 상태로 사이트를 열면, 이 브라우저가 기억해 둔 기기의 마지막 접속·위치를 갱신 =====
+  // 기기는 비밀번호+기기 확인으로 로그인하거나 기기를 등록할 때 기억됨. 같은 기기는 30분에 한 번만 보냄
+  async function touchDevice(session) {
+    let mem = null;
+    try { mem = JSON.parse(localStorage.getItem('opusy.device') || 'null'); } catch (e) {}
+    if (!mem || !mem.id || !session || !session.user || mem.user !== session.user.id) return false;
+    try { if (Date.now() - Number(localStorage.getItem('opusy.touchAt') || 0) < 30 * 60 * 1000) return false; } catch (e) {}
+    try {
+      const res = await fetch(`${CFG.url}/functions/v1/touch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ device_id: mem.id }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (out.error === 'unknown_device') { try { localStorage.removeItem('opusy.device'); } catch (e) {} return false; }   // 지워진 기기
+      if (!res.ok) return false;
+      try { localStorage.setItem('opusy.touchAt', String(Date.now())); } catch (e) {}
+      return out.status === 'ok';
+    } catch (e) { return false; }
+  }
+
   // ===== 등록된 기기 · 전체 화면: 왼쪽 목록에서 고른 기기의 자세한 정보와 접속 기록을 오른쪽에 보여 줌 =====
   let devSel = null;                                  // 고른 기기 id
   let devLogins = null;                               // 접속 기록: null=아직, false=실패, 배열
@@ -321,7 +342,15 @@
       if (document.activeElement === toast) $('#pfDevAdd').focus({ preventScroll: true });
     }, NOTE_MS);
   }
-  const devLabel = (d) => d.nickname || I18N[lang].devName[d.platform] || I18N[lang].devName[d.device_kind === 'mobile' ? 'mobile' : 'pc'];
+  const baseLabel = (d) => I18N[lang].devName[d.platform] || I18N[lang].devName[d.device_kind === 'mobile' ? 'mobile' : 'pc'];
+  // 이름을 붙이지 않은 같은 종류의 기기가 여러 대면 등록 순서대로 번호를 붙여 구분함 (예: Mac 1, Mac 2)
+  const devLabel = (d) => {
+    if (d.nickname) return d.nickname;
+    const base = baseLabel(d);
+    if (!Array.isArray(devices)) return base;
+    const same = devices.filter((x) => !x.nickname && baseLabel(x) === base).sort((p, q) => new Date(p.created_at) - new Date(q.created_at));
+    return same.length > 1 ? `${base} ${same.indexOf(d) + 1}` : base;
+  };
 
   function showDevices(focusSel) {
     const t = I18N[lang];
@@ -1476,8 +1505,14 @@
     selectView('posts');
 
     // 등록된 기기: 서버 함수 my_devices 가 내 기기의 종류·이름·등록일·마지막 접속만 돌려줌
+    const touched = touchDevice(session);               // 이 기기의 접속 기록 남기기 (기기 목록과 함께 진행)
     await reloadDevices();
     showDevices();
     $('#pfDev').classList.remove('is-loading');
+    if (await touched) {                                // 방금 기록됐으면 마지막 접속·접속 기록을 새로 받아 다시 그림
+      await reloadDevices();
+      devLogins = null;
+      showDevices();
+    }
   })();
 })();

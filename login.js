@@ -72,6 +72,7 @@
         idEmpty: '아이디를 입력해 주세요.',
         expiredLink: '확인 링크가 만료됐거나 이미 사용됐어요. 다시 로그인해서 확인 메일을 받아 주세요.',
         devLimit: '등록할 수 있는 기기 수를 넘었어요.',
+        devAlready: '이 기기는 이미 등록돼 있어요. 바로 들어갈게요.',
         notFound: '입력한 이름과 이메일로 가입된 계정을 찾지 못했어요.',
         samePw: '이전 비밀번호와 다른 비밀번호를 써 주세요.',
         expired: '링크가 만료됐거나 이미 사용됐어요. 재설정 메일을 다시 받아 주세요.',
@@ -154,6 +155,7 @@
         idEmpty: 'Please enter an ID.',
         expiredLink: 'The confirmation link has expired or was already used. Log in again to get a new email.',
         devLimit: 'You have reached the device limit.',
+        devAlready: 'This device is already registered. Taking you in.',
         notFound: 'No account matches that name and email.',
         samePw: 'Use a password different from your previous one.',
         expired: 'This link has expired or was already used. Request a new reset email.',
@@ -395,6 +397,11 @@
     headers: { 'Content-Type': 'application/json', apikey: CFG.key, ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}) },
     body: JSON.stringify(payload),
   });
+  // 이 브라우저가 어느 등록 기기인지 기억해 둠: 자동 로그인으로 사이트를 열 때 그 기기의 접속 기록을 남기는 데 씀
+  const rememberDevice = (deviceId, userId) => {
+    if (!deviceId || !userId) return;
+    try { localStorage.setItem('opusy.device', JSON.stringify({ id: deviceId, user: userId })); localStorage.removeItem('opusy.touchAt'); } catch (err) {}
+  };
   const tlsBlocked = (err) => !!err && /TLS|certificate/i.test(String(err.message || ''));   // 브라우저가 인증서 문제로 기기 확인을 막음
   let pending = null;                    // 비밀번호까지 확인된 로그인 정보 (기기 확인이나 확인 메일 요청에 다시 씀)
 
@@ -468,9 +475,11 @@
       if (!s || !s.session) return sideMsg(msg, 'expiredLink');
       const user = s.session.user;
       const { data: prof } = await sb.from('profiles').select('username, name').eq('id', user.id).maybeSingle();
-      const chRes = await fn('signup', { action: 'challenge' });
-      if (!chRes.ok) return sideMsg(msg, 'network');
+      // 등록 준비: 이 계정에 이미 있는 기기 목록과 계정의 사용자 값을 받음 (같은 기기를 두 번 등록하지 않게)
+      const chRes = await fn('device', { action: 'prepare' }, s.session.access_token);
+      if (!chRes.ok) return sideMsg(msg, chRes.status === 401 ? 'expiredLink' : 'network');
       const ch = await chRes.json();
+      const exclude = (ch.credentials || []).map((c) => ({ type: 'public-key', id: B64.dec(c) }));
       let builtIn = false;
       try { builtIn = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); } catch (err) {}
       let cred;
@@ -481,6 +490,7 @@
             rp: { name: 'OPUSY', id: location.hostname },
             user: { id: B64.dec(ch.userHandle), name: (prof && prof.username) || user.email, displayName: (prof && prof.name) || (prof && prof.username) || user.email },
             pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+            excludeCredentials: exclude,       // 이 기기에 이미 이 계정의 등록 정보가 있으면 새로 만들지 않음
             authenticatorSelection: { ...(builtIn ? { authenticatorAttachment: 'platform' } : {}), userVerification: 'required', residentKey: 'preferred' },
             attestation: 'none',
             timeout: 120000,
@@ -488,6 +498,8 @@
         });
       } catch (err) {
         if (tlsBlocked(err)) return sideMsg(msg, 'devTls');
+        // 이 기기는 이미 등록돼 있음: 메일 링크로 이미 로그인된 상태이므로 그대로 들어감
+        if (err && err.name === 'InvalidStateError') { sideMsg(msg, 'devAlready', true); setTimeout(() => { location.href = 'index.html'; }, 1800); return; }
         if (err && err.name === 'NotAllowedError') return sideMsg(msg, builtIn ? 'devCancel' : 'devNoLock');
         if (err && (err.name === 'NotSupportedError' || err.name === 'SecurityError')) return sideMsg(msg, 'devUnsupported');
         return sideMsg(msg, 'devFail');
@@ -502,6 +514,7 @@
       if (!res.ok) {
         return sideMsg(msg, out.error === 'unauthorized' ? 'expiredLink' : out.error === 'device_expired' ? 'devExpired' : out.error === 'device_unverified' ? 'devNoLock' : out.error === 'device_limit' ? 'devLimit' : 'devFail');
       }
+      rememberDevice(out.device_id, user.id);
       location.href = 'index.html';            // 등록 완료: 이미 로그인된 상태
     } catch (err) {
       sideMsg(msg, 'network');
@@ -539,8 +552,9 @@
         tokens = out;
         pending = null;
       }
-      const { error } = await sb.auth.setSession({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
+      const { data: sess, error } = await sb.auth.setSession({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
       if (error) return fail(f, 'generic');
+      rememberDevice(tokens.device_id, sess && sess.user && sess.user.id);
       location.href = 'index.html';
     } catch (err) {
       fail(f, 'network');

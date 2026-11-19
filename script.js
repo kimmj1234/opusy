@@ -120,6 +120,23 @@
         return s && s.access_token ? s : null;
       } catch (e) { return null; }
     };
+    // 접속 기록: 자동 로그인 상태로 메인 화면을 열면, 이 브라우저가 기억해 둔 기기의 마지막 접속·위치를 갱신 (30분에 한 번)
+    const touch = () => {
+      const s = read();
+      let mem = null;
+      try { mem = JSON.parse(localStorage.getItem('opusy.device') || 'null'); } catch (e) {}
+      if (!s || !mem || !mem.id || !s.user || mem.user !== s.user.id) return;
+      if (s.expires_at && s.expires_at * 1000 < Date.now()) return;      // 만료된 토큰은 보내지 않음 (내 프로필 화면에서 갱신 후 기록됨)
+      try { if (Date.now() - Number(localStorage.getItem('opusy.touchAt') || 0) < 30 * 60 * 1000) return; } catch (e) { return; }
+      fetch(`${cfg.url}/functions/v1/touch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: cfg.key, Authorization: `Bearer ${s.access_token}` },
+        body: JSON.stringify({ device_id: mem.id }),
+      }).then((r) => r.json().then((out) => {
+        if (out.error === 'unknown_device') localStorage.removeItem('opusy.device');
+        else if (r.ok) localStorage.setItem('opusy.touchAt', String(Date.now()));
+      })).catch(() => {});
+    };
     // 보여 줄 이름: 아이디 → 없으면 이메일 앞부분 (실명은 메뉴바에 드러내지 않음)
     const nameOf = (s) => {
       const u = (s && s.user) || {};
@@ -155,6 +172,7 @@
       render();
     });
     render();
+    touch();
   })();
 
   // ===== 언어 전환 (KR / ENG) =====
