@@ -646,3 +646,12 @@ body.pf-dragging, body.pf-dragging * { cursor: grabbing !important; }
 .pf-q[data-w="activity"][data-size="full"] .pf-d-body:not(.is-split) .pf-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 1100px) { .pf-q[data-w="activity"][data-size="full"] .pf-d-body:not(.is-split) .pf-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .pf-metrics.is-four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 활동 칸 위쪽 줄: 고르기 버튼의 자리는 어떤 항목을 골라도 바뀌지 않게 고정 (받은·보낸 좋아요 버튼은 그 옆 빈자리에 생김) */
+.pf-d-head { justify-content: flex-start; column-gap: max(10px, calc(16px * var(--scale))); }
+.pf-d-head > .pf-q-title { order: 1; }
+.pf-d-head > .pf-seg { order: 2; }
+.pf-d-head > .pf-act-tabs { order: 3; margin-left: auto; }                 /* 전체 화면: 늘 오른쪽 끝 */
+.pf-act-tabs[hidden] + .pf-seg { margin-left: auto; }                       /* 고르기가 없을 때: 받은·보낸 버튼이 오른쪽 끝 */
+/* 프로필 없이 작은 칸: 고르기가 제목 자리(왼쪽 끝)에 고정, 받은·보낸 버튼은 오른쪽 끝 */
+.pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-d-head > .pf-act-tabs { order: 0; margin-left: 0; }
+.pf-q[data-w="activity"].has-tabs:not([data-size="full"]) .pf-d-head > .pf-seg { margin-left: auto; }
